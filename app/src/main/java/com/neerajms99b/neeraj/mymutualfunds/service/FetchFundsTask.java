@@ -35,8 +35,10 @@ public class FetchFundsTask extends GcmTaskService {
     @Override
     public int onRunTask(TaskParams taskParams) {
         HttpResponse<JsonNode> response;
-        String query = "{\"search\":\"franklin bluechip\"}";
+
         if (taskParams.getTag().equals("force")) {
+            String fundName = taskParams.getExtras().getString("fund");
+            String query = "{\"search\":\""+fundName+"\"}";
             try {
                 response = Unirest.post(FUNDS_BASE_URL)
                         .header(KEY_PARAM, KEY_VALUE)

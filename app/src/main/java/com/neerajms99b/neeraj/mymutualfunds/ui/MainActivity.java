@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -14,7 +13,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
-import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,14 +29,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                FetchFundsTask fetchFundsTask = new FetchFundsTask();
-//                fetchFundsTask.execute("hdfc prud");
-//                FundsIntentService fundsIntentService = new FundsIntentService()
-                Intent intent = new Intent(context, FundsIntentService.class);
-                intent.putExtra("tag","force");
-                startService(intent);
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(context,SearchActivity.class);
+                startActivity(intent);
             }
         });
     }

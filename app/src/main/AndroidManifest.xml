@@ -3,6 +3,7 @@
     package="com.neerajms99b.neeraj.mymutualfunds">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,15 +19,30 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!--&lt;!&ndash; enable the search dialog to send searches to SearchableActivity &ndash;&gt;-->
+            <!--<meta-data android:name="android.app.default_searchable"-->
+                <!--android:value="ui.SearchActivity" />-->
         </activity>
-        <service android:name=".service.FetchFundsTask"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
-            android:exported="true">
+        <activity android:name=".ui.SearchActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.MainActivity" />
+        </activity>
+
+        <service
+            android:name=".service.FetchFundsTask"
+            android:exported="true"
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
             </intent-filter>
         </service>
         <service android:name=".service.FundsIntentService" />
     </application>
-
 </manifest>

@@ -2,6 +2,7 @@ package com.neerajms99b.neeraj.mymutualfunds.service;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.gcm.TaskParams;
@@ -20,7 +21,9 @@ public class FundsIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.d(FundsIntentService.class.getName(),"intent service executed");
+        Bundle bundle = new Bundle();
+        bundle.putString("fund",intent.getStringExtra("fund"));
         FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
-        fetchFundsTask.onRunTask(new TaskParams(intent.getStringExtra("tag")));
+        fetchFundsTask.onRunTask(new TaskParams(intent.getStringExtra("tag"),bundle));
     }
 }

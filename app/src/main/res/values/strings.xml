@@ -2,4 +2,7 @@
     <string name="app_name">My Mutual Funds</string>
     <string name="action_settings">Settings</string>
     <string name="search_hint">Enter fund name</string>
+    <string name="search_data_intent">fund_data_from_gcmtask</string>
+    <string name="search_data_bundle">data_bundle</string>
+    <string name="search_results_array_list">arraylist</string>
 </resources>

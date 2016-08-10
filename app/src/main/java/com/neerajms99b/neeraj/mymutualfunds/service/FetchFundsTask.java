@@ -2,6 +2,7 @@ package com.neerajms99b.neeraj.mymutualfunds.service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -11,9 +12,12 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.neerajms99b.neeraj.mymutualfunds.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import java.util.ArrayList;
 
 /**
  * Created by neeraj on 8/8/16.
@@ -35,6 +39,7 @@ public class FetchFundsTask extends GcmTaskService {
     @Override
     public int onRunTask(TaskParams taskParams) {
         HttpResponse<JsonNode> response;
+        ArrayList<String> fundsArrayList = new ArrayList<String>();
 
         if (taskParams.getTag().equals("force")) {
             String fundName = taskParams.getExtras().getString("fund");
@@ -51,10 +56,8 @@ public class FetchFundsTask extends GcmTaskService {
                     JSONArray jsonArray = jsonNodeHttpResponse.getArray();
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONArray jsonArray1 = jsonArray.getJSONArray(i);
+                        fundsArrayList.add(jsonArray1.getString(3));
                         Log.d(TAG, jsonArray1.getString(3));
-                        Intent intent = new Intent("result");
-                        intent.putExtra("result",jsonArray1.getString(3));
-                        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                     }
 
                 }catch (JSONException e){
@@ -62,6 +65,14 @@ public class FetchFundsTask extends GcmTaskService {
                 }
             } catch (UnirestException e) {
                 Log.d(TAG, e.toString());
+            }
+            if (fundsArrayList.size() != 0) {
+                Bundle dataBundle = new Bundle();
+                dataBundle.putStringArrayList(mContext.getString(R.string.search_results_array_list),fundsArrayList);
+                Intent intent = new Intent();
+                intent.setAction(mContext.getString(R.string.search_data_intent));
+                intent.putExtra(mContext.getString(R.string.search_data_bundle), dataBundle);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
             }
         }
         return 0;

@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">My Mutual Funds</string>
     <string name="action_settings">Settings</string>
-    <string name="search_hint">Enter fund name</string>
-    <string name="search_data_intent">fund_data_from_gcmtask</string>
-    <string name="search_data_bundle">data_bundle</string>
-    <string name="search_results_array_list">arraylist</string>
+    <string name="search_hint" translatable="true">Enter fund name</string>
+    <string name="search_data_intent" translatable="false">fund_data_from_gcmtask</string>
+    <string name="search_data_bundle" translatable="false">data_bundle</string>
+    <string name="basic_search_results_parcelable" translatable="false">basic_fund_info_parcelable</string>
+    <string name="tag_search_scode" translatable="false">search_scode</string>
+    <string name="tag_search_fundname" translatable="false">search_fund</string>
+    <string name="key_scode" translatable="false">scode</string>
+    <string name="key_fundname" translatable="false">fund_name</string>
 </resources>

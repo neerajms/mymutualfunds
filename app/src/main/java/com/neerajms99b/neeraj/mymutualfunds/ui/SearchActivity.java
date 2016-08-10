@@ -10,12 +10,14 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
+import com.neerajms99b.neeraj.mymutualfunds.data.BasicFundInfoParcelable;
 import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 import java.util.ArrayList;
@@ -24,9 +26,11 @@ import java.util.Arrays;
 public class SearchActivity extends AppCompatActivity {
     private final String TAG = SearchActivity.class.getSimpleName();
     private ArrayList<String> mArrayList;
+    private ArrayList<String> mScodesList;
     private ArrayAdapter<String> mFundsListAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private final String KEY_ARRAYLIST = "arraylist";
+    private final String KEY_SCODESLIST = "scodeslist";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +38,7 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        setTitle("Search Funds");
+        setTitle(null);
 
         final Context context = this;
         final SearchView search = (SearchView) findViewById(R.id.search);
@@ -62,14 +66,27 @@ public class SearchActivity extends AppCompatActivity {
         mSwipeRefreshLayout.setEnabled(false);
         mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
         mArrayList = new ArrayList<String>();
+        mScodesList = new ArrayList<String>();
         mFundsListAdapter = new ArrayAdapter<String>(this, R.layout.search_results_list_item,
                 R.id.list_item, mArrayList);
         ListView fundsListView = (ListView) findViewById(R.id.funds_listview);
+        fundsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intentService = new Intent(context,FundsIntentService.class);
+                intentService.putExtra("tag",getString(R.string.tag_search_scode));
+                intentService.putExtra(getString(R.string.key_scode),mScodesList.get(i));
+                startService(intentService);
+            }
+        });
         fundsListView.setAdapter(mFundsListAdapter);
-        if (savedInstanceState!=null && savedInstanceState.containsKey(KEY_ARRAYLIST)){
+        if (savedInstanceState!=null
+                && savedInstanceState.containsKey(KEY_ARRAYLIST)
+                && savedInstanceState.containsKey(KEY_SCODESLIST)){
             mFundsListAdapter.clear();
             mArrayList = savedInstanceState.getStringArrayList(KEY_ARRAYLIST);
             mFundsListAdapter.addAll(mArrayList);
+            mScodesList = savedInstanceState.getStringArrayList(KEY_SCODESLIST);
         }else{
             String[] list = {"Your search results will appear here"};
             mArrayList = new ArrayList<String>(Arrays.asList(list));
@@ -82,19 +99,30 @@ public class SearchActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(getResources().getString(R.string.search_data_intent))) {
-                mArrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
-                        .getStringArrayList(getString(R.string.search_results_array_list));
-                Log.d(TAG, mArrayList.get(1));
+                ArrayList<BasicFundInfoParcelable> arrayList = new ArrayList<BasicFundInfoParcelable>();
+                arrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
+                        .getParcelableArrayList(getString(R.string.basic_search_results_parcelable));
+                populateArrayList(arrayList);
+//                Log.d(TAG, mArrayList.get(1));
                 showList();
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         }
     };
 
+    public void populateArrayList(ArrayList<BasicFundInfoParcelable> arrayList){
+        mArrayList.clear();
+        mScodesList.clear();
+        for (int index= 0;index<arrayList.size();index++){
+            mArrayList.add(arrayList.get(index).mFundName);
+            mScodesList.add(arrayList.get(index).mScode);
+        }
+    }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putStringArrayList(KEY_ARRAYLIST,mArrayList);
+        outState.putStringArrayList(KEY_SCODESLIST,mScodesList);
 
     }
 

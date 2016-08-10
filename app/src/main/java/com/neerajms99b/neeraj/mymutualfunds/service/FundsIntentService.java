@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.gcm.TaskParams;
+import com.neerajms99b.neeraj.mymutualfunds.R;
 
 /**
  * Created by neeraj on 8/8/16.
@@ -21,9 +22,16 @@ public class FundsIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.d(FundsIntentService.class.getName(),"intent service executed");
-        Bundle bundle = new Bundle();
-        bundle.putString("fund",intent.getStringExtra("fund"));
-        FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
-        fetchFundsTask.onRunTask(new TaskParams(intent.getStringExtra("tag"),bundle));
+        if (intent.getStringExtra("tag").equals("force")) {
+            Bundle bundle = new Bundle();
+            bundle.putString("fund", intent.getStringExtra("fund"));
+            FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
+            fetchFundsTask.onRunTask(new TaskParams(intent.getStringExtra("tag"), bundle));
+        }else if (intent.getStringExtra("tag").equals(getString(R.string.tag_search_scode))){
+            Bundle bundle = new Bundle();
+            bundle.putString(getString(R.string.key_scode), intent.getStringExtra(getString(R.string.key_scode)));
+            FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
+            fetchFundsTask.onRunTask(new TaskParams(intent.getStringExtra("tag"), bundle));
+        }
     }
 }

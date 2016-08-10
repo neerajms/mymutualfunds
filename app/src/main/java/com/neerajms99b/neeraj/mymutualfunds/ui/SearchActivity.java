@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +25,8 @@ public class SearchActivity extends AppCompatActivity {
     private final String TAG = SearchActivity.class.getSimpleName();
     private ArrayList<String> mArrayList;
     private ArrayAdapter<String> mFundsListAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private final String KEY_ARRAYLIST = "arraylist";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,29 +35,20 @@ public class SearchActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle("Search Funds");
+
         final Context context = this;
         final SearchView search = (SearchView) findViewById(R.id.search);
         search.setIconified(false);
         search.setLayoutParams(new Toolbar.LayoutParams(Gravity.RIGHT));
-        /*((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).
-                toggleSoftInput(InputMethodManager.SHOW_FORCED,
-                        InputMethodManager.HIDE_IMPLICIT_ONLY);
-        search.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus){
-                    ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).
-                            hideSoftInputFromWindow(v.getWindowToken(),0);
-                }
-            }
-        });*/
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                mFundsListAdapter.clear();
                 Intent intentService = new Intent(context, FundsIntentService.class);
                 intentService.putExtra("tag", "force");
                 intentService.putExtra("fund", query);
                 startService(intentService);
+                mSwipeRefreshLayout.setRefreshing(true);
                 return false;
             }
 
@@ -63,39 +57,53 @@ public class SearchActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        String[] list = {"Your search results will appear here"};
-        mArrayList = new ArrayList<String>(Arrays.asList(list));
-        mFundsListAdapter= new ArrayAdapter<String>(this, R.layout.search_results_list_item,
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_search_swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(null);
+        mSwipeRefreshLayout.setEnabled(false);
+        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        mArrayList = new ArrayList<String>();
+        mFundsListAdapter = new ArrayAdapter<String>(this, R.layout.search_results_list_item,
                 R.id.list_item, mArrayList);
         ListView fundsListView = (ListView) findViewById(R.id.funds_listview);
         fundsListView.setAdapter(mFundsListAdapter);
-//        mFundsListAdapter.add(list[0]);
+        if (savedInstanceState!=null && savedInstanceState.containsKey(KEY_ARRAYLIST)){
+            mFundsListAdapter.clear();
+            mArrayList = savedInstanceState.getStringArrayList(KEY_ARRAYLIST);
+            mFundsListAdapter.addAll(mArrayList);
+        }else{
+            String[] list = {"Your search results will appear here"};
+            mArrayList = new ArrayList<String>(Arrays.asList(list));
+            mFundsListAdapter.addAll(mArrayList);
+        }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(getResources().getString(R.string.search_data_intent))) {
-//                Toast.makeText(getApplicationContext(), intent.getStringExtra(getResources().getString(R.string.search_data_bundle)),
-//                        Toast.LENGTH_SHORT).show();
-
-                 mArrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
+                mArrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
                         .getStringArrayList(getString(R.string.search_results_array_list));
-                Log.d(TAG,mArrayList.get(1));
+                Log.d(TAG, mArrayList.get(1));
                 showList();
+                mSwipeRefreshLayout.setRefreshing(false);
             }
         }
     };
 
-    private void showList(){
-//        for (int i = 0; i<mArrayList.size();i++){
-//            mFundsListAdapter.addA;
-//        }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList(KEY_ARRAYLIST,mArrayList);
+
+    }
+
+    private void showList() {
         mFundsListAdapter.clear();
         mFundsListAdapter.addAll(mArrayList);
         mFundsListAdapter.notifyDataSetChanged();
     }
+
     @Override
     protected void onResume() {
         super.onResume();

@@ -44,5 +44,8 @@
             </intent-filter>
         </service>
         <service android:name=".service.FundsIntentService" />
+        <provider
+            android:name=".data.FundsContentProvider"
+            android:authorities="com.neerajms99b.neeraj.mymutualfunds.data" />
     </application>
 </manifest>

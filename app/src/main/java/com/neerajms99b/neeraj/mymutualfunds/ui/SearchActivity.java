@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.data.BasicFundInfoParcelable;
@@ -98,15 +99,19 @@ public class SearchActivity extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(getResources().getString(R.string.search_data_intent))) {
-                ArrayList<BasicFundInfoParcelable> arrayList = new ArrayList<BasicFundInfoParcelable>();
-                arrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
-                        .getParcelableArrayList(getString(R.string.basic_search_results_parcelable));
-                populateArrayList(arrayList);
+                if (intent.getExtras().containsKey(getString(R.string.search_data_bundle))) {
+                    ArrayList<BasicFundInfoParcelable> arrayList = new ArrayList<BasicFundInfoParcelable>();
+                    arrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
+                            .getParcelableArrayList(getString(R.string.basic_search_results_parcelable));
+                    populateArrayList(arrayList);
 //                Log.d(TAG, mArrayList.get(1));
-                showList();
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
+                    showList();
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }else if (intent.getExtras().containsKey(getString(R.string.key_toast_message))){
+                    Toast.makeText(context,
+                            intent.getExtras().getString(getString(R.string.key_toast_message)),
+                            Toast.LENGTH_SHORT).show();
+                }
         }
     };
 
@@ -136,7 +141,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter(getResources().getString(R.string.search_data_intent)));
+                mMessageReceiver, new IntentFilter(getResources().getString(R.string.gcmtask_intent)));
     }
 
     @Override

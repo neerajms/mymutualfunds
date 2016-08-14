@@ -3,6 +3,7 @@ package com.neerajms99b.neeraj.mymutualfunds.service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -40,10 +41,14 @@ public class FetchFundsTask extends GcmTaskService {
     private final String KEY_NAV = "nav";
     private final String KEY_SCODE = "scode";
     private Context mContext;
-    public FetchFundsTask(){}
-    public FetchFundsTask(Context context){
+
+    public FetchFundsTask() {
+    }
+
+    public FetchFundsTask(Context context) {
         mContext = context;
     }
+
     @Override
     public int onRunTask(TaskParams taskParams) {
 
@@ -51,7 +56,7 @@ public class FetchFundsTask extends GcmTaskService {
             HttpResponse<JsonNode> response;
             ArrayList<BasicFundInfoParcelable> fundsArrayList = new ArrayList<BasicFundInfoParcelable>();
             String fundName = taskParams.getExtras().getString(KEY_FUNDNAME);
-            String query = "{\"search\":\""+fundName+"\"}";
+            String query = "{\"search\":\"" + fundName + "\"}";
             try {
                 response = Unirest.post(FUNDS_BASE_URL)
                         .header(KEY_PARAM, KEY_VALUE)
@@ -69,17 +74,17 @@ public class FetchFundsTask extends GcmTaskService {
                         Log.d(TAG, innerJsonArray.getString(3));
                     }
 
-                }catch (JSONException e){
-                    Log.d(TAG,e.toString());
+                } catch (JSONException e) {
+                    Log.d(TAG, e.toString());
                 }
             } catch (UnirestException e) {
                 Log.d(TAG, e.toString());
             }
             if (fundsArrayList.size() != 0) {
                 Bundle dataBundle = new Bundle();
-                dataBundle.putParcelableArrayList(mContext.getString(R.string.basic_search_results_parcelable),fundsArrayList);
+                dataBundle.putParcelableArrayList(mContext.getString(R.string.basic_search_results_parcelable), fundsArrayList);
                 Intent intent = new Intent();
-                intent.setAction(mContext.getString(R.string.search_data_intent));
+                intent.setAction(mContext.getString(R.string.gcmtask_intent));
                 intent.putExtra(mContext.getString(R.string.search_data_bundle), dataBundle);
                 LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
             }
@@ -89,37 +94,54 @@ public class FetchFundsTask extends GcmTaskService {
             String fundName = null;
             String nav = null;
             String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
-            String query = "{\"scodes\":[\"" + scode + "\"]}";
-            try {
-                response = Unirest.post(FUNDS_BASE_URL)
-                        .header(KEY_PARAM, KEY_VALUE)
-                        .header(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE)
-                        .header(ACCEPT_PARAM, ACCEPT_VALUE)
-                        .body(query)
-                        .asJson();
-                JsonNode jsonNodeHttpResponse = response.getBody();
-                Log.d(TAG,jsonNodeHttpResponse.toString());
+            String url = String.valueOf(FundsContentProvider.mUri) + "/" + scode;
+            Uri queryUri = Uri.parse(url);
+            Cursor cursor = mContext.getContentResolver().query(queryUri, null, null, null, null);
+            if (cursor.moveToFirst()) {
+                sendToast(mContext.getString(R.string.unique_constraint_failed_message));
+            } else {
+
+                String query = "{\"scodes\":[\"" + scode + "\"]}";
                 try {
-                    JSONObject jsonObject = jsonNodeHttpResponse.getObject();
-                    JSONObject jsonObject1 = jsonObject.getJSONObject(scode);
-                    fundName = jsonObject1.getString(KEY_FUNDNAME);
-                    nav = jsonObject1.getString(KEY_NAV);
-                    Log.d(TAG,nav);
-                } catch (JSONException je) {
-                    Log.d(TAG, je.toString());
+                    response = Unirest.post(FUNDS_BASE_URL)
+                            .header(KEY_PARAM, KEY_VALUE)
+                            .header(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE)
+                            .header(ACCEPT_PARAM, ACCEPT_VALUE)
+                            .body(query)
+                            .asJson();
+                    JsonNode jsonNodeHttpResponse = response.getBody();
+                    Log.d(TAG, jsonNodeHttpResponse.toString());
+                    try {
+                        JSONObject jsonObject = jsonNodeHttpResponse.getObject();
+                        JSONObject jsonObject1 = jsonObject.getJSONObject(scode);
+                        fundName = jsonObject1.getString(KEY_FUNDNAME);
+                        nav = jsonObject1.getString(KEY_NAV);
+                        Log.d(TAG, nav);
+                    } catch (JSONException je) {
+                        Log.d(TAG, je.toString());
+                    }
+                } catch (UnirestException ue) {
+                    Log.d(TAG, ue.toString());
                 }
-            } catch (UnirestException ue) {
-                Log.d(TAG, ue.toString());
-            }
-            if (fundName != null && nav != null) {
-                ContentValues fundContentValues = new ContentValues();
-                fundContentValues.put(FundsContentProvider.FUND_SCODE, scode);
-                fundContentValues.put(FundsContentProvider.FUND_NAME, fundName);
-                fundContentValues.put(FundsContentProvider.FUND_NAV, nav);
-                Uri uri = mContext.getContentResolver().insert(FundsContentProvider.mUri, fundContentValues);
-                Log.d(TAG,uri.toString());
+                if (fundName != null && nav != null) {
+                    ContentValues fundContentValues = new ContentValues();
+                    fundContentValues.put(FundsContentProvider.FUND_SCODE, scode);
+                    fundContentValues.put(FundsContentProvider.FUND_NAME, fundName);
+                    fundContentValues.put(FundsContentProvider.FUND_NAV, nav);
+                    Uri uri = mContext.getContentResolver().insert(FundsContentProvider.mUri, fundContentValues);
+                    if (uri != null){
+                        sendToast(mContext.getString(R.string.fund_added_message));
+                    }
+                }
             }
         }
         return 0;
+    }
+    public void sendToast(String message){
+        Intent intent = new Intent();
+        intent.setAction(mContext.getString(R.string.gcmtask_intent));
+        intent.putExtra(mContext.getString(R.string.key_toast_message),
+                message);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 }

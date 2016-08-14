@@ -34,11 +34,12 @@ public class FundsContentProvider extends ContentProvider {
         mUriMatcher.addURI(AUTHORITY, TABLE_NAME, 1);
         mUriMatcher.addURI(AUTHORITY, TABLE_NAME + "/#", 2);
     }
+
     @Override
     public boolean onCreate() {
         FundsDBHelper fundsDBHelper = new FundsDBHelper(getContext());
         database = fundsDBHelper.getWritableDatabase();
-        return (database!=null)?true:false;
+        return (database != null) ? true : false;
     }
 
     @Nullable
@@ -52,7 +53,7 @@ public class FundsContentProvider extends ContentProvider {
                 break;
 
             case 2:
-                selection = "_id=" + uri.getLastPathSegment();
+                selection = FUND_SCODE + "=" + uri.getLastPathSegment();
                 Log.d("SELECTION:", selection);
                 break;
 

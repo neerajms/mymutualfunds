@@ -15,6 +15,7 @@ public class FundsDBHelper extends SQLiteOpenHelper {
     private static final String FUND_SCODE = "scode";
     private static final String FUND_NAME = "fund_name";
     private static final String FUND_NAV = "nav";
+    private static final String UNITS_OWNED = "units";
     private static final String FUND_CHANGE_VALUE = "change_value";
     private static final String FUND_CHANGE_PERCENT = "change_percent";
 
@@ -22,8 +23,8 @@ public class FundsDBHelper extends SQLiteOpenHelper {
             KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
             FUND_SCODE + " TEXT UNIQUE, "+
             FUND_NAME + " TEXT, " +
-            FUND_NAV + " TEXT);";
-
+            FUND_NAV + " TEXT, "+
+            UNITS_OWNED + " TEXT);";
 
     public FundsDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

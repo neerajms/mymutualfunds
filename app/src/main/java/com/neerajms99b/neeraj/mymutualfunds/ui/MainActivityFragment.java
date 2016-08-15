@@ -1,5 +1,6 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -47,7 +48,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mFundsListAdapter = new FundsListAdapter(data);
+        mFundsListAdapter = new FundsListAdapter(data,this);
         mRecyclerView.setAdapter(mFundsListAdapter);
         mFundsListAdapter.notifyDataSetChanged();
     }
@@ -55,5 +56,22 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    public void editClicked(String scode){
+        Bundle bundle = new Bundle();
+        bundle.putString(getString(R.string.key_scode),scode);
+        UnitsInputDialogFragment unitsInputDialogFragment = new UnitsInputDialogFragment();
+        unitsInputDialogFragment.setArguments(bundle);
+        unitsInputDialogFragment.setTargetFragment(MainActivityFragment.this,0);
+        unitsInputDialogFragment.show(getFragmentManager(),null);
+    }
+    public void unitsInput(String units, String scode){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(FundsContentProvider.UNITS_OWNED,units);
+        String[] selectionArgs = {scode};
+        getContext().getContentResolver().update(FundsContentProvider.mUri,contentValues,FundsContentProvider.KEY_ID,selectionArgs);
+        getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,this);
+//        mFundsListAdapter.notifyDataSetChanged();
     }
 }

@@ -6,64 +6,86 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
+import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivityFragment;
 
 /**
  * Created by neeraj on 9/8/16.
  */
 public class FundsListAdapter extends RecyclerView.Adapter<FundsListAdapter.ViewHolder> {
     private Cursor mCursor;
+    private MainActivityFragment mCallBack;
 
-    public FundsListAdapter(Cursor cursor){
+    public FundsListAdapter(Cursor cursor, MainActivityFragment mainActivityFragment) {
         mCursor = cursor;
+        mCallBack = mainActivityFragment;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         public CardView mFundCardView;
         public TextView mFundName;
         public TextView mFundNAV;
-        public ViewHolder(CardView cardView,TextView fundNameTextView, TextView fundNAVTextView) {
+        public TextView mUnits;
+        public ImageButton mEditButton;
+
+        public ViewHolder(CardView cardView, TextView fundNameTextView,
+                          TextView fundNAVTextView, TextView units, ImageButton editButton) {
             super(cardView);
             mFundCardView = cardView;
             mFundName = fundNameTextView;
             mFundNAV = fundNAVTextView;
+            mUnits = units;
+            mEditButton = editButton;
         }
 
-        @Override
-        public void onClick(View view) {
-
-        }
     }
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         float density = parent.getResources().getDisplayMetrics().density;
-        final int leftMargin = 16;
-        final int topMargin = 8;
-        final int rightMargin = 16;
-        final int bottomMargin = 8;
+        final int leftMargin = 8;
+        final int topMargin = 4;
+        final int rightMargin = 8;
+        final int bottomMargin = 4;
         CardView cardView = (CardView) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.main_activity_list_item,parent,false);
+                .inflate(R.layout.main_activity_list_item, parent, false);
         RecyclerView.LayoutParams layoutParams = new RecyclerView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins((int)(leftMargin*density),(int)(topMargin*density),
-                (int)(rightMargin*density),(int)(bottomMargin*density));
+        layoutParams.setMargins((int) (leftMargin * density), (int) (topMargin * density),
+                (int) (rightMargin * density), (int) (bottomMargin * density));
         cardView.setLayoutParams(layoutParams);
         TextView fundNameTextView = (TextView) cardView.findViewById(R.id.fund_name);
         TextView fundNAVTextView = (TextView) cardView.findViewById(R.id.fund_nav);
-        ViewHolder viewHolder = new ViewHolder(cardView,fundNameTextView,fundNAVTextView);
+        TextView units = (TextView) cardView.findViewById(R.id.units);
+        ImageButton editButton = (ImageButton) cardView.findViewById(R.id.edit_units);
+        ViewHolder viewHolder = new ViewHolder(cardView, fundNameTextView, fundNAVTextView, units, editButton);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         mCursor.moveToPosition(position);
         holder.mFundName.setText(mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.FUND_NAME)));
         holder.mFundNAV.setText(mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.FUND_NAV)));
+        if (mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)) != null) {
+            holder.mUnits.setText("Units in hand:" + mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)));
+        } else {
+            holder.mUnits.setText("Units in hand:" + "0");
+        }
+        holder.mEditButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Toast.makeText(mContext,"clicked",Toast.LENGTH_SHORT).show();
+                mCursor.moveToPosition(position);
+                mCallBack.editClicked(mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.FUND_SCODE)));
+            }
+        });
+//        holder.mEditButton.setBackgroundColor();
     }
 
 

@@ -1,13 +1,24 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.MainActivityFragment"
+    android:orientation="vertical"
+    android:background="@color/colorBackground"
     tools:showIn="@layout/activity_main">
+    <android.support.v7.widget.CardView
+        android:id="@+id/net_worth_card"
+        android:layout_width="match_parent"
+        app:cardCornerRadius="0dp"
+        app:elevation="@dimen/net_worth_cardview_elevation"
+        android:layout_height="@dimen/net_worth_card_height">
+
+    </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/funds_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</RelativeLayout>
+</LinearLayout>

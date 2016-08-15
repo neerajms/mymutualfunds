@@ -12,4 +12,8 @@
     <string name="key_toast_message" translatable="false">unique_constraint_failed_message</string>
     <string name="unique_constraint_failed_message">Fund already in portfolio</string>
     <string name="fund_added_message">Fund added to portfolio</string>
+    <string name="units_title">Enter number of units</string>
+    <string name="alert_dialog_ok">Ok</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+    <string name="notify_data_change" translatable="false">notify</string>
 </resources>

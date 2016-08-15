@@ -109,6 +109,7 @@ public class FetchFundsTask extends GcmTaskService {
                             .header(ACCEPT_PARAM, ACCEPT_VALUE)
                             .body(query)
                             .asJson();
+                    Log.d(TAG,response.toString());
                     JsonNode jsonNodeHttpResponse = response.getBody();
                     Log.d(TAG, jsonNodeHttpResponse.toString());
                     try {

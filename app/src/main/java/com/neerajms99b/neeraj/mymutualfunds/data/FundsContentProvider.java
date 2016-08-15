@@ -24,6 +24,7 @@ public class FundsContentProvider extends ContentProvider {
     public static final String FUND_SCODE = "scode";
     public static final String FUND_NAME = "fund_name";
     public static final String FUND_NAV = "nav";
+    public static final String UNITS_OWNED = "units";
 
     private SQLiteDatabase database;
 
@@ -94,7 +95,10 @@ public class FundsContentProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
+    public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionValues) {
+        selection = FUND_SCODE + " = ? ";
+        int result = database.update(TABLE_NAME,contentValues,selection,selectionValues);
+        Log.d("update",String.valueOf(result));
+        return result;
     }
 }

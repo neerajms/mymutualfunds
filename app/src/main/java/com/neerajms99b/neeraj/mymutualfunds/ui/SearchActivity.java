@@ -22,7 +22,6 @@ import com.neerajms99b.neeraj.mymutualfunds.data.BasicFundInfoParcelable;
 import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class SearchActivity extends AppCompatActivity {
     private final String TAG = SearchActivity.class.getSimpleName();
@@ -32,6 +31,7 @@ public class SearchActivity extends AppCompatActivity {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private final String KEY_ARRAYLIST = "arraylist";
     private final String KEY_SCODESLIST = "scodeslist";
+    private UnitsInputDialogFragment mUnitsInputDialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class SearchActivity extends AppCompatActivity {
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mFundsListAdapter.clear();
+
                 Intent intentService = new Intent(context, FundsIntentService.class);
                 intentService.putExtra("tag", "force");
                 intentService.putExtra("fund", query);
@@ -77,6 +77,13 @@ public class SearchActivity extends AppCompatActivity {
                 Intent intentService = new Intent(context,FundsIntentService.class);
                 intentService.putExtra("tag",getString(R.string.tag_search_scode));
                 intentService.putExtra(getString(R.string.key_scode),mScodesList.get(i));
+//                Bundle bundle = new Bundle();
+//                bundle.putString();
+//                mUnitsInputDialogFragment = new UnitsInputDialogFragment(intentService);
+//                mUnitsInputDialogFragment.setArguments();
+//                mUnitsInputDialogFragment.show(getSupportFragmentManager(),null);
+//                mFundsListAdapter.clear();
+
                 startService(intentService);
             }
         });
@@ -88,9 +95,9 @@ public class SearchActivity extends AppCompatActivity {
             mArrayList = savedInstanceState.getStringArrayList(KEY_ARRAYLIST);
             mFundsListAdapter.addAll(mArrayList);
             mScodesList = savedInstanceState.getStringArrayList(KEY_SCODESLIST);
-        }else{
-            String[] list = {"Your search results will appear here"};
-            mArrayList = new ArrayList<String>(Arrays.asList(list));
+        }
+        else{
+            mArrayList = new ArrayList<String>();
             mFundsListAdapter.addAll(mArrayList);
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

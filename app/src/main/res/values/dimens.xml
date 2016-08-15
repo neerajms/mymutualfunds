@@ -9,4 +9,8 @@
     <dimen name="text_view_layout_margin">8dp</dimen>
     <dimen name="cardview_minheight">70dp</dimen>
     <dimen name="main_relativelayout_bottom_padding">8dp</dimen>
+    <dimen name="net_worth_card_height">100dp</dimen>
+    <dimen name="net_worth_card_marginbottom">8dp</dimen>
+    <dimen name="recyclerview_toppadding">4dp</dimen>
+    <dimen name="net_worth_cardview_elevation">6dp</dimen>
 </resources>

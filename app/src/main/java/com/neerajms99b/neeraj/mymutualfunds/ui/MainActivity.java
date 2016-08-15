@@ -1,5 +1,6 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
+import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
+
 }

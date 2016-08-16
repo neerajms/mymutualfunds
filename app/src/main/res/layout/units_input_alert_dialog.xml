@@ -6,6 +6,9 @@
         android:id="@+id/units_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="number"/>
+        android:inputType="number"
+        android:layout_marginLeft="@dimen/input_dialog_margin"
+        android:layout_marginRight="@dimen/input_dialog_margin"/>
+
 
 </LinearLayout>

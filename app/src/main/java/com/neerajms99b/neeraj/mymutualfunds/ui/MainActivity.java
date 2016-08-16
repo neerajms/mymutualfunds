@@ -1,6 +1,5 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
-import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 
 public class MainActivity extends AppCompatActivity {
 

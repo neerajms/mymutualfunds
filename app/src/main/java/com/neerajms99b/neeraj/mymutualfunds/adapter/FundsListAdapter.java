@@ -71,7 +71,7 @@ public class FundsListAdapter extends RecyclerView.Adapter<FundsListAdapter.View
     public void onBindViewHolder(ViewHolder holder, final int position) {
         mCursor.moveToPosition(position);
         holder.mFundName.setText(mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.FUND_NAME)));
-        holder.mFundNAV.setText(mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.FUND_NAV)));
+        holder.mFundNAV.setText(String.format("%.2f",mCursor.getDouble(mCursor.getColumnIndex(FundsContentProvider.FUND_NAV))));
         if (mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)) != null) {
             holder.mUnits.setText("Units in hand:" + mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)));
         } else {

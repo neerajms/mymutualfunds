@@ -16,4 +16,6 @@
     <string name="alert_dialog_ok">Ok</string>
     <string name="alert_dialog_cancel">Cancel</string>
     <string name="notify_data_change" translatable="false">notify</string>
+    <string name="net_worth">Net Worth</string>
+    <string name="key_net_worth" translatable="false">net_worth</string>
 </resources>

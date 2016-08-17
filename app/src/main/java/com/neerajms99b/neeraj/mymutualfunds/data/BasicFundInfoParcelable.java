@@ -9,16 +9,18 @@ import android.os.Parcelable;
 public class BasicFundInfoParcelable implements Parcelable {
     public String mScode;
     public String mFundName;
+
     public BasicFundInfoParcelable(String scode,
-                                   String fundName){
+                                   String fundName) {
         mScode = scode;
         mFundName = fundName;
     }
 
-    private BasicFundInfoParcelable(Parcel in){
+    private BasicFundInfoParcelable(Parcel in) {
         mScode = in.readString();
         mFundName = in.readString();
     }
+
     @Override
     public int describeContents() {
         return 0;
@@ -29,8 +31,9 @@ public class BasicFundInfoParcelable implements Parcelable {
         destination.writeString(mScode);
         destination.writeString(mFundName);
     }
+
     public static final Parcelable.Creator<BasicFundInfoParcelable> CREATOR
-            = new Parcelable.Creator<BasicFundInfoParcelable>(){
+            = new Parcelable.Creator<BasicFundInfoParcelable>() {
 
         @Override
         public BasicFundInfoParcelable createFromParcel(Parcel in) {

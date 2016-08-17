@@ -14,7 +14,7 @@
         android:layout_height="@dimen/net_worth_card_height"
         app:cardCornerRadius="0dp"
         android:padding="@dimen/net_worth_card_padding"
-        app:elevation="@dimen/net_worth_cardview_elevation">
+        app:cardElevation="@dimen/net_worth_cardview_elevation">
 
         <LinearLayout
             android:layout_width="match_parent"

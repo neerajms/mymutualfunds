@@ -63,9 +63,7 @@ public class FundsContentProvider extends ContentProvider {
         }
 
         Cursor c = qb.query(database, projection, selection, selectionArgs, null, null, sortOrder);
-        Log.d("Query:", String.valueOf(c));
         c.setNotificationUri(getContext().getContentResolver(), uri);
-
         return c;
     }
 
@@ -90,15 +88,16 @@ public class FundsContentProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String s, String[] strings) {
-        return 0;
+    public int delete(Uri uri, String column, String[] args) {
+        String whereClause = column + " =? ";
+        int deleted = database.delete(TABLE_NAME, whereClause, args);
+        return deleted;
     }
 
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionValues) {
         selection = FUND_SCODE + " = ? ";
-        int result = database.update(TABLE_NAME,contentValues,selection,selectionValues);
-        Log.d("update",String.valueOf(result));
+        int result = database.update(TABLE_NAME, contentValues, selection, selectionValues);
         return result;
     }
 }

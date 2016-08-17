@@ -19,11 +19,11 @@ public class FundsDBHelper extends SQLiteOpenHelper {
     private static final String FUND_CHANGE_VALUE = "change_value";
     private static final String FUND_CHANGE_PERCENT = "change_percent";
 
-    public static final String CREATE_FUNDS_DATABASE = "CREATE TABLE " + FUNDS_TABLE_NAME + " ("+
-            KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
-            FUND_SCODE + " TEXT UNIQUE, "+
+    public static final String CREATE_FUNDS_DATABASE = "CREATE TABLE " + FUNDS_TABLE_NAME + " (" +
+            KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            FUND_SCODE + " TEXT, " +
             FUND_NAME + " TEXT, " +
-            FUND_NAV + " TEXT, "+
+            FUND_NAV + " TEXT, " +
             UNITS_OWNED + " TEXT);";
 
     public FundsDBHelper(Context context) {

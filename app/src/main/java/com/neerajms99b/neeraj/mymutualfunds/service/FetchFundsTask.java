@@ -109,7 +109,7 @@ public class FetchFundsTask extends GcmTaskService {
                             .header(ACCEPT_PARAM, ACCEPT_VALUE)
                             .body(query)
                             .asJson();
-                    Log.d(TAG,response.toString());
+                    Log.d(TAG, response.toString());
                     JsonNode jsonNodeHttpResponse = response.getBody();
                     Log.d(TAG, jsonNodeHttpResponse.toString());
                     try {
@@ -130,7 +130,7 @@ public class FetchFundsTask extends GcmTaskService {
                     fundContentValues.put(FundsContentProvider.FUND_NAME, fundName);
                     fundContentValues.put(FundsContentProvider.FUND_NAV, nav);
                     Uri uri = mContext.getContentResolver().insert(FundsContentProvider.mUri, fundContentValues);
-                    if (uri != null){
+                    if (uri != null) {
                         sendToast(mContext.getString(R.string.fund_added_message));
                     }
                 }
@@ -138,7 +138,8 @@ public class FetchFundsTask extends GcmTaskService {
         }
         return 0;
     }
-    public void sendToast(String message){
+
+    public void sendToast(String message) {
         Intent intent = new Intent();
         intent.setAction(mContext.getString(R.string.gcmtask_intent));
         intent.putExtra(mContext.getString(R.string.key_toast_message),

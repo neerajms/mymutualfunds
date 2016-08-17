@@ -74,29 +74,21 @@ public class SearchActivity extends AppCompatActivity {
         fundsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intentService = new Intent(context,FundsIntentService.class);
-                intentService.putExtra("tag",getString(R.string.tag_search_scode));
-                intentService.putExtra(getString(R.string.key_scode),mScodesList.get(i));
-//                Bundle bundle = new Bundle();
-//                bundle.putString();
-//                mUnitsInputDialogFragment = new UnitsInputDialogFragment(intentService);
-//                mUnitsInputDialogFragment.setArguments();
-//                mUnitsInputDialogFragment.show(getSupportFragmentManager(),null);
-//                mFundsListAdapter.clear();
-
+                Intent intentService = new Intent(context, FundsIntentService.class);
+                intentService.putExtra("tag", getString(R.string.tag_search_scode));
+                intentService.putExtra(getString(R.string.key_scode), mScodesList.get(i));
                 startService(intentService);
             }
         });
         fundsListView.setAdapter(mFundsListAdapter);
-        if (savedInstanceState!=null
+        if (savedInstanceState != null
                 && savedInstanceState.containsKey(KEY_ARRAYLIST)
-                && savedInstanceState.containsKey(KEY_SCODESLIST)){
+                && savedInstanceState.containsKey(KEY_SCODESLIST)) {
             mFundsListAdapter.clear();
             mArrayList = savedInstanceState.getStringArrayList(KEY_ARRAYLIST);
             mFundsListAdapter.addAll(mArrayList);
             mScodesList = savedInstanceState.getStringArrayList(KEY_SCODESLIST);
-        }
-        else{
+        } else {
             mArrayList = new ArrayList<String>();
             mFundsListAdapter.addAll(mArrayList);
         }
@@ -106,35 +98,35 @@ public class SearchActivity extends AppCompatActivity {
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-                if (intent.getExtras().containsKey(getString(R.string.search_data_bundle))) {
-                    ArrayList<BasicFundInfoParcelable> arrayList = new ArrayList<BasicFundInfoParcelable>();
-                    arrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
-                            .getParcelableArrayList(getString(R.string.basic_search_results_parcelable));
-                    populateArrayList(arrayList);
-//                Log.d(TAG, mArrayList.get(1));
-                    showList();
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }else if (intent.getExtras().containsKey(getString(R.string.key_toast_message))){
-                    Toast.makeText(context,
-                            intent.getExtras().getString(getString(R.string.key_toast_message)),
-                            Toast.LENGTH_SHORT).show();
-                }
+            if (intent.getExtras().containsKey(getString(R.string.search_data_bundle))) {
+                ArrayList<BasicFundInfoParcelable> arrayList = new ArrayList<BasicFundInfoParcelable>();
+                arrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
+                        .getParcelableArrayList(getString(R.string.basic_search_results_parcelable));
+                populateArrayList(arrayList);
+                showList();
+                mSwipeRefreshLayout.setRefreshing(false);
+            } else if (intent.getExtras().containsKey(getString(R.string.key_toast_message))) {
+                Toast.makeText(context,
+                        intent.getExtras().getString(getString(R.string.key_toast_message)),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
-    public void populateArrayList(ArrayList<BasicFundInfoParcelable> arrayList){
+    public void populateArrayList(ArrayList<BasicFundInfoParcelable> arrayList) {
         mArrayList.clear();
         mScodesList.clear();
-        for (int index= 0;index<arrayList.size();index++){
+        for (int index = 0; index < arrayList.size(); index++) {
             mArrayList.add(arrayList.get(index).mFundName);
             mScodesList.add(arrayList.get(index).mScode);
         }
     }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putStringArrayList(KEY_ARRAYLIST,mArrayList);
-        outState.putStringArrayList(KEY_SCODESLIST,mScodesList);
+        outState.putStringArrayList(KEY_ARRAYLIST, mArrayList);
+        outState.putStringArrayList(KEY_SCODESLIST, mScodesList);
 
     }
 

@@ -20,11 +20,9 @@ public class UnitsInputDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-//        return super.onCreateDialog(savedInstanceState);
-        // Use the Builder class for convenient dialog construction
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
-        View view = layoutInflater.inflate(R.layout.units_input_alert_dialog,null);
-        final EditText editText =(EditText) view.findViewById(R.id.units_edittext);
+        View view = layoutInflater.inflate(R.layout.units_input_alert_dialog, null);
+        final EditText editText = (EditText) view.findViewById(R.id.units_edittext);
         final MainActivityFragment callBack = (MainActivityFragment) getTargetFragment();
         Bundle bundle = getArguments();
         final String scode = bundle.getString(getString(R.string.key_scode));
@@ -34,7 +32,7 @@ public class UnitsInputDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.alert_dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         String units = editText.getText().toString();
-                        callBack.unitsInput(units,scode);
+                        callBack.unitsInput(units, scode);
                     }
                 })
                 .setNegativeButton(R.string.alert_dialog_cancel, new DialogInterface.OnClickListener() {
@@ -42,7 +40,6 @@ public class UnitsInputDialogFragment extends DialogFragment {
 
                     }
                 });
-        // Create the AlertDialog object and return it
         return builder.create();
     }
 }

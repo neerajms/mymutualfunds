@@ -13,6 +13,8 @@ import android.view.View;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 
 public class MainActivity extends AppCompatActivity {
+    private FloatingActionButton mFab;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,15 +23,28 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final Context context = this;
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mContext = this;
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, SearchActivity.class);
-                startActivity(intent);
+                startSearchActivity();
             }
         });
+        hideFab();
+    }
+
+    public void startSearchActivity() {
+        Intent intent = new Intent(mContext, SearchActivity.class);
+        startActivity(intent);
+    }
+
+    public void hideFab() {
+        mFab.hide();
+    }
+
+    public void showFab() {
+        mFab.show();
     }
 
     @Override
@@ -47,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_add_fund) {
+            startSearchActivity();
         }
         return super.onOptionsItemSelected(item);
     }

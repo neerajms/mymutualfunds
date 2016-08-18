@@ -2,7 +2,7 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_margin">32dp</dimen>
     <dimen name="padding_list">16dp</dimen>
     <dimen name="search_result_listitem_textsize">16sp</dimen>
     <dimen name="cardview_layout_margin">48dp</dimen>

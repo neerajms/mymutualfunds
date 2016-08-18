@@ -32,6 +32,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private String mNetWorth;
     private ItemTouchHelper mItemTouchHelper;
     private ItemTouchHelper.Callback mItemTouchCallBack;
+    private MainActivity mCallBack;
 
     public MainActivityFragment() {
     }
@@ -41,6 +42,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        mCallBack = (MainActivity) getActivity();
         mNetWorthAmount = (TextView) rootView.findViewById(R.id.net_worth_amount);
         mNetWorthAmount.setText("₹0.00");
         mFundsListAdapter = new FundsListAdapter(null, this);
@@ -64,8 +66,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mFundsListAdapter.swapCursor(data);
+
         if (data.moveToFirst()) {
             setNetWorthAmount(data);
+        } else {
+            mCallBack.showFab();
         }
     }
 
@@ -118,12 +123,4 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void restartLoader() {
         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
     }
-
-//    public void removeFund(String[] selectionArgs, int position) {
-//        mFundsListAdapter.notifyItemRemoved(position);
-//        getContext().getContentResolver().delete(
-//                FundsContentProvider.mUri, FundsContentProvider.FUND_SCODE, selectionArgs);
-////        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
-////        restartLoader();
-//    }
 }

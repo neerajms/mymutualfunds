@@ -20,6 +20,7 @@ public class FundsListAdapter extends CursorRecyclerViewAdapter<FundsListAdapter
         implements ItemTouchHelperAdapter {
     private Cursor mCursor;
     private MainActivityFragment mCallBack;
+    private final int FIRST_CARD = 1;
 
     public FundsListAdapter(Cursor cursor, MainActivityFragment mainActivityFragment) {
         super(mainActivityFragment.getContext(), cursor);
@@ -59,10 +60,13 @@ public class FundsListAdapter extends CursorRecyclerViewAdapter<FundsListAdapter
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         float density = parent.getResources().getDisplayMetrics().density;
-        final int leftMargin = 8;
-        final int topMargin = 4;
-        final int rightMargin = 8;
-        final int bottomMargin = 4;
+        int leftMargin = 8;
+        int topMargin = 0;
+        int rightMargin = 8;
+        int bottomMargin = 8;
+        if (viewType == FIRST_CARD) {
+            topMargin = 8;
+        }
         CardView cardView = (CardView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.main_activity_list_item, parent, false);
         RecyclerView.LayoutParams layoutParams = new RecyclerView.LayoutParams(
@@ -81,6 +85,14 @@ public class FundsListAdapter extends CursorRecyclerViewAdapter<FundsListAdapter
     @Override
     public int getItemCount() {
         return super.getItemCount();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == 0) {
+            return FIRST_CARD;
+        }
+        return 0;
     }
 
     @Override

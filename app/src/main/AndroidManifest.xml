@@ -19,17 +19,20 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!--&lt;!&ndash; enable the search dialog to send searches to SearchableActivity &ndash;&gt;-->
-            <!--<meta-data android:name="android.app.default_searchable"-->
-                <!--android:value="ui.SearchActivity" />-->
+            <!-- &lt;!&ndash; enable the search dialog to send searches to SearchableActivity &ndash;&gt; -->
+            <!-- <meta-data android:name="android.app.default_searchable" -->
+            <!-- android:value="ui.SearchActivity" /> -->
         </activity>
-        <activity android:name=".ui.SearchActivity"
+        <activity
+            android:name=".ui.SearchActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity" />
@@ -44,8 +47,11 @@
             </intent-filter>
         </service>
         <service android:name=".service.FundsIntentService" />
+
         <provider
             android:name=".data.FundsContentProvider"
             android:authorities="com.neerajms99b.neeraj.mymutualfunds.data" />
+
     </application>
+
 </manifest>

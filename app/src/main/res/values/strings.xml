@@ -18,4 +18,8 @@
     <string name="notify_data_change" translatable="false">notify</string>
     <string name="net_worth">Net Worth</string>
     <string name="key_net_worth" translatable="false">net_worth</string>
+    <string name="title_activity_my_stats">MyStatsActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="tab_my_stats">My Stats</string>
+    <string name="tab_my_funds">My Funds</string>
 </resources>

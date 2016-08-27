@@ -23,7 +23,7 @@ public class UnitsInputDialogFragment extends DialogFragment {
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.units_input_alert_dialog, null);
         final EditText editText = (EditText) view.findViewById(R.id.units_edittext);
-        final MainActivityFragment callBack = (MainActivityFragment) getTargetFragment();
+        final FundsListFragment callBack = (FundsListFragment) getTargetFragment();
         Bundle bundle = getArguments();
         final String scode = bundle.getString(getString(R.string.key_scode));
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

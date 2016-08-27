@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
-import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivityFragment;
+import com.neerajms99b.neeraj.mymutualfunds.ui.FundsListFragment;
 
 /**
  * Created by neeraj on 9/8/16.
@@ -19,13 +19,13 @@ import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivityFragment;
 public class FundsListAdapter extends CursorRecyclerViewAdapter<FundsListAdapter.ViewHolder>
         implements ItemTouchHelperAdapter {
     private Cursor mCursor;
-    private MainActivityFragment mCallBack;
+    private FundsListFragment mCallBack;
     private final int FIRST_CARD = 1;
 
-    public FundsListAdapter(Cursor cursor, MainActivityFragment mainActivityFragment) {
-        super(mainActivityFragment.getContext(), cursor);
+    public FundsListAdapter(Cursor cursor, FundsListFragment fundsListFragment) {
+        super(fundsListFragment.getContext(), cursor);
         mCursor = cursor;
-        mCallBack = mainActivityFragment;
+        mCallBack = fundsListFragment;
     }
 
     @Override

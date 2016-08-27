@@ -24,7 +24,7 @@ import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class FundsListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private FundsListAdapter mFundsListAdapter;
     private RecyclerView mRecyclerView;
     public int CURSOR_LOADER_ID = 0;
@@ -33,8 +33,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private ItemTouchHelper mItemTouchHelper;
     private ItemTouchHelper.Callback mItemTouchCallBack;
     private MainActivity mCallBack;
+    public final String ARG_OBJECT = "funds_list";
 
-    public MainActivityFragment() {
+    public FundsListFragment() {
     }
 
     @Override
@@ -108,7 +109,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         bundle.putString(getString(R.string.key_scode), scode);
         UnitsInputDialogFragment unitsInputDialogFragment = new UnitsInputDialogFragment();
         unitsInputDialogFragment.setArguments(bundle);
-        unitsInputDialogFragment.setTargetFragment(MainActivityFragment.this, 0);
+        unitsInputDialogFragment.setTargetFragment(FundsListFragment.this, 0);
         unitsInputDialogFragment.show(getFragmentManager(), null);
     }
 

@@ -22,4 +22,5 @@
     <string name="action_settings">Settings</string>
     <string name="tab_my_stats">My Stats</string>
     <string name="tab_my_funds">My Funds</string>
+    <string name="key_tab_position" translatable="false">tab_position</string>
 </resources>

@@ -1,9 +1,11 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -38,6 +40,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     private ItemTouchHelper.Callback mItemTouchCallBack;
     private MainActivity mCallBack;
     public final String ARG_OBJECT = "funds_list";
+    private FloatingActionButton mFab;
 
     public FundsListFragment() {
     }
@@ -54,8 +57,8 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mCallBack = (MainActivity) getActivity();
-        mNetWorthAmount = (TextView) rootView.findViewById(R.id.net_worth_amount);
-        mNetWorthAmount.setText("₹0.00");
+//        mNetWorthAmount = (TextView) rootView.findViewById(R.id.net_worth_amount);
+//        mNetWorthAmount.setText("₹0.00");
         mFundsListAdapter = new FundsListAdapter(null, this);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.funds_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -65,7 +68,14 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         mItemTouchCallBack = new SimpleItemTouchHelper(mFundsListAdapter);
         mItemTouchHelper = new ItemTouchHelper(mItemTouchCallBack);
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
-
+        mFab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startSearchActivity();
+            }
+        });
+        mFab.hide();
         return rootView;
     }
 
@@ -81,10 +91,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add_fund) {
-            mCallBack.startSearchActivity();
+            startSearchActivity();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -99,9 +108,10 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         mFundsListAdapter.swapCursor(data);
 
         if (data.moveToFirst()) {
-            setNetWorthAmount(data);
+//            setNetWorthAmount(data);
+            mFab.hide();
         } else {
-            mCallBack.showFab();
+            mFab.show();
         }
     }
 
@@ -126,7 +136,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
             }
         } while (data.moveToNext());
         mNetWorth = String.format("%.2f", netWorth);
-        mNetWorthAmount.setText("₹" + mNetWorth);
+//        mNetWorthAmount.setText("₹" + mNetWorth);
     }
 
     @Override
@@ -149,6 +159,11 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         String[] selectionArgs = {scode};
         getContext().getContentResolver().update(FundsContentProvider.mUri, contentValues, FundsContentProvider.KEY_ID, selectionArgs);
         restartLoader();
+    }
+
+    public void startSearchActivity() {
+        Intent intent = new Intent(getActivity(), SearchActivity.class);
+        startActivity(intent);
     }
 
     public void restartLoader() {

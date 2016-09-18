@@ -38,6 +38,7 @@
                 android:value=".ui.MainActivity" />
         </activity>
 
+        <activity android:name=".ui.SignInActivity"/>
         <service
             android:name=".service.FetchFundsTask"
             android:exported="true"

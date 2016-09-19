@@ -22,6 +22,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FundsListAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SimpleItemTouchHelper;
@@ -41,6 +46,11 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     private MainActivity mCallBack;
     public final String ARG_OBJECT = "funds_list";
     private FloatingActionButton mFab;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+    private Query mQuery;
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mMyRef;
 
     public FundsListFragment() {
     }
@@ -49,6 +59,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance();
     }
 
     @Override
@@ -157,6 +170,8 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         ContentValues contentValues = new ContentValues();
         contentValues.put(FundsContentProvider.UNITS_OWNED, units);
         String[] selectionArgs = {scode};
+        mMyRef = mDatabase.getReference(mFirebaseUser.getUid());
+        mMyRef.child(scode).child("units").setValue(units);
         getContext().getContentResolver().update(FundsContentProvider.mUri, contentValues, FundsContentProvider.KEY_ID, selectionArgs);
         restartLoader();
     }
@@ -166,6 +181,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         startActivity(intent);
     }
 
+    public void deleteFirebaseNode(){
+
+    }
     public void restartLoader() {
         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
     }

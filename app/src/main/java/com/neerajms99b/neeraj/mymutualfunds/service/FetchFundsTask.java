@@ -11,12 +11,18 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.neerajms99b.neeraj.mymutualfunds.BuildConfig;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.data.BasicFundInfoParcelable;
+import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 
 import org.json.JSONArray;
@@ -24,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by neeraj on 8/8/16.
@@ -35,18 +42,22 @@ public class FetchFundsTask extends GcmTaskService {
     private final String ACCEPT_PARAM = "Accept";
     private final String CONTENT_TYPE_VALUE = "application/json";
     private final String ACCEPT_VALUE = "application/json";
-    private final String KEY_VALUE = "My API Key";
+    private final String KEY_VALUE = BuildConfig.API_KEY;
     private final String TAG = getClass().getSimpleName();
     private final String KEY_FUNDNAME = "fund";
     private final String KEY_NAV = "nav";
     private final String KEY_SCODE = "scode";
     private Context mContext;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
 
     public FetchFundsTask() {
     }
 
     public FetchFundsTask(Context context) {
         mContext = context;
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
     }
 
     @Override
@@ -129,6 +140,12 @@ public class FetchFundsTask extends GcmTaskService {
                     fundContentValues.put(FundsContentProvider.FUND_SCODE, scode);
                     fundContentValues.put(FundsContentProvider.FUND_NAME, fundName);
                     fundContentValues.put(FundsContentProvider.FUND_NAV, nav);
+                    String units = "0";
+                    FundInfo info = new FundInfo(scode,fundName,nav,units);
+                    Map<String, Object> fund = info.toMap();
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference myRef = database.getReference(mFirebaseUser.getUid());
+                    myRef.child(scode).setValue(fund);
                     Uri uri = mContext.getContentResolver().insert(FundsContentProvider.mUri, fundContentValues);
                     if (uri != null) {
                         sendToast(mContext.getString(R.string.fund_added_message));

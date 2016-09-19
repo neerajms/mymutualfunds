@@ -24,4 +24,5 @@
     <string name="tab_my_funds">My Funds</string>
     <string name="key_tab_position" translatable="false">tab_position</string>
     <string name="sign_in">Sign In</string>
+    <string name="units_in_hand">Units in hand</string>
 </resources>

@@ -10,6 +10,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+        buildConfigField("String","API_KEY",API_KEY)
     }
     buildTypes {
         release {
@@ -35,6 +36,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.0.0'
     compile 'com.google.android.gms:play-services-gcm:9.4.0'
     compile 'com.google.firebase:firebase-auth:9.4.0'
+    compile 'com.google.firebase:firebase-database:9.4.0'
     compile 'com.google.android.gms:play-services-auth:9.4.0'
 }
 apply plugin: 'com.google.gms.google-services'

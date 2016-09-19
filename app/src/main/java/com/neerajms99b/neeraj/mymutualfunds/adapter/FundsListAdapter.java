@@ -100,9 +100,9 @@ public class FundsListAdapter extends CursorRecyclerViewAdapter<FundsListAdapter
         holder.mFundName.setText(cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_NAME)));
         holder.mFundNAV.setText(String.format("%.2f", cursor.getDouble(cursor.getColumnIndex(FundsContentProvider.FUND_NAV))));
         if (cursor.getString(cursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)) != null) {
-            holder.mUnits.setText("Units in hand:" + cursor.getString(cursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)));
+            holder.mUnits.setText(mCallBack.getString(R.string.units_in_hand) + cursor.getString(cursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)));
         } else {
-            holder.mUnits.setText("Units in hand:" + "0");
+            holder.mUnits.setText(mCallBack.getString(R.string.units_in_hand) + "0");
         }
         holder.mEditButton.setOnClickListener(new View.OnClickListener() {
             @Override

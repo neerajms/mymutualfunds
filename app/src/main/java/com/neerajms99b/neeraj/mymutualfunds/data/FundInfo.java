@@ -22,11 +22,22 @@ public class FundInfo {
 
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("scode", mScode);
-        result.put("fundName", mFundName);
-        result.put("nav", mNav);
-        result.put("units", mUnits);
+        result.put("mScode", mScode);
+        result.put("mFundName", mFundName);
+        result.put("mNav", mNav);
+        result.put("mUnits", mUnits);
         return result;
     }
-
+    public String getScode(){
+        return mScode;
+    }
+    public String getFundName(){
+        return mFundName;
+    }
+    public String getNav(){
+        return mNav;
+    }
+    public String getUnits(){
+        return mUnits;
+    }
 }

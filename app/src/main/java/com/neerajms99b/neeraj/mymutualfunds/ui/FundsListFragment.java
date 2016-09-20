@@ -28,8 +28,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.neerajms99b.neeraj.mymutualfunds.R;
+import com.neerajms99b.neeraj.mymutualfunds.adapter.FirebaseAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FundsListAdapter;
-import com.neerajms99b.neeraj.mymutualfunds.adapter.SimpleItemTouchHelper;
+import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 
 /**
@@ -51,6 +52,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     private Query mQuery;
     private FirebaseDatabase mDatabase;
     private DatabaseReference mMyRef;
+    private FirebaseAdapter mFirebaseAdapter;
 
     public FundsListFragment() {
     }
@@ -62,6 +64,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance();
+        getFirebaseData();
     }
 
     @Override
@@ -72,15 +75,16 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         mCallBack = (MainActivity) getActivity();
 //        mNetWorthAmount = (TextView) rootView.findViewById(R.id.net_worth_amount);
 //        mNetWorthAmount.setText("₹0.00");
-        mFundsListAdapter = new FundsListAdapter(null, this);
+//        mFundsListAdapter = new FundsListAdapter(null, this);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.funds_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setAdapter(mFundsListAdapter);
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+//        mRecyclerView.setAdapter(mFundsListAdapter);
+        mRecyclerView.setAdapter(mFirebaseAdapter);
+//        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
-        mItemTouchCallBack = new SimpleItemTouchHelper(mFundsListAdapter);
-        mItemTouchHelper = new ItemTouchHelper(mItemTouchCallBack);
-        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+//        mItemTouchCallBack = new SimpleItemTouchHelper(mFundsListAdapter);
+//        mItemTouchHelper = new ItemTouchHelper(mItemTouchCallBack);
+//        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
         mFab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,7 +135,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onResume() {
         super.onResume();
-        restartLoader();
+//        restartLoader();
     }
 
     public void setNetWorthAmount(Cursor data) {
@@ -186,5 +190,13 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     }
     public void restartLoader() {
         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+    }
+
+    public void getFirebaseData(){
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = firebaseDatabase.getReference(mFirebaseUser.getUid());
+        Query query = myRef;
+        mFirebaseAdapter = new FirebaseAdapter(FundInfo.class,
+                R.layout.main_activity_list_item,FirebaseAdapter.FundHolder.class,query);
     }
 }

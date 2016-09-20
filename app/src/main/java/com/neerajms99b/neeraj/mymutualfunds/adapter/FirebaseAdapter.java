@@ -3,6 +3,7 @@ package com.neerajms99b.neeraj.mymutualfunds.adapter;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.Query;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
+import com.neerajms99b.neeraj.mymutualfunds.ui.FundsListFragment;
 
 /**
  * Created by neeraj on 20/9/16.
@@ -18,10 +20,13 @@ import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
 
 public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo,FirebaseAdapter.FundHolder> {
     private final int FIRST_CARD = 1;
+    private FundsListFragment mCallBack;
 
-    public FirebaseAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref) {
+    public FirebaseAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref, FundsListFragment fundsListFragment) {
         super(modelClass, modelLayout, viewHolderClass, ref);
+        mCallBack = fundsListFragment;
     }
+
 
     public static class FundHolder extends RecyclerView.ViewHolder{
         public CardView mFundCardView;
@@ -49,13 +54,22 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo,FirebaseAd
         public void setUnits(String units){
             mUnits.setText(units);
         }
+        public ImageButton getEditButton(){
+            return mEditButton;
+        }
     }
 
     @Override
-    protected void populateViewHolder(FundHolder viewHolder, FundInfo model, int position) {
+    protected void populateViewHolder(FundHolder viewHolder, final FundInfo model, int position) {
         viewHolder.setFundName(model.getFundName());
         viewHolder.setFundNAV(model.getNav());
         viewHolder.setUnits(model.getUnits());
+        viewHolder.getEditButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCallBack.editClicked(model.getScode());
+            }
+        });
     }
 
     @Override

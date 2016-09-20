@@ -63,7 +63,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         setHasOptionsMenu(true);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mDatabase = FirebaseDatabase.getInstance();
+//        mDatabase.setPersistenceEnabled(true);
         getFirebaseData();
     }
 
@@ -175,9 +177,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         contentValues.put(FundsContentProvider.UNITS_OWNED, units);
         String[] selectionArgs = {scode};
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid());
-        mMyRef.child(scode).child("units").setValue(units);
-        getContext().getContentResolver().update(FundsContentProvider.mUri, contentValues, FundsContentProvider.KEY_ID, selectionArgs);
-        restartLoader();
+        mMyRef.child(scode).child("mUnits").setValue(units);
+//        getContext().getContentResolver().update(FundsContentProvider.mUri, contentValues, FundsContentProvider.KEY_ID, selectionArgs);
+//        restartLoader();
     }
 
     public void startSearchActivity() {
@@ -195,8 +197,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     public void getFirebaseData(){
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference myRef = firebaseDatabase.getReference(mFirebaseUser.getUid());
+        myRef.keepSynced(true);
         Query query = myRef;
         mFirebaseAdapter = new FirebaseAdapter(FundInfo.class,
-                R.layout.main_activity_list_item,FirebaseAdapter.FundHolder.class,query);
+                R.layout.main_activity_list_item,FirebaseAdapter.FundHolder.class,query,this);
     }
 }

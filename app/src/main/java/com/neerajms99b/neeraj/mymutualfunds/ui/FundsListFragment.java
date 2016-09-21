@@ -30,6 +30,7 @@ import com.google.firebase.database.Query;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FirebaseAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FundsListAdapter;
+import com.neerajms99b.neeraj.mymutualfunds.adapter.SimpleItemTouchHelper;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 
@@ -83,9 +84,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         mRecyclerView.setAdapter(mFirebaseAdapter);
 //        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
-//        mItemTouchCallBack = new SimpleItemTouchHelper(mFundsListAdapter);
-//        mItemTouchHelper = new ItemTouchHelper(mItemTouchCallBack);
-//        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+        mItemTouchCallBack = new SimpleItemTouchHelper(mFirebaseAdapter);
+        mItemTouchHelper = new ItemTouchHelper(mItemTouchCallBack);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
         mFab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,8 +187,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         startActivity(intent);
     }
 
-    public void deleteFirebaseNode(){
-
+    public void deleteFirebaseNode(int position){
+        mMyRef = mDatabase.getReference(mFirebaseUser.getUid());
+        mMyRef.child(mFirebaseAdapter.getItem(position).getScode()).removeValue();
     }
     public void restartLoader() {
         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);

@@ -18,13 +18,19 @@ import com.neerajms99b.neeraj.mymutualfunds.ui.FundsListFragment;
  * Created by neeraj on 20/9/16.
  */
 
-public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo,FirebaseAdapter.FundHolder> {
+public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo,FirebaseAdapter.FundHolder>
+        implements ItemTouchHelperAdapter {
     private final int FIRST_CARD = 1;
     private FundsListFragment mCallBack;
 
     public FirebaseAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref, FundsListFragment fundsListFragment) {
         super(modelClass, modelLayout, viewHolderClass, ref);
         mCallBack = fundsListFragment;
+    }
+
+    @Override
+    public void onItemDismissed(int position) {
+        mCallBack.deleteFirebaseNode(position);
     }
 
 

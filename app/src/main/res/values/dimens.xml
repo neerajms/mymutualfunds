@@ -19,4 +19,8 @@
     <dimen name="net_worth_card_padding">16dp</dimen>
     <dimen name="input_dialog_margin">24dp</dimen>
     <dimen name="funds_recycler_view_top_margin">104dp</dimen>
+    <dimen name="fund_title">20sp</dimen>
+    <dimen name="nav_text">16sp</dimen>
+    <dimen name="nav_change_text">16sp</dimen>
+    <dimen name="units_in_hand_text">14sp</dimen>
 </resources>

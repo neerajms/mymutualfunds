@@ -25,4 +25,8 @@
     <string name="key_tab_position" translatable="false">tab_position</string>
     <string name="sign_in">Sign In</string>
     <string name="units_in_hand">Units in hand</string>
+    <string name="net_asset_value_title">Net Asset Value</string>
+    <string name="change_title">Change</string>
+    <string name="roboto_medium" translatable="false">sans-serif-medium</string>
+    <string name="roboto_regular" translatable="false">sans-serif</string>
 </resources>

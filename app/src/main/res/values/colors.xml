@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorBackground">#ECEFF1</color>
+    <color name="fundNameBlack">#000000</color>
+    <color name="colorRed">#d50000</color>
+    <color name="colorGreen">#00c853</color>
 </resources>

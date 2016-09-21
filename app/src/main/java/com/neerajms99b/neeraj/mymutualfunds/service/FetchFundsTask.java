@@ -1,6 +1,5 @@
 package com.neerajms99b.neeraj.mymutualfunds.service;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -47,6 +46,9 @@ public class FetchFundsTask extends GcmTaskService {
     private final String KEY_FUNDNAME = "fund";
     private final String KEY_NAV = "nav";
     private final String KEY_SCODE = "scode";
+    private final String KEY_CHANGE = "change";
+    private final String KEY_CHANGE_VALUE = "value";
+    private final String KEY_CHANGE_PERCENT = "percent";
     private Context mContext;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -104,6 +106,8 @@ public class FetchFundsTask extends GcmTaskService {
             HttpResponse<JsonNode> response;
             String fundName = null;
             String nav = null;
+            String changeValue = null;
+            String changePercent = null;
             String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
             String url = String.valueOf(FundsContentProvider.mUri) + "/" + scode;
             Uri queryUri = Uri.parse(url);
@@ -128,6 +132,9 @@ public class FetchFundsTask extends GcmTaskService {
                         JSONObject jsonObject1 = jsonObject.getJSONObject(scode);
                         fundName = jsonObject1.getString(KEY_FUNDNAME);
                         nav = jsonObject1.getString(KEY_NAV);
+                        JSONObject jsonObject2 = jsonObject1.getJSONObject(KEY_CHANGE);
+                        changeValue = jsonObject2.getString(KEY_CHANGE_VALUE);
+                        changePercent = jsonObject2.getString(KEY_CHANGE_PERCENT);
                         Log.d(TAG, nav);
                     } catch (JSONException je) {
                         Log.d(TAG, je.toString());
@@ -136,20 +143,20 @@ public class FetchFundsTask extends GcmTaskService {
                     Log.d(TAG, ue.toString());
                 }
                 if (fundName != null && nav != null) {
-                    ContentValues fundContentValues = new ContentValues();
-                    fundContentValues.put(FundsContentProvider.FUND_SCODE, scode);
-                    fundContentValues.put(FundsContentProvider.FUND_NAME, fundName);
-                    fundContentValues.put(FundsContentProvider.FUND_NAV, nav);
+//                    ContentValues fundContentValues = new ContentValues();
+//                    fundContentValues.put(FundsContentProvider.FUND_SCODE, scode);
+//                    fundContentValues.put(FundsContentProvider.FUND_NAME, fundName);
+//                    fundContentValues.put(FundsContentProvider.FUND_NAV, nav);
                     String units = "0";
-                    FundInfo info = new FundInfo(scode,fundName,nav,units);
+                    FundInfo info = new FundInfo(scode,fundName,nav,units,changeValue,changePercent);
                     Map<String, Object> fund = info.toMap();
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference myRef = database.getReference(mFirebaseUser.getUid());
                     myRef.child(scode).setValue(fund);
-                    Uri uri = mContext.getContentResolver().insert(FundsContentProvider.mUri, fundContentValues);
-                    if (uri != null) {
-                        sendToast(mContext.getString(R.string.fund_added_message));
-                    }
+//                    Uri uri = mContext.getContentResolver().insert(FundsContentProvider.mUri, fundContentValues);
+//                    if (uri != null) {
+//                        sendToast(mContext.getString(R.string.fund_added_message));
+//                    }
                 }
             }
         }

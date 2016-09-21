@@ -18,10 +18,11 @@ import com.neerajms99b.neeraj.mymutualfunds.ui.FundsListFragment;
  * Created by neeraj on 20/9/16.
  */
 
-public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo,FirebaseAdapter.FundHolder>
+public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseAdapter.FundHolder>
         implements ItemTouchHelperAdapter {
     private final int FIRST_CARD = 1;
     private FundsListFragment mCallBack;
+    private int mLastPosition = -1;
 
     public FirebaseAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref, FundsListFragment fundsListFragment) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -34,42 +35,70 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo,FirebaseAd
     }
 
 
-    public static class FundHolder extends RecyclerView.ViewHolder{
+    public class FundHolder extends RecyclerView.ViewHolder {
         public CardView mFundCardView;
         public TextView mFundName;
         public TextView mFundNAV;
         public TextView mUnits;
+        public TextView mChange;
         public ImageButton mEditButton;
 
         public FundHolder(CardView cardView, TextView fundNameTextView,
-                          TextView fundNAVTextView, TextView units, ImageButton editButton) {
+                          TextView fundNAVTextView, TextView units, TextView change, ImageButton editButton) {
             super(cardView);
             mFundCardView = cardView;
             mFundName = fundNameTextView;
             mFundNAV = fundNAVTextView;
             mUnits = units;
             mEditButton = editButton;
+            mChange = change;
         }
 
-        public void setFundName(String fundName){
+        public void setFundName(String fundName) {
             mFundName.setText(fundName);
         }
-        public void setFundNAV(String fundNav){
+
+        public void setFundNAV(String fundNav,boolean isNegative) {
+            if (isNegative){
+                mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorRed));
+            }else {
+                mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
+            }
             mFundNAV.setText(fundNav);
         }
-        public void setUnits(String units){
+
+        public void setUnits(String units) {
             mUnits.setText(units);
         }
-        public ImageButton getEditButton(){
+
+        public void setChange(double changeValue,double changePercent,boolean isNegative){
+            if (isNegative){
+                mChange.setTextColor(mCallBack.getResources().getColor(R.color.colorRed));
+            }else {
+                mChange.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
+            }
+            String change = String.valueOf(Math.abs(changeValue))+
+                    "("+String.valueOf(Math.abs(changePercent))+"%"+")";
+            mChange.setText(change);
+        }
+
+        public ImageButton getEditButton() {
             return mEditButton;
         }
     }
 
     @Override
     protected void populateViewHolder(FundHolder viewHolder, final FundInfo model, int position) {
+        double changeValue = Double.valueOf(model.getChangeValue());
+        double changePercent = Double.valueOf(model.getChangePercent().substring(0,model.getChangePercent().length()-1));
+        boolean isNegative = false;
+        if (changeValue < 0.00d){
+            isNegative = true;
+        }
         viewHolder.setFundName(model.getFundName());
-        viewHolder.setFundNAV(model.getNav());
+        viewHolder.setFundNAV(model.getNav(),isNegative);
         viewHolder.setUnits(model.getUnits());
+        viewHolder.setChange(changeValue,changePercent,isNegative);
         viewHolder.getEditButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,8 +127,9 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo,FirebaseAd
         TextView fundNameTextView = (TextView) cardView.findViewById(R.id.fund_name);
         TextView fundNAVTextView = (TextView) cardView.findViewById(R.id.fund_nav);
         TextView units = (TextView) cardView.findViewById(R.id.units);
+        TextView change = (TextView) cardView.findViewById(R.id.nav_change);
         ImageButton editButton = (ImageButton) cardView.findViewById(R.id.edit_units);
-        FundHolder viewHolder = new FundHolder(cardView, fundNameTextView, fundNAVTextView, units, editButton);
+        FundHolder viewHolder = new FundHolder(cardView, fundNameTextView, fundNAVTextView, units, change, editButton);
         return viewHolder;
     }
 

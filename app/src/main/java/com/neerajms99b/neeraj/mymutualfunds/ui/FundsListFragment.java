@@ -63,7 +63,6 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         setHasOptionsMenu(true);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mDatabase = FirebaseDatabase.getInstance();
 //        mDatabase.setPersistenceEnabled(true);
         getFirebaseData();
@@ -195,10 +194,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     public void getFirebaseData(){
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = firebaseDatabase.getReference(mFirebaseUser.getUid());
-        myRef.keepSynced(true);
-        Query query = myRef;
+        mMyRef = mDatabase.getReference(mFirebaseUser.getUid());
+//        myRef.keepSynced(true);
+        Query query = mMyRef;
         mFirebaseAdapter = new FirebaseAdapter(FundInfo.class,
                 R.layout.main_activity_list_item,FirebaseAdapter.FundHolder.class,query,this);
     }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -41,10 +42,12 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         public TextView mFundNAV;
         public TextView mUnits;
         public TextView mChange;
+        public ImageView mArrow;
         public ImageButton mEditButton;
 
         public FundHolder(CardView cardView, TextView fundNameTextView,
-                          TextView fundNAVTextView, TextView units, TextView change, ImageButton editButton) {
+                          TextView fundNAVTextView, TextView units, TextView change,
+                          ImageButton editButton, ImageView arrow) {
             super(cardView);
             mFundCardView = cardView;
             mFundName = fundNameTextView;
@@ -52,6 +55,7 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
             mUnits = units;
             mEditButton = editButton;
             mChange = change;
+            mArrow = arrow;
         }
 
         public void setFundName(String fundName) {
@@ -64,7 +68,8 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
             }else {
                 mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
             }
-            mFundNAV.setText(fundNav);
+            String nav = String.format("%.2f",Double.valueOf(fundNav));
+            mFundNAV.setText(nav);
         }
 
         public void setUnits(String units) {
@@ -74,8 +79,12 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         public void setChange(double changeValue,double changePercent,boolean isNegative){
             if (isNegative){
                 mChange.setTextColor(mCallBack.getResources().getColor(R.color.colorRed));
+                mArrow.setImageResource(R.drawable.ic_action_down);
+                mArrow.setVisibility(View.VISIBLE);
             }else {
                 mChange.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
+                mArrow.setImageResource(R.drawable.ic_action_up);
+                mArrow.setVisibility(View.VISIBLE);
             }
             String change = String.valueOf(Math.abs(changeValue))+
                     "("+String.valueOf(Math.abs(changePercent))+"%"+")";
@@ -128,8 +137,11 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         TextView fundNAVTextView = (TextView) cardView.findViewById(R.id.fund_nav);
         TextView units = (TextView) cardView.findViewById(R.id.units);
         TextView change = (TextView) cardView.findViewById(R.id.nav_change);
+        ImageView arrow = (ImageView) cardView.findViewById(R.id.arrow);
+        arrow.setVisibility(View.INVISIBLE);
         ImageButton editButton = (ImageButton) cardView.findViewById(R.id.edit_units);
-        FundHolder viewHolder = new FundHolder(cardView, fundNameTextView, fundNAVTextView, units, change, editButton);
+        FundHolder viewHolder = new FundHolder(cardView, fundNameTextView, fundNAVTextView,
+                units, change, editButton,arrow);
         return viewHolder;
     }
 

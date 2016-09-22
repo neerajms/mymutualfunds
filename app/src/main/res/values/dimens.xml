@@ -23,4 +23,5 @@
     <dimen name="nav_text">16sp</dimen>
     <dimen name="nav_change_text">16sp</dimen>
     <dimen name="units_in_hand_text">14sp</dimen>
+    <dimen name="fund_nav_minWidth">72dp</dimen>
 </resources>

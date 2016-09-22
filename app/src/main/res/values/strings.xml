@@ -9,7 +9,7 @@
     <string name="tag_search_fundname" translatable="false">search_fund</string>
     <string name="key_scode" translatable="false">scode</string>
     <string name="key_fundname" translatable="false">fund_name</string>
-    <string name="key_toast_message" translatable="false">unique_constraint_failed_message</string>
+    <string name="key_toast_message" translatable="false">toast_message</string>
     <string name="unique_constraint_failed_message">Fund already in portfolio</string>
     <string name="fund_added_message">Fund added to portfolio</string>
     <string name="units_title">Enter number of units</string>
@@ -29,4 +29,6 @@
     <string name="change_title">Change</string>
     <string name="roboto_medium" translatable="false">sans-serif-medium</string>
     <string name="roboto_regular" translatable="false">sans-serif</string>
+    <string name="scode_shared_pref_key">scodeInSharedPreferences</string>
+    <string name="shared_prefs_file_key">com.neerajms99b.neeraj.mymutualfunds.file_key</string>
 </resources>

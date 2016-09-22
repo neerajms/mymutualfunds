@@ -2,8 +2,7 @@ package com.neerajms99b.neeraj.mymutualfunds.service;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -22,7 +21,6 @@ import com.neerajms99b.neeraj.mymutualfunds.BuildConfig;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.data.BasicFundInfoParcelable;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
-import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,6 +50,7 @@ public class FetchFundsTask extends GcmTaskService {
     private Context mContext;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
+    private ArrayList<String> mFundsScodesArrayList;
 
     public FetchFundsTask() {
     }
@@ -109,13 +108,13 @@ public class FetchFundsTask extends GcmTaskService {
             String changeValue = null;
             String changePercent = null;
             String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
-            String url = String.valueOf(FundsContentProvider.mUri) + "/" + scode;
-            Uri queryUri = Uri.parse(url);
-            Cursor cursor = mContext.getContentResolver().query(queryUri, null, null, null, null);
-            if (cursor.moveToFirst()) {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference(mFirebaseUser.getUid());
+            SharedPreferences sharedPreferences = mContext.getSharedPreferences(
+                    mContext.getString(R.string.shared_prefs_file_key), MODE_PRIVATE);
+            if (sharedPreferences.getBoolean(scode, false)) {
                 sendToast(mContext.getString(R.string.unique_constraint_failed_message));
             } else {
-
                 String query = "{\"scodes\":[\"" + scode + "\"]}";
                 try {
                     response = Unirest.post(FUNDS_BASE_URL)
@@ -143,20 +142,14 @@ public class FetchFundsTask extends GcmTaskService {
                     Log.d(TAG, ue.toString());
                 }
                 if (fundName != null && nav != null) {
-//                    ContentValues fundContentValues = new ContentValues();
-//                    fundContentValues.put(FundsContentProvider.FUND_SCODE, scode);
-//                    fundContentValues.put(FundsContentProvider.FUND_NAME, fundName);
-//                    fundContentValues.put(FundsContentProvider.FUND_NAV, nav);
                     String units = "0";
-                    FundInfo info = new FundInfo(scode,fundName,nav,units,changeValue,changePercent);
+                    FundInfo info = new FundInfo(scode, fundName, nav, units, changeValue, changePercent);
                     Map<String, Object> fund = info.toMap();
-                    FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    DatabaseReference myRef = database.getReference(mFirebaseUser.getUid());
                     myRef.child(scode).setValue(fund);
-//                    Uri uri = mContext.getContentResolver().insert(FundsContentProvider.mUri, fundContentValues);
-//                    if (uri != null) {
-//                        sendToast(mContext.getString(R.string.fund_added_message));
-//                    }
+                    sendToast(mContext.getString(R.string.fund_added_message));
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean(scode, true);
+                    editor.commit();
                 }
             }
         }

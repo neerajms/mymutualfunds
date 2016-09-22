@@ -57,7 +57,6 @@ public class SearchActivity extends AppCompatActivity {
                 mSwipeRefreshLayout.setRefreshing(true);
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;

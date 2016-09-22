@@ -29,6 +29,7 @@
     <string name="change_title">Change</string>
     <string name="roboto_medium" translatable="false">sans-serif-medium</string>
     <string name="roboto_regular" translatable="false">sans-serif</string>
-    <string name="scode_shared_pref_key">scodeInSharedPreferences</string>
-    <string name="shared_prefs_file_key">com.neerajms99b.neeraj.mymutualfunds.file_key</string>
+    <string name="scode_shared_pref_key" translatable="false">scodeInSharedPreferences</string>
+    <string name="shared_prefs_file_key" translatable="false">com.neerajms99b.neeraj.mymutualfunds.file_key</string>
+    <string name="tag_fetch_graph_data" translatable="false">fetchGraphData</string>
 </resources>

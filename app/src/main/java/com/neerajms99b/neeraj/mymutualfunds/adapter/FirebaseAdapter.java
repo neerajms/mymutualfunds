@@ -94,6 +94,10 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         public ImageButton getEditButton() {
             return mEditButton;
         }
+
+        public CardView getFundCardView(){
+            return mFundCardView;
+        }
     }
 
     @Override
@@ -112,6 +116,12 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
             @Override
             public void onClick(View view) {
                 mCallBack.editClicked(model.getScode());
+            }
+        });
+        viewHolder.getFundCardView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCallBack.showGraph(model.getScode());
             }
         });
     }

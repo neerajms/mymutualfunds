@@ -33,6 +33,7 @@ import com.neerajms99b.neeraj.mymutualfunds.adapter.FundsListAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SimpleItemTouchHelper;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
+import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -54,6 +55,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     private FirebaseDatabase mDatabase;
     private DatabaseReference mMyRef;
     private FirebaseAdapter mFirebaseAdapter;
+    private final String TAG = FundsListFragment.class.getSimpleName();
 
     public FundsListFragment() {
     }
@@ -201,5 +203,13 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         Query query = mMyRef;
         mFirebaseAdapter = new FirebaseAdapter(FundInfo.class,
                 R.layout.main_activity_list_item,FirebaseAdapter.FundHolder.class,query,this);
+    }
+
+    public void showGraph(String scode){
+        Log.d(TAG,scode);
+        Intent intentService = new Intent(getContext(), FundsIntentService.class);
+        intentService.putExtra("tag",getString(R.string.tag_fetch_graph_data));
+        intentService.putExtra(getString(R.string.key_scode),scode);
+        getActivity().startService(intentService);
     }
 }

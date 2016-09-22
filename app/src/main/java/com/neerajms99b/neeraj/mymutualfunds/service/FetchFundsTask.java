@@ -26,7 +26,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Map;
 
 /**
@@ -153,6 +155,51 @@ public class FetchFundsTask extends GcmTaskService {
                 }
             }
         }
+        if (taskParams.getTag().equals(mContext.getString(R.string.tag_fetch_graph_data))) {
+            String scode = taskParams.getExtras().getString(KEY_SCODE);
+            Calendar date = Calendar.getInstance();
+            SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
+            SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
+            String yearString = dateFormatYear.format(date.getTime());
+            String monthString = dateFormatMonth.format(date.getTime());
+            int currentQuarter = Integer.valueOf(monthString) / 4;
+            int monthInt = 0;
+            Log.d(TAG, String.valueOf(currentQuarter));
+            switch (currentQuarter) {
+                case 0:
+                    monthInt = 12;
+                    break;
+                case 1:
+                    monthInt = 3;
+                    break;
+                case 2:
+                    monthInt = 6;
+                    break;
+                default:
+                    monthInt = 9;
+            }
+            int yearInt = Integer.valueOf(yearString);
+            int year = yearInt;
+            while (year >= yearInt - 2) {
+                while (monthInt >= 3) {
+                    String day = "01";
+                    if (monthInt == 12 || monthInt == 3) {
+                        day = "31";
+                    } else if (monthInt == 6 || monthInt == 9) {
+                        day = "30";
+                    }
+                    String month = String.format("%02d", monthInt);
+
+                    String dateFull = day + "/" + month + "/" + String.valueOf(year);
+                    Log.d(TAG,dateFull);
+                    getGraph(scode, dateFull);
+                    monthInt = monthInt - 3;
+                }
+                year--;
+                monthInt = 12;
+            }
+//            getGraph(scode, "30/06/2015");
+        }
         return 0;
     }
 
@@ -162,5 +209,31 @@ public class FetchFundsTask extends GcmTaskService {
         intent.putExtra(mContext.getString(R.string.key_toast_message),
                 message);
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+    }
+
+    public boolean getGraph(String scode, String date) {
+        try {
+            String requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + date + "\"" + "}";
+            HttpResponse<JsonNode> response = Unirest.post("https://mutualfundsnav.p.mashape.com/historical")
+                    .header(KEY_PARAM, KEY_VALUE)
+                    .header(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE)
+                    .header(ACCEPT_PARAM, ACCEPT_VALUE)
+                    .body(requestBody)
+                    .asJson();
+            Log.d(TAG, response.toString());
+            JsonNode jsonNode = response.getBody();
+            try {
+                JSONObject jsonObject = jsonNode.getObject();
+                String nav = jsonObject.getString(KEY_NAV);
+                String dat = jsonObject.getString("date");
+                Log.d(TAG, nav + " " + dat);
+            } catch (JSONException je) {
+                Log.d(TAG, je.toString());
+            }
+        } catch (UnirestException ue) {
+            Log.d(TAG, ue.toString());
+            return false;
+        }
+        return true;
     }
 }

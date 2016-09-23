@@ -54,7 +54,8 @@
             android:name=".data.FundsContentProvider"
             android:authorities="com.neerajms99b.neeraj.mymutualfunds.data" />
 
-        <activity android:name=".ui.GraphActivity"></activity>
+        <activity android:name=".ui.GraphActivity"/>
+
     </application>
 
 </manifest>

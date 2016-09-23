@@ -4,13 +4,11 @@ import android.database.Cursor;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
-import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.ui.FundsListFragment;
 
 /**
@@ -30,11 +28,11 @@ public class FundsListAdapter extends CursorRecyclerViewAdapter<FundsListAdapter
 
     @Override
     public void onItemDismissed(int position) {
-        Cursor cursor = getCursor();
-        cursor.moveToPosition(position);
-        String[] selectionArgs = {cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_SCODE))};
-        mCallBack.getContext().getContentResolver().delete(
-                FundsContentProvider.mUri, FundsContentProvider.FUND_SCODE, selectionArgs);
+//        Cursor cursor = getCursor();
+//        cursor.moveToPosition(position);
+//        String[] selectionArgs = {cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_SCODE))};
+//        mCallBack.getContext().getContentResolver().delete(
+//                FundsContentProvider.mUri, FundsContentProvider.FUND_SCODE, selectionArgs);
         notifyItemRemoved(position);
         mCallBack.restartLoader();
     }
@@ -97,19 +95,19 @@ public class FundsListAdapter extends CursorRecyclerViewAdapter<FundsListAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final Cursor cursor, final int position) {
-        holder.mFundName.setText(cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_NAME)));
-        holder.mFundNAV.setText(String.format("%.2f", cursor.getDouble(cursor.getColumnIndex(FundsContentProvider.FUND_NAV))));
-        if (cursor.getString(cursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)) != null) {
-            holder.mUnits.setText(mCallBack.getString(R.string.units_in_hand) + cursor.getString(cursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)));
-        } else {
-            holder.mUnits.setText(mCallBack.getString(R.string.units_in_hand) + "0");
-        }
-        holder.mEditButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cursor.moveToPosition(position);
-                mCallBack.editClicked(cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_SCODE)));
-            }
-        });
+//        holder.mFundName.setText(cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_NAME)));
+//        holder.mFundNAV.setText(String.format("%.2f", cursor.getDouble(cursor.getColumnIndex(FundsContentProvider.FUND_NAV))));
+//        if (cursor.getString(cursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)) != null) {
+//            holder.mUnits.setText(mCallBack.getString(R.string.units_in_hand) + cursor.getString(cursor.getColumnIndex(FundsContentProvider.UNITS_OWNED)));
+//        } else {
+//            holder.mUnits.setText(mCallBack.getString(R.string.units_in_hand) + "0");
+//        }
+//        holder.mEditButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                cursor.moveToPosition(position);
+//                mCallBack.editClicked(cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_SCODE)));
+//            }
+//        });
     }
 }

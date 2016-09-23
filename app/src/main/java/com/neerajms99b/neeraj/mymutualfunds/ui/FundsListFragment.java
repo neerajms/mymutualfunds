@@ -1,6 +1,5 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -8,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,7 +30,6 @@ import com.neerajms99b.neeraj.mymutualfunds.adapter.FirebaseAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FundsListAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SimpleItemTouchHelper;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
-import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 /**
@@ -121,7 +118,8 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(), FundsContentProvider.mUri, null, null, null, null);
+//        return new CursorLoader(getActivity(), FundsContentProvider.mUri, null, null, null, null);
+        return null;
     }
 
     @Override
@@ -142,23 +140,23 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
 //        restartLoader();
     }
 
-    public void setNetWorthAmount(Cursor data) {
-        int units = 0;
-        double nav = 0.0d;
-        double netWorth = 0.0d;
-        do {
-            Log.d("inside", "while");
-            units = 0;
-            nav = 0.0d;
-            if (data.getString(data.getColumnIndex(FundsContentProvider.UNITS_OWNED)) != null) {
-                units = data.getInt(data.getColumnIndex(FundsContentProvider.UNITS_OWNED));
-                nav = data.getDouble(data.getColumnIndex(FundsContentProvider.FUND_NAV));
-                netWorth = netWorth + units * nav;
-            }
-        } while (data.moveToNext());
-        mNetWorth = String.format("%.2f", netWorth);
-//        mNetWorthAmount.setText("₹" + mNetWorth);
-    }
+//    public void setNetWorthAmount(Cursor data) {
+//        int units = 0;
+//        double nav = 0.0d;
+//        double netWorth = 0.0d;
+//        do {
+//            Log.d("inside", "while");
+//            units = 0;
+//            nav = 0.0d;
+////            if (data.getString(data.getColumnIndex(FundsContentProvider.UNITS_OWNED)) != null) {
+////                units = data.getInt(data.getColumnIndex(FundsContentProvider.UNITS_OWNED));
+////                nav = data.getDouble(data.getColumnIndex(FundsContentProvider.FUND_NAV));
+//                netWorth = netWorth + units * nav;
+//            }
+//        } while (data.moveToNext());
+//        mNetWorth = String.format("%.2f", netWorth);
+////        mNetWorthAmount.setText("₹" + mNetWorth);
+//    }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -175,9 +173,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     public void unitsInput(String units, String scode) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(FundsContentProvider.UNITS_OWNED, units);
-        String[] selectionArgs = {scode};
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(FundsContentProvider.UNITS_OWNED, units);
+//        String[] selectionArgs = {scode};
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid());
         mMyRef.child(scode).child("mUnits").setValue(units);
 //        getContext().getContentResolver().update(FundsContentProvider.mUri, contentValues, FundsContentProvider.KEY_ID, selectionArgs);
@@ -207,6 +205,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
 
     public void showGraph(String scode){
         Log.d(TAG,scode);
+//        mCallBack.launchGraphActivity(scode);
         Intent intentService = new Intent(getContext(), FundsIntentService.class);
         intentService.putExtra("tag",getString(R.string.tag_fetch_graph_data));
         intentService.putExtra(getString(R.string.key_scode),scode);

@@ -38,8 +38,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity" />
         </activity>
+        <activity android:name=".ui.SignInActivity" />
 
-        <activity android:name=".ui.SignInActivity"/>
         <service
             android:name=".service.FetchFundsTask"
             android:exported="true"
@@ -54,6 +54,7 @@
             android:name=".data.FundsContentProvider"
             android:authorities="com.neerajms99b.neeraj.mymutualfunds.data" />
 
+        <activity android:name=".ui.GraphActivity"></activity>
     </application>
 
 </manifest>

@@ -49,6 +49,7 @@ public class FetchFundsTask extends GcmTaskService {
     private final String KEY_CHANGE = "change";
     private final String KEY_CHANGE_VALUE = "value";
     private final String KEY_CHANGE_PERCENT = "percent";
+    private final String KEY_QUARTER = "q";
     private Context mContext;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -160,45 +161,91 @@ public class FetchFundsTask extends GcmTaskService {
             Calendar date = Calendar.getInstance();
             SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
             SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
-            String yearString = dateFormatYear.format(date.getTime());
-            String monthString = dateFormatMonth.format(date.getTime());
-            int currentQuarter = Integer.valueOf(monthString) / 4;
-            int monthInt = 0;
-            Log.d(TAG, String.valueOf(currentQuarter));
-            switch (currentQuarter) {
-                case 0:
-                    monthInt = 12;
-                    break;
-                case 1:
-                    monthInt = 3;
-                    break;
-                case 2:
-                    monthInt = 6;
-                    break;
-                default:
-                    monthInt = 9;
-            }
-            int yearInt = Integer.valueOf(yearString);
-            int year = yearInt;
-            while (year >= yearInt - 2) {
-                while (monthInt >= 3) {
-                    String day = "01";
-                    if (monthInt == 12 || monthInt == 3) {
-                        day = "31";
-                    } else if (monthInt == 6 || monthInt == 9) {
-                        day = "30";
-                    }
-                    String month = String.format("%02d", monthInt);
-
-                    String dateFull = day + "/" + month + "/" + String.valueOf(year);
-                    Log.d(TAG,dateFull);
-                    getGraph(scode, dateFull);
-                    monthInt = monthInt - 3;
-                }
-                year--;
-                monthInt = 12;
-            }
-//            getGraph(scode, "30/06/2015");
+//            String yearString = dateFormatYear.format(date.getTime());
+//            String monthString = dateFormatMonth.format(date.getTime());
+//            int currentQuarter = Integer.valueOf(monthString) / 4;
+//            int monthInt = 0;
+//            int yearInt = Integer.valueOf(yearString);
+//            Log.d(TAG, String.valueOf(currentQuarter));
+//            switch (currentQuarter) {
+//                case 0:
+//                    monthInt = 12;
+//                    yearInt = yearInt - 1;
+//                    break;
+//                case 1:
+//                    monthInt = 3;
+//                    break;
+//                case 2:
+//                    monthInt = 6;
+//                    break;
+//                default:
+//                    monthInt = 9;
+//            }
+//            Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);
+//            Cursor cursor = mContext.getContentResolver().query(uri, null, null, null, null);
+//            if (!cursor.moveToFirst()) {
+//                ContentValues initial = new ContentValues();
+//                initial.put(FundsContentProvider.FUND_SCODE, scode);
+//                mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, initial);
+//            }
+//
+//            int year = yearInt;
+//            int quarter = 12;
+//            while (year >= yearInt - 2) {
+//                while (monthInt >= 3) {
+//                    String day = "01";
+//                    if (monthInt == 12 || monthInt == 3) {
+//                        day = "31";
+//                    } else if (monthInt == 6 || monthInt == 9) {
+//                        day = "30";
+//                    }
+//                    String month = String.format("%02d", monthInt);
+//
+//                    String dateFull = day + "/" + month + "/" + String.valueOf(year);
+//                    Log.d(TAG, dateFull);
+//                    String value = getGraph(scode, dateFull);
+//                    if (value != null) {
+//                        ContentValues navForQuarter = new ContentValues();
+//                        navForQuarter.put(KEY_QUARTER + quarter, value);
+//                        mContext.getContentResolver().update(uri, navForQuarter, null, null);
+//                    } else {
+//                        if (day.equals("31")) {
+//                            day = "29";
+//                        }else {
+//                            day = "28";
+//                        }
+//                        dateFull = day + "/" + month + "/" + String.valueOf(year);
+//                        Log.d(TAG, dateFull);
+//                        value = getGraph(scode, dateFull);
+//                        if (value != null) {
+//                            ContentValues navForQuarter = new ContentValues();
+//                            navForQuarter.put(KEY_QUARTER + quarter, value);
+//                            mContext.getContentResolver().update(uri, navForQuarter, null, null);
+//                        }
+//                    }
+//                    quarter--;
+//                    monthInt = monthInt - 3;
+//                }
+//                year--;
+//                monthInt = 12;
+//            }
+//            cursor = mContext.getContentResolver().query(uri, null, null, null, null);
+//            if (cursor.moveToFirst()) {
+//                Log.d(TAG, cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_SCODE)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q12)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q11)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q10)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q9)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q8)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q7)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q6)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q5)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q4)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q3)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q2)) + "\n" +
+//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q1)));
+//            }
+            getGraph(scode, "31/08/2015");
         }
         return 0;
     }
@@ -211,7 +258,8 @@ public class FetchFundsTask extends GcmTaskService {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
-    public boolean getGraph(String scode, String date) {
+    public String getGraph(String scode, String date) {
+        String nav = null;
         try {
             String requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + date + "\"" + "}";
             HttpResponse<JsonNode> response = Unirest.post("https://mutualfundsnav.p.mashape.com/historical")
@@ -224,16 +272,14 @@ public class FetchFundsTask extends GcmTaskService {
             JsonNode jsonNode = response.getBody();
             try {
                 JSONObject jsonObject = jsonNode.getObject();
-                String nav = jsonObject.getString(KEY_NAV);
-                String dat = jsonObject.getString("date");
-                Log.d(TAG, nav + " " + dat);
+                nav = jsonObject.getString(KEY_NAV);
+                Log.d(TAG,nav);
             } catch (JSONException je) {
                 Log.d(TAG, je.toString());
             }
         } catch (UnirestException ue) {
             Log.d(TAG, ue.toString());
-            return false;
         }
-        return true;
+        return nav;
     }
 }

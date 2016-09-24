@@ -34,7 +34,10 @@
     <string name="tag_fetch_graph_data" translatable="false">fetchGraphData</string>
     <string name="key_graph_fetched" translatable="false">graphDataFetched</string>
     <string name="stock_values">Stock Values</string>
-    <string name="chart_description">Description</string>
+    <string name="chart_description">NAV for the last few quarter ends</string>
+    <string name="total_value">Total value:</string>
+    <string name="key_fund_nav">fundNav</string>
+    <string name="key_units_in_hand">unitsInHand</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

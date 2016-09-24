@@ -96,7 +96,7 @@ public class FundsContentProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String column, String[] args) {
-        String whereClause = column + " =? ";
+        String whereClause = column + " = " + uri.getLastPathSegment();
         int deleted = database.delete(TABLE_NAME_HISTORICAL, whereClause, args);
         return deleted;
     }

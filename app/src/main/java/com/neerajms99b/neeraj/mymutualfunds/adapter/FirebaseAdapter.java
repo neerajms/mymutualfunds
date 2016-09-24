@@ -121,7 +121,7 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         viewHolder.getFundCardView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCallBack.showGraph(model.getScode());
+                mCallBack.showGraph(model.getScode(),model.getFundName(),model.getNav(),model.getUnits());
             }
         });
     }

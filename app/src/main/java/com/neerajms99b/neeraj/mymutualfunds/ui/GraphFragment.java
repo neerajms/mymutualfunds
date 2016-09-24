@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -36,18 +37,28 @@ import java.util.Calendar;
 public class GraphFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private final String TAG = GraphFragment.class.getSimpleName();
     private String mScode;
+    private String mFundName;
+    private String mFundNav;
+    private String mUnits;
+    private String mTotalValue;
     public int CURSOR_LOADER_ID = 0;
     private Context mContext;
     private ArrayList<String> mLabels;
     private ArrayList<String> mEntriesString;
     private ArrayList<Entry> mEntries;
     private LineChart mChart;
+    private final String mRupeeSymbol = "₹";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
         mScode = bundle.getString(getString(R.string.key_scode));
+        mFundName = bundle.getString(getString(R.string.key_fundname));
+        mFundNav = bundle.getString(getString(R.string.key_fund_nav));
+        mUnits = bundle.getString(getString(R.string.key_units_in_hand));
+        mTotalValue = mRupeeSymbol + String.format("%.2f",Float.parseFloat(mFundNav) * Float.parseFloat(mUnits));
+
         mContext = getContext();
         mEntriesString = new ArrayList<String>();
         mLabels = new ArrayList<String>();
@@ -60,6 +71,10 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_graph, container, false);
         mChart = (LineChart) rootView.findViewById(R.id.chart);
+        TextView fundNameTextView = (TextView) rootView.findViewById(R.id.fund_name);
+        TextView totalValueTextView = (TextView) rootView.findViewById(R.id.total_value);
+        fundNameTextView.setText(mFundName);
+        totalValueTextView.setText(mTotalValue);
         // Inflate the layout for this fragment
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
         return rootView;
@@ -186,7 +201,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         lineDataSet.setDrawCircles(false);
         lineDataSet.setDrawFilled(false);
 //        lineDataSet.setFillColor(getResources().getColor(android.R.color.holo_blue_light));
-        lineDataSet.setColor(getResources().getColor(android.R.color.holo_blue_light), 220);
+        lineDataSet.setColor(getResources().getColor(R.color.colorAccent), 220);
 //        lineDataSet.setFillAlpha(220);
         lineDataSet.setDrawValues(false);
         lineDataSet.setLineWidth(3.5f);

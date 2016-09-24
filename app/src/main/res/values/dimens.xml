@@ -26,4 +26,6 @@
     <dimen name="fund_nav_minWidth">72dp</dimen>
     <dimen name="historical_graph_height">300dp</dimen>
     <dimen name="historical_graph_layout_margin">8dp</dimen>
+    <dimen name="total_value_text_size">16sp</dimen>
+    <dimen name="fund_name_in_detail_view">20sp</dimen>
 </resources>

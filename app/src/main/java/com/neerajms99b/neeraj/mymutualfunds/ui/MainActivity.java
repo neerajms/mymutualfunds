@@ -96,9 +96,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void onTabReselected(TabLayout.Tab tab) {
 
     }
-    public void launchGraphActivity(String scode){
-        Intent intent = new Intent(this,GraphActivity.class);
-        intent.putExtra(getString(R.string.key_scode),scode);
+
+    public void launchGraphActivity(String scode, String fundName, String fundNav, String units) {
+        Intent intent = new Intent(this, GraphActivity.class);
+        intent.putExtra(getString(R.string.key_scode), scode);
+        intent.putExtra(getString(R.string.key_fundname),fundName);
+        intent.putExtra(getString(R.string.key_fund_nav),fundNav);
+        intent.putExtra(getString(R.string.key_units_in_hand),units);
         startActivity(intent);
     }
 }

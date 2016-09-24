@@ -2,6 +2,7 @@ package com.neerajms99b.neeraj.mymutualfunds.ui;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -30,6 +31,7 @@ import com.neerajms99b.neeraj.mymutualfunds.adapter.FirebaseAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FundsListAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SimpleItemTouchHelper;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
+import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -188,7 +190,10 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
 
     public void deleteFirebaseNode(int position){
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid());
-        mMyRef.child(mFirebaseAdapter.getItem(position).getScode()).removeValue();
+        String scode = mFirebaseAdapter.getItem(position).getScode();
+        mMyRef.child(scode).removeValue();
+        Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString()+"/"+scode);
+        getActivity().getContentResolver().delete(uri,null,null);
     }
     public void restartLoader() {
         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
@@ -202,9 +207,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
                 R.layout.main_activity_list_item,FirebaseAdapter.FundHolder.class,query,this);
     }
 
-    public void showGraph(String scode){
+    public void showGraph(String scode,String fundName,String fundNav,String units){
         Log.d(TAG,scode);
-        mCallBack.launchGraphActivity(scode);
+        mCallBack.launchGraphActivity(scode,fundName,fundNav,units);
 //        Intent intentService = new Intent(getContext(), FundsIntentService.class);
 //        intentService.putExtra("tag",getString(R.string.tag_fetch_graph_data));
 //        intentService.putExtra(getString(R.string.key_scode),scode);

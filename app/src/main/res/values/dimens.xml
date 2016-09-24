@@ -5,7 +5,7 @@
     <dimen name="fab_margin">32dp</dimen>
     <dimen name="padding_list">16dp</dimen>
     <dimen name="search_result_listitem_textsize">16sp</dimen>
-    <dimen name="cardview_layout_margin">48dp</dimen>
+    <dimen name="cardview_layout_margin">8dp</dimen>
     <dimen name="text_view_layout_margin">8dp</dimen>
     <dimen name="cardview_minheight">70dp</dimen>
     <dimen name="main_relativelayout_bottom_padding">8dp</dimen>
@@ -24,4 +24,6 @@
     <dimen name="nav_change_text">16sp</dimen>
     <dimen name="units_in_hand_text">14sp</dimen>
     <dimen name="fund_nav_minWidth">72dp</dimen>
+    <dimen name="historical_graph_height">300dp</dimen>
+    <dimen name="historical_graph_layout_margin">8dp</dimen>
 </resources>

@@ -18,11 +18,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.AxisValueFormatter;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
@@ -72,19 +74,6 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onLoadFinished(Loader loader, Cursor data) {
         if (data.moveToFirst()) {
-//            Log.d(TAG, data.getString(data.getColumnIndex(FundsContentProvider.FUND_SCODE)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q12)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q11)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q10)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q9)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q8)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q7)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q6)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q5)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q4)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q3)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q2)) + "\n" +
-//                    data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q1)) + "\n");
             postExecute(data);
             populateChart();
 
@@ -93,19 +82,14 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
             intentService.putExtra("tag", getString(R.string.tag_fetch_graph_data));
             intentService.putExtra(getString(R.string.key_scode), mScode);
             getActivity().startService(intentService);
-//            getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,this);
         }
     }
 
     BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            Log.d(TAG,"broadcast received");
-//            Bundle bundle = intent.getExtras();
             if (intent.getExtras().containsKey(getString(R.string.key_graph_fetched))) {
-//                if (bundle.getBoolean(getString(R.string.key_graph_fetched))){
                 restartLoader();
-//                }
             }
         }
     };
@@ -160,16 +144,11 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         }
         int i = 12;
         int j = 0;
-//        if (currentQuarter != 0) {
-//            currentQuarter = currentQuarter - 1;
-//        }
         while (i >= 1) {
-//            while (monthInt >= 3) {
-//                String value = data.getString(data.getColumnIndex(keyQ + String.valueOf(i)));
-            if (monthInt == 0){
+            if (monthInt == 0) {
                 monthInt = 12;
             }
-            switch (monthInt){
+            switch (monthInt) {
                 case 12:
                     currentQuarter = 3;
                     break;
@@ -184,24 +163,18 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
                     yearInt--;
                     break;
             }
-
-//                data.moveToFirst();
             String key = "q" + String.valueOf(i);
             if (data.getString(data.getColumnIndex(key)) != null) {
                 mEntriesString.add(j, data.getString(data.getColumnIndex(keyQ + String.valueOf(i))));
-                mLabels.add(j, String.valueOf(currentQuarter) + "." + String.valueOf(yearInt));
+                mLabels.add(j, "Q" + String.valueOf(currentQuarter) + " " + String.valueOf(yearInt).substring(2, 4));
                 j++;
             }
             monthInt = monthInt - 3;
-//            currentQuarter--;
-//            }
-
-//            monthInt = 12;
             i--;
         }
         int l = 0;
         for (int k = mLabels.size() - 1; k >= 0; k--) {
-            mEntries.add(new Entry(l,Float.parseFloat(mEntriesString.get(k))));
+            mEntries.add(new Entry(l, Float.parseFloat(mEntriesString.get(k))));
             l++;
             Log.d(mLabels.get(k), mEntriesString.get(k));
         }
@@ -211,26 +184,43 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         LineDataSet lineDataSet = new LineDataSet(mEntries,
                 getString(R.string.stock_values));
         lineDataSet.setDrawCircles(false);
-//        lineDataSet.setDrawCubic(true);
-        lineDataSet.setDrawFilled(true);
-        lineDataSet.setFillColor(getResources().getColor(android.R.color.holo_blue_light));
+        lineDataSet.setDrawFilled(false);
+//        lineDataSet.setFillColor(getResources().getColor(android.R.color.holo_blue_light));
         lineDataSet.setColor(getResources().getColor(android.R.color.holo_blue_light), 220);
-        lineDataSet.setFillAlpha(220);
+//        lineDataSet.setFillAlpha(220);
         lineDataSet.setDrawValues(false);
-//
+        lineDataSet.setLineWidth(3.5f);
+
         YAxis yAxisLeft = mChart.getAxisLeft();
         yAxisLeft.setTextColor(getResources().getColor(android.R.color.black));
-//
+        yAxisLeft.setDrawGridLines(false);
+
         YAxis yAxisRight = mChart.getAxisRight();
-        yAxisRight.setTextColor(getResources().getColor(android.R.color.black));
-//
+        yAxisRight.setDrawLabels(false);
+//        yAxisRight.setTextColor(getResources().getColor(android.R.color.white));
+        yAxisRight.setDrawGridLines(false);
+        yAxisRight.setDrawAxisLine(false);
+
+        AxisValueFormatter formatter = new AxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return mLabels.get((mLabels.size() - 1) - (int) value);
+            }
+
+            @Override
+            public int getDecimalDigits() {
+                return 0;
+            }
+        };
+
         XAxis xAxis = mChart.getXAxis();
         xAxis.setDrawGridLines(false);
         xAxis.setAvoidFirstLastClipping(true);
-//        xAxis.setSpaceBetweenLabels(0);
         xAxis.setTextColor(getResources().getColor(android.R.color.black));
-//        xAxis.setSpaceBetweenLabels(2);
-//
+        xAxis.setValueFormatter(formatter);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
+
         LineData data = new LineData(lineDataSet);
         mChart.setDescription(getString(R.string.chart_description));
         mChart.setData(data);

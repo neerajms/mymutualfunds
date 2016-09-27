@@ -4,7 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.SQLException;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
@@ -45,8 +45,8 @@ public class FundsContentProvider extends ContentProvider {
 
     static {
         mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        mUriMatcher.addURI(AUTHORITY, TABLE_NAME_HISTORICAL + "/#", 2);
         mUriMatcher.addURI(AUTHORITY,TABLE_NAME_RECENT_SEARCH + "/*",1);
+        mUriMatcher.addURI(AUTHORITY, TABLE_NAME_HISTORICAL + "/#", 2);
         mUriMatcher.addURI(AUTHORITY,TABLE_NAME_RECENT_SEARCH,3);
         mUriMatcher.addURI(AUTHORITY,TABLE_NAME_HISTORICAL,4);
     }
@@ -93,23 +93,28 @@ public class FundsContentProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
         ContentValues cv = contentValues;
-        long rowID = 0;
-        switch (mUriMatcher.match(uri)){
-            case 3:
-                rowID = database.insert(TABLE_NAME_RECENT_SEARCH, null, contentValues);
-                break;
-            case 4:
-                rowID = database.insert(TABLE_NAME_HISTORICAL,null,contentValues);
-                break;
-        }
+        try {
+            long rowID = 0;
+            switch (mUriMatcher.match(uri)) {
+                case 3:
+                    rowID = database.insert(TABLE_NAME_RECENT_SEARCH, null, contentValues);
+                    break;
+                case 4:
+                    rowID = database.insert(TABLE_NAME_HISTORICAL, null, contentValues);
+                    break;
+            }
 
-        if (rowID > 0) {
-            String _uri = String.valueOf(uri) + "/" + String.valueOf(cv.get(KEY_ID));
-            Uri tempUri = Uri.parse(_uri);
-            getContext().getContentResolver().notifyChange(tempUri, null);
-            return tempUri;
+            if (rowID > 0) {
+                String _uri = String.valueOf(uri) + "/" + String.valueOf(cv.get(KEY_ID));
+                Uri tempUri = Uri.parse(_uri);
+                getContext().getContentResolver().notifyChange(tempUri, null);
+                return tempUri;
+            }
+        }catch (SQLiteConstraintException sce){
+            return null;
         }
-        throw new SQLException("Failed to add a record into " + uri);
+//        throw new SQLException("Failed to add a record into " + uri);
+        return null;
     }
 
     @Override
@@ -117,9 +122,8 @@ public class FundsContentProvider extends ContentProvider {
         int deleted = 0;
         String whereClause = null;
         switch (mUriMatcher.match(uri)){
-            case 1:
-                whereClause = SEARCH_WORD + "=" + uri.getLastPathSegment();
-                deleted = database.delete(TABLE_NAME_RECENT_SEARCH, whereClause, args);
+            case 3:
+                deleted = database.delete(TABLE_NAME_RECENT_SEARCH, null, args);
                 break;
             case 2:
                 whereClause = FUND_SCODE + "=" + uri.getLastPathSegment();

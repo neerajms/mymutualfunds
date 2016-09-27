@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
     <TextView
         android:id="@+id/search_suggestion_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/text_view_layout_margin"
-        android:layout_marginRight="@dimen/text_view_layout_margin"
-        android:minHeight="@dimen/suggestions_list_item_min_height"/>
+        style="@style/suggestions_text_style"/>
 </LinearLayout>

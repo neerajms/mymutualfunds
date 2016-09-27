@@ -15,6 +15,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,22 +63,11 @@ public class SearchActivity extends AppCompatActivity {
         search.setIconified(false);
         search.setLayoutParams(new Toolbar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
         search.setSuggestionsAdapter(mAdapter);
+        search.setQueryHint(getString(R.string.search_hint));
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Intent intentService = new Intent(context, FundsIntentService.class);
-                intentService.putExtra("tag", "force");
-                intentService.putExtra("fund", query);
-                startService(intentService);
-//                mRecentSuggestions.saveRecentQuery(query,null);
-                Uri uri = Uri.parse(mRecentString + query);
-                mCursor = getContentResolver().query(uri, null, null, null, null);
-                if (!mCursor.moveToFirst()) {
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(FundsContentProvider.SEARCH_WORD, query);
-                    getContentResolver().insert(FundsContentProvider.mUriRecentSearch, contentValues);
-                }
-                mSwipeRefreshLayout.setRefreshing(true);
+                onSubmission(query);
                 return false;
             }
 
@@ -95,6 +85,19 @@ public class SearchActivity extends AppCompatActivity {
                     }
                 }
                 return false;
+            }
+        });
+        search.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                Cursor cursor = mAdapter.getCursor();
+                onSubmission(cursor.getString(cursor.getColumnIndex(FundsContentProvider.SEARCH_WORD)));
+                return true;
             }
         });
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_search_swipe_refresh_layout);
@@ -132,10 +135,23 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
+        } else if (item.getItemId() == R.id.clear) {
+            int deleted = getContentResolver().delete(FundsContentProvider.mUriRecentSearch, null, null);
+            if (deleted > 0) {
+                Toast.makeText(mContext, getString(R.string.history_cleared_toast), Toast.LENGTH_SHORT).show();
+            } else if (deleted == 0) {
+                Toast.makeText(mContext, getString(R.string.nothing_to_clear_toast), Toast.LENGTH_SHORT).show();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -192,5 +208,18 @@ public class SearchActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+    }
+
+    public void onSubmission(String query) {
+        mSwipeRefreshLayout.setRefreshing(true);
+        Intent intentService = new Intent(mContext, FundsIntentService.class);
+        intentService.putExtra("tag", "force");
+        intentService.putExtra("fund", query);
+        startService(intentService);
+//        Uri uri = Uri.parse(mRecentString + query);
+//        mCursor = getContentResolver().query(uri, null, null, null, null);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(FundsContentProvider.SEARCH_WORD, query);
+        getContentResolver().insert(FundsContentProvider.mUriRecentSearch, contentValues);
     }
 }

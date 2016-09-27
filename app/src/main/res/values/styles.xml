@@ -27,4 +27,11 @@
         <item name="android:textSize">@dimen/fund_title</item>
     </style>
 
+    <style name="suggestions_text_style">
+        <item name="android:layout_marginLeft">@dimen/text_view_layout_margin</item>
+        <item name="android:layout_marginRight">@dimen/text_view_layout_margin</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">@dimen/suggestion_text_size</item>
+        <item name="android:minHeight">@dimen/suggestions_list_item_min_height</item>
+    </style>
 </resources>

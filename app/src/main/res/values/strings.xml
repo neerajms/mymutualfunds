@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">My Mutual Funds</string>
     <string name="action_add_fund">Add more funds</string>
-    <string name="search_hint" translatable="true">Enter fund name</string>
+    <string name="search_hint" translatable="true">Enter fund name or scheme code</string>
     <string name="gcmtask_intent" translatable="false">info_from_gcmtask</string>
     <string name="search_data_bundle" translatable="false">data_bundle</string>
     <string name="basic_search_results_parcelable" translatable="false">basic_fund_info_parcelable</string>
@@ -13,7 +13,7 @@
     <string name="unique_constraint_failed_message">Fund already in portfolio</string>
     <string name="fund_added_message">Fund added to portfolio</string>
     <string name="units_title">Enter number of units</string>
-    <string name="alert_dialog_ok">Ok</string>
+    <string name="alert_dialog_ok">Submit</string>
     <string name="alert_dialog_cancel">Cancel</string>
     <string name="notify_data_change" translatable="false">notify</string>
     <string name="net_worth">Net Worth</string>
@@ -39,7 +39,9 @@
     <string name="key_fund_nav" translatable="false">fundNav</string>
     <string name="key_units_in_hand" translatable="false">unitsInHand</string>
     <string name="firebase_child_funds" translatable="false">funds</string>
-    <string name="menu_search_title">Search</string>
+    <string name="menu_clear_history">Clear search history</string>
+    <string name="history_cleared_toast">Cleared all search history</string>
+    <string name="nothing_to_clear_toast">Nothing to clear in history</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -186,13 +185,9 @@ public class FetchFundsTask extends GcmTaskService {
                     monthInt = 9;
             }
             Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);
-            Cursor cursor = mContext.getContentResolver().query(uri, null, null, null, null);
-            if (!cursor.moveToFirst()) {
-                ContentValues initial = new ContentValues();
-                initial.put(FundsContentProvider.FUND_SCODE, scode);
-                mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, initial);
-            }
-
+            ContentValues initial = new ContentValues();
+            initial.put(FundsContentProvider.FUND_SCODE, scode);
+            mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, initial);
             int year = yearInt;
             int quarter = 12;
             while (year >= yearInt - 2) {
@@ -240,23 +235,6 @@ public class FetchFundsTask extends GcmTaskService {
                 year--;
                 monthInt = 12;
             }
-//            cursor = mContext.getContentResolver().query(uri, null, null, null, null);
-//            if (cursor.moveToFirst()) {
-//                Log.d(TAG, cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_SCODE)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q12)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q11)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q10)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q9)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q8)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q7)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q6)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q5)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q4)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q3)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q2)) + "\n" +
-//                        cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV_Q1)));
-//            }
-//            getGraph(scode, "31/08/2015");
             Intent intent = new Intent();
             intent.setAction(mContext.getString(R.string.gcmtask_intent));
             intent.putExtra(mContext.getString(R.string.key_graph_fetched), true);
@@ -288,7 +266,6 @@ public class FetchFundsTask extends GcmTaskService {
             try {
                 JSONObject jsonObject = jsonNode.getObject();
                 nav = jsonObject.getString(KEY_NAV);
-//                Log.d(TAG,nav);
             } catch (JSONException je) {
                 Log.d(TAG, je.toString());
             }

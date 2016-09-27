@@ -28,5 +28,7 @@
     <dimen name="historical_graph_layout_margin">8dp</dimen>
     <dimen name="total_value_text_size">16sp</dimen>
     <dimen name="fund_name_in_detail_view">20sp</dimen>
-    <dimen name="suggestions_list_item_min_height">40dp</dimen>
+    <dimen name="suggestions_list_item_min_height">56dp</dimen>
+    <dimen name="suggestion_text_size">18sp</dimen>
+
 </resources>

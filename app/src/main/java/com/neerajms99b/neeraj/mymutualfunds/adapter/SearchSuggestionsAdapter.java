@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,8 +42,6 @@ public class SearchSuggestionsAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        Log.d("SearchSuggestionAdapter",cursor.getString(cursor.getColumnIndex(FundsContentProvider.SEARCH_WORD)));
-//        TextView textView = (TextView) view.findViewById(R.id.search_suggestion_text);
         mTextView.setText(cursor.getString(cursor.getColumnIndex(FundsContentProvider.SEARCH_WORD)));
     }
 }

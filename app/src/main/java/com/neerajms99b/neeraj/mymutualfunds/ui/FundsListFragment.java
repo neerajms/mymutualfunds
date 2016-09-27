@@ -177,7 +177,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
 //        ContentValues contentValues = new ContentValues();
 //        contentValues.put(FundsContentProvider.UNITS_OWNED, units);
 //        String[] selectionArgs = {scode};
-        mMyRef = mDatabase.getReference(mFirebaseUser.getUid());
+        mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
         mMyRef.child(scode).child("mUnits").setValue(units);
 //        getContext().getContentResolver().update(FundsContentProvider.mUri, contentValues, FundsContentProvider.KEY_ID, selectionArgs);
 //        restartLoader();
@@ -200,7 +200,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     public void getFirebaseData(){
-        mMyRef = mDatabase.getReference(mFirebaseUser.getUid());
+        mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
 //        myRef.keepSynced(true);
         Query query = mMyRef;
         mFirebaseAdapter = new FirebaseAdapter(FundInfo.class,

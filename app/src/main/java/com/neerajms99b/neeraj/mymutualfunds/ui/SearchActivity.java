@@ -1,25 +1,32 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
+import com.neerajms99b.neeraj.mymutualfunds.adapter.SearchSuggestionsAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.data.BasicFundInfoParcelable;
+import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 import java.util.ArrayList;
@@ -33,6 +40,10 @@ public class SearchActivity extends AppCompatActivity {
     private final String KEY_ARRAYLIST = "arraylist";
     private final String KEY_SCODESLIST = "scodeslist";
     private UnitsInputDialogFragment mUnitsInputDialogFragment;
+    private SearchSuggestionsAdapter mAdapter;
+    public Context mContext;
+    public String mRecentString;
+    public Cursor mCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,23 +53,47 @@ public class SearchActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setTitle(null);
 
+        mRecentString = FundsContentProvider.mUriRecentSearch.toString() + "/";
+        mContext = this;
+        mAdapter = new SearchSuggestionsAdapter(this, mCursor, 0);
         final Context context = this;
+
         final SearchView search = (SearchView) findViewById(R.id.search);
         search.setIconified(false);
-        search.setLayoutParams(new Toolbar.LayoutParams(Gravity.RIGHT));
+        search.setLayoutParams(new Toolbar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        search.setSuggestionsAdapter(mAdapter);
         search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
                 Intent intentService = new Intent(context, FundsIntentService.class);
                 intentService.putExtra("tag", "force");
                 intentService.putExtra("fund", query);
                 startService(intentService);
+//                mRecentSuggestions.saveRecentQuery(query,null);
+                Uri uri = Uri.parse(mRecentString + query);
+                mCursor = getContentResolver().query(uri, null, null, null, null);
+                if (!mCursor.moveToFirst()) {
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(FundsContentProvider.SEARCH_WORD, query);
+                    getContentResolver().insert(FundsContentProvider.mUriRecentSearch, contentValues);
+                }
                 mSwipeRefreshLayout.setRefreshing(true);
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
+                if (newText.length() >= 1) {
+                    Uri uri = Uri.parse(mRecentString + newText);
+                    mCursor = getContentResolver().query(uri, null, null, null, null);
+                    if (mCursor.moveToFirst()) {
+                        Log.d(TAG, mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.SEARCH_WORD)));
+                        mAdapter.changeCursor(mCursor);
+                        mAdapter.notifyDataSetChanged();
+                    } else {
+                        mAdapter.changeCursor(null);
+                    }
+                }
                 return false;
             }
         });
@@ -74,6 +109,7 @@ public class SearchActivity extends AppCompatActivity {
         fundsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
                 Intent intentService = new Intent(context, FundsIntentService.class);
                 intentService.putExtra("tag", getString(R.string.tag_search_scode));
                 intentService.putExtra(getString(R.string.key_scode), mScodesList.get(i));
@@ -97,7 +133,7 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
         }

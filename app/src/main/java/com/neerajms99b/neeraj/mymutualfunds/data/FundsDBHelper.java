@@ -26,6 +26,9 @@ public class FundsDBHelper extends SQLiteOpenHelper {
     private static final String NAV_Q11 = "q11";
     private static final String NAV_Q12 = "q12";
 
+    private static final String TABLE_NAME_RECENT_SEARCH = "recent";
+    private static final String SEARCH_WORD = "keyword";
+
 
     public static final String CREATE_FUNDS_DATABASE = "CREATE TABLE " + TABLE_NAME_HISTORICAL + " (" +
             KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -43,6 +46,10 @@ public class FundsDBHelper extends SQLiteOpenHelper {
             NAV_Q11 + " TEXT, " +
             NAV_Q12 + " TEXT);";
 
+    public static final String CREATE_RECENTS_DATABASE = "CREATE TABLE " + TABLE_NAME_RECENT_SEARCH
+            + " (" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+            SEARCH_WORD + " TEXT UNIQUE);";
+
     public FundsDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -50,6 +57,7 @@ public class FundsDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_FUNDS_DATABASE);
+        sqLiteDatabase.execSQL(CREATE_RECENTS_DATABASE);
     }
 
     @Override

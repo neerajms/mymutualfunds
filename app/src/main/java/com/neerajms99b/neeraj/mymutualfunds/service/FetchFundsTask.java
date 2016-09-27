@@ -152,7 +152,7 @@ public class FetchFundsTask extends GcmTaskService {
                     String units = "0";
                     FundInfo info = new FundInfo(scode, fundName, nav, units, changeValue, changePercent);
                     Map<String, Object> fund = info.toMap();
-                    myRef.child(scode).setValue(fund);
+                    myRef.child(mContext.getString(R.string.firebase_child_funds)).child(scode).setValue(fund);
                     sendToast(mContext.getString(R.string.fund_added_message));
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putBoolean(scode, true);

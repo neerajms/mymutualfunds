@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private FirebaseUser mFirebaseUser;
     private Context mContext;
     private ViewPager mViewPager;
+    private PagerAdapter mPagerAdapter;
     private final String TAG = MainActivity.class.getSimpleName();
 
     @Override
@@ -35,13 +36,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             finish();
             return;
         }
-        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
         final TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.tab_my_stats)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.tab_my_funds)));
         tabLayout.addOnTabSelectedListener(this);
         mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(pagerAdapter);
+        mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         mViewPager.setCurrentItem(tab.getPosition());
+        mPagerAdapter.notifyDataSetChanged();
     }
 
     @Override

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.Query;
 import com.neerajms99b.neeraj.mymutualfunds.R;
-import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
+import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.ui.FundsListFragment;
 
 /**

@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SearchSuggestionsAdapter;
-import com.neerajms99b.neeraj.mymutualfunds.data.BasicFundInfoParcelable;
+import com.neerajms99b.neeraj.mymutualfunds.models.BasicFundInfoParcelable;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 

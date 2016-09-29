@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="funds_recycler_view_top_margin">96dp</dimen>
+    <dimen name="net_worth_card_view_top_margin">104dp</dimen>
 </resources>

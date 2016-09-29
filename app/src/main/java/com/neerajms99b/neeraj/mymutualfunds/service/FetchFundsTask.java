@@ -21,8 +21,8 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.neerajms99b.neeraj.mymutualfunds.BuildConfig;
 import com.neerajms99b.neeraj.mymutualfunds.R;
-import com.neerajms99b.neeraj.mymutualfunds.data.BasicFundInfoParcelable;
-import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
+import com.neerajms99b.neeraj.mymutualfunds.models.BasicFundInfoParcelable;
+import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 
 import org.json.JSONArray;
@@ -136,7 +136,7 @@ public class FetchFundsTask extends GcmTaskService {
                         JSONObject jsonObject = jsonNodeHttpResponse.getObject();
                         JSONObject jsonObject1 = jsonObject.getJSONObject(scode);
                         fundName = jsonObject1.getString(KEY_FUNDNAME);
-                        nav = jsonObject1.getString(KEY_NAV);
+                        nav = String.format("%.2f",Float.parseFloat(jsonObject1.getString(KEY_NAV)));
                         JSONObject jsonObject2 = jsonObject1.getJSONObject(KEY_CHANGE);
                         changeValue = jsonObject2.getString(KEY_CHANGE_VALUE);
                         changePercent = jsonObject2.getString(KEY_CHANGE_PERCENT);

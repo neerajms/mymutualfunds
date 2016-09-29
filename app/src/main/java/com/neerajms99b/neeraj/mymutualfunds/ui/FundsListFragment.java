@@ -30,7 +30,7 @@ import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FirebaseAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FundsListAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SimpleItemTouchHelper;
-import com.neerajms99b.neeraj.mymutualfunds.data.FundInfo;
+import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 
 /**
@@ -128,7 +128,6 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         mFundsListAdapter.swapCursor(data);
 
         if (data.moveToFirst()) {
-//            setNetWorthAmount(data);
             mFab.hide();
         } else {
             mFab.show();
@@ -179,6 +178,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
 //        String[] selectionArgs = {scode};
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
         mMyRef.child(scode).child("mUnits").setValue(units);
+
 //        getContext().getContentResolver().update(FundsContentProvider.mUri, contentValues, FundsContentProvider.KEY_ID, selectionArgs);
 //        restartLoader();
     }
@@ -188,28 +188,29 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         startActivity(intent);
     }
 
-    public void deleteFirebaseNode(int position){
+    public void deleteFirebaseNode(int position) {
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid());
         String scode = mFirebaseAdapter.getItem(position).getScode();
         mMyRef.child(scode).removeValue();
-        Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString()+"/"+scode);
-        getActivity().getContentResolver().delete(uri,null,null);
+        Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);
+        getActivity().getContentResolver().delete(uri, null, null);
     }
+
     public void restartLoader() {
         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
     }
 
-    public void getFirebaseData(){
+    public void getFirebaseData() {
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
 //        myRef.keepSynced(true);
         Query query = mMyRef;
         mFirebaseAdapter = new FirebaseAdapter(FundInfo.class,
-                R.layout.main_activity_list_item,FirebaseAdapter.FundHolder.class,query,this);
+                R.layout.main_activity_list_item, FirebaseAdapter.FundHolder.class, query, this);
     }
 
-    public void showGraph(String scode,String fundName,String fundNav,String units){
-        Log.d(TAG,scode);
-        mCallBack.launchGraphActivity(scode,fundName,fundNav,units);
+    public void showGraph(String scode, String fundName, String fundNav, String units) {
+        Log.d(TAG, scode);
+        mCallBack.launchGraphActivity(scode, fundName, fundNav, units);
 //        Intent intentService = new Intent(getContext(), FundsIntentService.class);
 //        intentService.putExtra("tag",getString(R.string.tag_fetch_graph_data));
 //        intentService.putExtra(getString(R.string.key_scode),scode);

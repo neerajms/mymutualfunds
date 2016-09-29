@@ -47,7 +47,6 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     private ArrayList<String> mEntriesString;
     private ArrayList<Entry> mEntries;
     private LineChart mChart;
-    private final String mRupeeSymbol = "₹";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +56,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         mFundName = bundle.getString(getString(R.string.key_fundname));
         mFundNav = bundle.getString(getString(R.string.key_fund_nav));
         mUnits = bundle.getString(getString(R.string.key_units_in_hand));
-        mTotalValue = mRupeeSymbol + String.format("%.2f",Float.parseFloat(mFundNav) * Float.parseFloat(mUnits));
+        mTotalValue = getString(R.string.rupee_symbol) + String.format("%.2f",Float.parseFloat(mFundNav) * Float.parseFloat(mUnits));
 
         mContext = getContext();
         mEntriesString = new ArrayList<String>();

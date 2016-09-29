@@ -1,4 +1,4 @@
-package com.neerajms99b.neeraj.mymutualfunds.data;
+package com.neerajms99b.neeraj.mymutualfunds.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

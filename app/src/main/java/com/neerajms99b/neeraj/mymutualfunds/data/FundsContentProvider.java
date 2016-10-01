@@ -73,6 +73,9 @@ public class FundsContentProvider extends ContentProvider {
                 selection = FUND_SCODE + "=" + uri.getLastPathSegment();
                 Log.d("SELECTION:", selection);
                 break;
+            case 4:
+                qb.setTables(TABLE_NAME_HISTORICAL);
+                break;
 
             default:
                 return null;

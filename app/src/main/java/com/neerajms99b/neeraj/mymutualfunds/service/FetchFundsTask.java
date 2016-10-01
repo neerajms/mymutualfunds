@@ -3,7 +3,7 @@ package com.neerajms99b.neeraj.mymutualfunds.service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -21,9 +21,9 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.neerajms99b.neeraj.mymutualfunds.BuildConfig;
 import com.neerajms99b.neeraj.mymutualfunds.R;
+import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.models.BasicFundInfoParcelable;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
-import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -106,8 +106,7 @@ public class FetchFundsTask extends GcmTaskService {
                 intent.putExtra(mContext.getString(R.string.search_data_bundle), dataBundle);
                 LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
             }
-        }
-        if (taskParams.getTag().equals(mContext.getString(R.string.tag_search_scode))) {
+        }else if (taskParams.getTag().equals(mContext.getString(R.string.tag_search_scode))) {
             HttpResponse<JsonNode> response;
             String fundName = null;
             String nav = null;
@@ -116,9 +115,11 @@ public class FetchFundsTask extends GcmTaskService {
             String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference(mFirebaseUser.getUid());
-            SharedPreferences sharedPreferences = mContext.getSharedPreferences(
-                    mContext.getString(R.string.shared_prefs_file_key), MODE_PRIVATE);
-            if (sharedPreferences.getBoolean(scode, false)) {
+            ContentValues initial = new ContentValues();
+            initial.put(FundsContentProvider.FUND_SCODE, scode);
+            Uri resultUri = mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, initial);
+
+            if (resultUri == null) {
                 sendToast(mContext.getString(R.string.unique_constraint_failed_message));
             } else {
                 String query = "{\"scodes\":[\"" + scode + "\"]}";
@@ -153,13 +154,41 @@ public class FetchFundsTask extends GcmTaskService {
                     Map<String, Object> fund = info.toMap();
                     myRef.child(mContext.getString(R.string.firebase_child_funds)).child(scode).setValue(fund);
                     sendToast(mContext.getString(R.string.fund_added_message));
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putBoolean(scode, true);
-                    editor.commit();
+//                    SharedPreferences.Editor editor = sharedPreferences.edit();
+//                    editor.putBoolean(scode, true);
+//                    editor.commit();
                 }
             }
-        }
-        if (taskParams.getTag().equals(mContext.getString(R.string.tag_fetch_graph_data))) {
+        } else if (taskParams.getTag().equals(mContext.getResources().getString(R.string.tag_update_nav))){
+
+            Log.e("fetchfundstask","executed");
+            Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
+                    new String[]{FundsContentProvider.FUND_SCODE},null,null,null);
+            if (cursor.moveToFirst()){
+                int index = 0;
+                String scodes = "\"scodes\":[";
+                ArrayList<String> scodesArrayList = new ArrayList<>();
+                do {
+                    String scode = cursor.getString(
+                            cursor.getColumnIndex(FundsContentProvider.FUND_SCODE));
+                    scodes = scodes + "\""+ scode +"\""+",";
+                    scodesArrayList.add(scode);
+                    if (index == 4){
+                        index = 0;
+                        scodes = scodes + "\"" + cursor.getString(
+                                cursor.getColumnIndex(FundsContentProvider.FUND_SCODE))+"\"";
+                        fetchFundInfoFromApi(scodes, scodesArrayList);
+                        scodes = null;
+                        scodesArrayList.clear();
+                    }
+                    index++;
+                }while (cursor.moveToNext());
+                if (scodes != null){
+                    scodes = scodes.substring(0,scodes.length()-1);
+                    fetchFundInfoFromApi(scodes, scodesArrayList);
+                }
+            }
+        }else if (taskParams.getTag().equals(mContext.getString(R.string.tag_fetch_graph_data))) {
             String scode = taskParams.getExtras().getString(KEY_SCODE);
             Calendar date = Calendar.getInstance();
             SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
@@ -185,9 +214,6 @@ public class FetchFundsTask extends GcmTaskService {
                     monthInt = 9;
             }
             Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);
-            ContentValues initial = new ContentValues();
-            initial.put(FundsContentProvider.FUND_SCODE, scode);
-            mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, initial);
             int year = yearInt;
             int quarter = 12;
             while (year >= yearInt - 2) {
@@ -273,5 +299,43 @@ public class FetchFundsTask extends GcmTaskService {
             Log.d(TAG, ue.toString());
         }
         return nav;
+    }
+
+    public void fetchFundInfoFromApi(String scodes, ArrayList<String> scodesArrayList){
+        String query = "{" + scodes + "]}";
+        try {
+            HttpResponse<JsonNode> response = Unirest.post(FUNDS_BASE_URL)
+                    .header(KEY_PARAM, KEY_VALUE)
+                    .header(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE)
+                    .header(ACCEPT_PARAM, ACCEPT_VALUE)
+                    .body(query)
+                    .asJson();
+            JsonNode jsonNode = response.getBody();
+            Log.e(TAG,query.toString());
+            JSONObject jsonObject = jsonNode.getObject();
+            for (int index = 0; index <scodesArrayList.size(); index++){
+                extractInfoFromJson(scodesArrayList.get(index),jsonObject);
+            }
+        }catch (UnirestException ue){
+            Log.e(TAG,ue.toString());
+        }
+    }
+    public void extractInfoFromJson(String scode,JSONObject object){
+        try {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference(mFirebaseUser.getUid())
+                    .child(mContext.getString(R.string.firebase_child_funds)).child(scode);
+            JSONObject jsonObject = object.getJSONObject(scode);
+            String nav = jsonObject.getString("nav");
+            JSONObject jsonObject1 = jsonObject.getJSONObject("change");
+            String changePercent = jsonObject1.getString("value");
+            String changeValue = jsonObject1.getString("percent");
+            Log.e(TAG,nav + " " + changePercent + " " + changeValue);
+            myRef.child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
+            myRef.child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
+            myRef.child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
+        }catch (JSONException je){
+            Log.e(TAG,je.toString());
+        }
     }
 }

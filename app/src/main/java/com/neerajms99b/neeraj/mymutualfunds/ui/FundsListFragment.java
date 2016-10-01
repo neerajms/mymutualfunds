@@ -189,7 +189,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     public void deleteFirebaseNode(int position) {
-        mMyRef = mDatabase.getReference(mFirebaseUser.getUid());
+        mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
         String scode = mFirebaseAdapter.getItem(position).getScode();
         mMyRef.child(scode).removeValue();
         Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);

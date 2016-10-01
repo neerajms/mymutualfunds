@@ -14,7 +14,8 @@
     <dimen name="recyclerview_toppadding">4dp</dimen>
     <dimen name="net_worth_cardview_elevation">6dp</dimen>
     <dimen name="net_worth_heading_size">16sp</dimen>
-    <dimen name="net_worth_heading_top_padding">8dp</dimen>
+    <dimen name="net_worth_heading_top_margin">8dp</dimen>
+    <dimen name="margin_8dp">8dp</dimen>
     <dimen name="net_worth_text_size">20sp</dimen>
     <dimen name="net_worth_card_padding">16dp</dimen>
     <dimen name="input_dialog_margin">24dp</dimen>

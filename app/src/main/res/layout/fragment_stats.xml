@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackground"
     android:orientation="vertical"
     tools:showIn="@layout/activity_main">
 
@@ -11,10 +12,10 @@
         android:id="@+id/card_view_net_worth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/net_worth_card_view_top_margin"
+        android:layout_marginBottom="@dimen/cardview_layout_margin"
         android:layout_marginLeft="@dimen/cardview_layout_margin"
         android:layout_marginRight="@dimen/cardview_layout_margin"
-        android:layout_marginBottom="@dimen/cardview_layout_margin"
+        android:layout_marginTop="@dimen/net_worth_card_view_top_margin"
         android:minHeight="@dimen/cardview_minheight"
         card_view:cardCornerRadius="2dp">
 
@@ -26,19 +27,31 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:gravity="center_horizontal"
-                android:paddingTop="@dimen/net_worth_heading_top_padding"
+                android:layout_marginLeft="@dimen/margin_8dp"
+                android:layout_marginStart="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/net_worth_heading_top_margin"
                 android:text="@string/net_worth"
                 android:textSize="@dimen/net_worth_heading_size" />
 
             <TextView
                 android:id="@+id/net_worth_amount"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_8dp"
+                android:layout_marginStart="@dimen/margin_8dp"
                 android:textSize="@dimen/net_worth_text_size" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_networth"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/historical_graph_height"
+                android:layout_margin="@dimen/historical_graph_layout_margin" />
+
         </LinearLayout>
 
     </android.support.v7.widget.CardView>

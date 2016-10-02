@@ -42,6 +42,11 @@ public class FundsIntentService extends IntentService {
             Log.e("intent service","intent received");
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(intent.getStringExtra("tag")));
+        }else if (intent.getStringExtra("tag").equals(getString(R.string.tag_insert_scodes))){
+            Bundle bundle = new Bundle();
+            bundle.putString(getString(R.string.key_scode),intent.getStringExtra(getString(R.string.key_scode)));
+            FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
+            fetchFundsTask.onRunTask(new TaskParams(intent.getStringExtra("tag"),bundle));
         }
     }
 }

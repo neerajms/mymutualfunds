@@ -1,5 +1,8 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,11 +10,15 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.PagerAdapter;
+import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
     //    private FloatingActionButton mFab;
@@ -21,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
     private final String TAG = MainActivity.class.getSimpleName();
+    private AlarmManager mAlarmManager;
+    private PendingIntent mPendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setAlarm(this);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser == null) {
@@ -106,5 +116,28 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         intent.putExtra(getString(R.string.key_fund_nav),fundNav);
         intent.putExtra(getString(R.string.key_units_in_hand),units);
         startActivity(intent);
+    }
+
+    public void setAlarm(Context context) {
+        Log.e(TAG, "AlarmService set");
+        mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, FundsIntentService.class);
+        intent.putExtra("tag", context.getString(R.string.tag_update_nav));
+        mPendingIntent = PendingIntent.getService(context, 0, intent, 0);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 6);
+        calendar.set(Calendar.MINUTE, 50);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                1000 * 60, mPendingIntent);
+    }
+
+    public class BootReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+                setAlarm(mContext);
+            }
+        }
     }
 }

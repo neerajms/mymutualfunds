@@ -1,9 +1,5 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -32,7 +28,6 @@ import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.UpdateFragment;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.models.NetWorthGraphModel;
-import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,8 +55,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     private LineChart mChart;
     private int mLabelIndex;
     private ArrayList<NetWorthGraphModel> mGraphList;
-    private AlarmManager mAlarmManager;
-    private PendingIntent mPendingIntent;
+
 
 
     @Override
@@ -99,7 +93,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mNetWorthAmountTextView = (TextView) rootView.findViewById(R.id.net_worth_amount);
         Log.e(TAG, "oncreateview");
         setNetWorth();
-        setAlarm(getContext());
 //        AlarmReceiver alarmReceiver = new AlarmReceiver();
 //        alarmReceiver.setAlarm(getContext());
 //        populateChart();
@@ -355,18 +348,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         populateChart();
     }
 
-    public void setAlarm(Context context) {
-        Log.e(TAG, "AlarmService set");
-        mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, FundsIntentService.class);
-        intent.putExtra("tag", context.getString(R.string.tag_update_nav));
-        mPendingIntent = PendingIntent.getService(context, 0, intent, 0);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 22);
-        calendar.set(Calendar.MINUTE, 23);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                1000 * 60, mPendingIntent);
-    }
+
 
 }

@@ -87,7 +87,8 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(Loader loader, Cursor data) {
-        if (data.moveToFirst()) {
+        if (data.moveToFirst() && data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q5))!=null) {
+
             postExecute(data);
             populateChart();
 

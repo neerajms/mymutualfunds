@@ -46,6 +46,7 @@
     <string name="funds_array_list" translatable="false">fundsArrayList</string>
     <string name="key_change_percent" translatable="false">mChangePercent</string>
     <string name="key_change_value" translatable="false">mChangeValue</string>
+    <string name="tag_insert_scodes" translatable="false">insertScodes</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>

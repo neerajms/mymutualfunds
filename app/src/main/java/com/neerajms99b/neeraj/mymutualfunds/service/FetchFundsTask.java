@@ -178,7 +178,7 @@ public class FetchFundsTask extends GcmTaskService {
                         scodes = scodes + "\"" + cursor.getString(
                                 cursor.getColumnIndex(FundsContentProvider.FUND_SCODE))+"\"";
                         fetchFundInfoFromApi(scodes, scodesArrayList);
-                        scodes = null;
+                        scodes = "\"scodes\":[";
                         scodesArrayList.clear();
                     }
                     index++;
@@ -265,6 +265,11 @@ public class FetchFundsTask extends GcmTaskService {
             intent.setAction(mContext.getString(R.string.gcmtask_intent));
             intent.putExtra(mContext.getString(R.string.key_graph_fetched), true);
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        } else if (taskParams.getTag().equals(mContext.getString(R.string.tag_insert_scodes))){
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FundsContentProvider.FUND_SCODE,
+                    taskParams.getExtras().getString(mContext.getString(R.string.key_scode)));
+            mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical,contentValues);
         }
         return 0;
     }
@@ -327,9 +332,9 @@ public class FetchFundsTask extends GcmTaskService {
                     .child(mContext.getString(R.string.firebase_child_funds)).child(scode);
             JSONObject jsonObject = object.getJSONObject(scode);
             String nav = jsonObject.getString("nav");
-            JSONObject jsonObject1 = jsonObject.getJSONObject("change");
-            String changePercent = jsonObject1.getString("value");
-            String changeValue = jsonObject1.getString("percent");
+            JSONObject jsonObject1 = jsonObject.getJSONObject(KEY_CHANGE);
+            String changePercent = jsonObject1.getString(KEY_CHANGE_PERCENT);
+            String changeValue = jsonObject1.getString(KEY_CHANGE_VALUE);
             Log.e(TAG,nav + " " + changePercent + " " + changeValue);
             myRef.child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
             myRef.child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);

@@ -30,8 +30,9 @@ import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FirebaseAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FundsListAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SimpleItemTouchHelper;
-import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
+import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
+import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -216,5 +217,10 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
 //        intentService.putExtra(getString(R.string.key_scode),scode);
 //        getActivity().startService(intentService);
     }
-
+    public void addScodeToDatabase(String scode){
+        Intent intent = new Intent(getContext(), FundsIntentService.class);
+        intent.putExtra("tag",getString(R.string.tag_insert_scodes));
+        intent.putExtra(getString(R.string.key_scode),scode);
+        getContext().startService(intent);
+    }
 }

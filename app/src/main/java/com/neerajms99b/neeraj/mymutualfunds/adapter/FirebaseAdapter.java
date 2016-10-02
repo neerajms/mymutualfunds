@@ -102,10 +102,11 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
 
     @Override
     protected void populateViewHolder(FundHolder viewHolder, final FundInfo model, int position) {
+        mCallBack.addScodeToDatabase(model.getScode());
         double changeValue = Double.valueOf(model.getChangeValue());
         double changePercent = Double.valueOf(model.getChangePercent().substring(0,model.getChangePercent().length()-1));
         boolean isNegative = false;
-        if (changeValue < 0.00d){
+        if (changeValue < 0.0){
             isNegative = true;
         }
         viewHolder.setFundName(model.getFundName());

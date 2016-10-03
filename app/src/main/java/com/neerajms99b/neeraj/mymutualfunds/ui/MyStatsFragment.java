@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -49,7 +50,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     private String TAG = MyStatsFragment.class.getSimpleName();
     private ArrayList<FundInfo> mFundsArrayList;
     private TextView mNetWorthAmountTextView;
-    private String mTodaysDate;
+    private String mToday;
+    private String mYesterday;
     private ArrayList<String> mLabels;
     private ArrayList<String> mEntriesString;
     private ArrayList<Entry> mEntries;
@@ -58,7 +60,10 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     private ArrayList<NetWorthGraphModel> mGraphList;
     private float mNetWorthFire;
     private Iterable<DataSnapshot> mDataSnapshotIterable;
-
+    private String mNetWorthChange;
+    private boolean mIsNetChangeNegative;
+    private TextView mNetWorthChangeTextView;
+    private ImageView mChangeArrow;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,7 +78,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mEntries = new ArrayList<>();
         mLabels = new ArrayList<String>();
         mGraphList = new ArrayList<>();
-        getTodaysDate();
+        getDates();
         readFirebaseFundsList();
         setHasOptionsMenu(false);
     }
@@ -86,6 +91,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mChart = (LineChart) rootView.findViewById(R.id.chart_networth);
         readFirebaseNetworthList();
         mNetWorthAmountTextView = (TextView) rootView.findViewById(R.id.net_worth_amount);
+        mNetWorthChangeTextView = (TextView) rootView.findViewById(R.id.net_worth_change);
+        mChangeArrow = (ImageView) rootView.findViewById(R.id.net_worth_arrow);
         Log.e(TAG, "oncreateview");
         setNetWorth();
         return rootView;
@@ -100,7 +107,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 //                String key = dataSnapshot.getKey();
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
-                Log.e(TAG,fundInfo.getFundName());
+                Log.e(TAG, fundInfo.getFundName());
 
                 if (!alreadyPresent(fundInfo)) {
                     mFundsArrayList.add(fundInfo);
@@ -188,6 +195,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     public void updateNetWorth() {
         calculateNetWorth();
         setNetWorth();
+        setNetWorthChange();
     }
 
     public void reflectRemoval(FundInfo fundInfo) {
@@ -211,16 +219,27 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 Object value = dataSnapshot.getValue();
                 String date = dataSnapshot.getKey();
                 String netWorth = String.valueOf(value);
-                if (date.equals(mTodaysDate)) {
+//                String netWorthToday = null;
+//                String netWorthYesterday = null;
+                if (date.equals(mToday)) {
+//                    netWorthToday = netWorth;
                     netWorth = getString(R.string.rupee_symbol) + netWorth;
                     mNetWorthAmountTextView.setText(netWorth);
                 }
+// else if (date.equals(mYesterday)){
+//                    netWorthYesterday = netWorth;
+//                }
+//                if (netWorthToday != null && netWorthYesterday != null)
                 processGraphData(dataSnapshot);
+                calculateNetWorthChange();
+                setNetWorthChange();
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 changeNetworthList(dataSnapshot);
+                calculateNetWorthChange();
+                setNetWorthChange();
             }
 
             @Override
@@ -241,13 +260,23 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         netWorthRef.addChildEventListener(childEventListener);
     }
 
-    public void getTodaysDate() {
+    public void getDates() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-        mTodaysDate = format.format(calendar.getTime());
+        mToday = format.format(calendar.getTime());
+        try {
+            calendar.setTime(format.parse(mToday));
+            calendar.add(Calendar.DATE, -1);
+            mYesterday = format.format(calendar.getTime());
+        } catch (ParseException pe) {
+            Log.e(TAG, pe.toString());
+        }
     }
 
     public void populateChart() {
+        if (mNetWorthChange != null){
+            setNetWorthChange();
+        }
         LineDataSet lineDataSet = new LineDataSet(mEntries,
                 getString(R.string.stock_values));
         lineDataSet.setDrawCircles(true);
@@ -332,5 +361,35 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             mLabels.add(i, mGraphList.get(i).getDate().toString().substring(4, 10));
         }
         populateChart();
+    }
+
+    public void calculateNetWorthChange() {
+        if (mGraphList.size() >= 2) {
+            float netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
+            float netWorthPrevious = Float.parseFloat(mGraphList.get(mGraphList.size() - 2).getNetworth());
+            float changeValue = netWorthLatest - netWorthPrevious;
+            float changePercent = Math.abs(changeValue) * 100 / netWorthPrevious;
+            String changePercentStr = String.format("%.2f",changePercent);
+            if (changeValue<0){
+                mIsNetChangeNegative = true;
+            }else {
+                mIsNetChangeNegative = false;
+            }
+
+            mNetWorthChange = String.valueOf(Math.abs(changeValue))+"("+changePercentStr+"%)";
+            Log.e(TAG, "netChPerc: " + String.valueOf(changeValue) + " " + String.valueOf(changePercent) + "%");
+        }
+    }
+    public void setNetWorthChange(){
+        mNetWorthChangeTextView.setText(mNetWorthChange);
+        if (mIsNetChangeNegative){
+            mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorRed));
+            mChangeArrow.setImageResource(R.drawable.ic_action_down);
+            mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorRed));
+        }else {
+            mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+            mChangeArrow.setImageResource(R.drawable.ic_action_up);
+            mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+        }
     }
 }

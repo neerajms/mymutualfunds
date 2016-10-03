@@ -16,7 +16,7 @@
     <string name="alert_dialog_ok">Submit</string>
     <string name="alert_dialog_cancel">Cancel</string>
     <string name="notify_data_change" translatable="false">notify</string>
-    <string name="net_worth">Net Worth</string>
+    <string name="net_worth_label">Net Worth</string>
     <string name="key_net_worth" translatable="false">net_worth</string>
     <string name="title_activity_my_stats">MyStatsActivity</string>
     <string name="action_settings">Settings</string>

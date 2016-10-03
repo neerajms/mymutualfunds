@@ -20,7 +20,7 @@
     <style name="fundName">
         <item name="android:fontFamily">@string/roboto_regular</item>
         <item name="android:textSize">@dimen/fund_title</item>
-        <item name="android:textColor">@color/fundNameBlack</item>
+        <item name="android:textColor">@color/textColorBlack</item>
     </style>
     <style name="navValue">
         <item name="android:fontFamily">@string/roboto_medium</item>

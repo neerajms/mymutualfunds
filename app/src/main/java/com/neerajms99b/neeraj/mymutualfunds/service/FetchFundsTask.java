@@ -154,9 +154,6 @@ public class FetchFundsTask extends GcmTaskService {
                     Map<String, Object> fund = info.toMap();
                     myRef.child(mContext.getString(R.string.firebase_child_funds)).child(scode).setValue(fund);
                     sendToast(mContext.getString(R.string.fund_added_message));
-//                    SharedPreferences.Editor editor = sharedPreferences.edit();
-//                    editor.putBoolean(scode, true);
-//                    editor.commit();
                 }else {
                     sendToast(mContext.getString(R.string.message_failed_to_add_fund));
                     Uri uriDelete = Uri.parse(FundsContentProvider.mUriHistorical.toString() +

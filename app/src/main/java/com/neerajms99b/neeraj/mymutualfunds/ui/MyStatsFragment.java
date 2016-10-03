@@ -36,6 +36,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
+
 /**
  * Created by neeraj on 27/8/16.
  */
@@ -55,7 +56,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     private LineChart mChart;
     private int mLabelIndex;
     private ArrayList<NetWorthGraphModel> mGraphList;
-
+    private float mNetWorthFire;
+    private Iterable<DataSnapshot> mDataSnapshotIterable;
 
 
     @Override
@@ -72,37 +74,21 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mLabels = new ArrayList<String>();
         mGraphList = new ArrayList<>();
         getTodaysDate();
-
-        if (savedInstanceState != null && savedInstanceState.containsKey(getString(R.string.funds_array_list))) {
-            mFundsArrayList = savedInstanceState.getParcelableArrayList(getString(R.string.funds_array_list));
-            calculateNetWorth();
-        } else {
-
-        }
         readFirebaseFundsList();
-
         setHasOptionsMenu(false);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_stats, container, false);
         mChart = (LineChart) rootView.findViewById(R.id.chart_networth);
         readFirebaseNetworthList();
         mNetWorthAmountTextView = (TextView) rootView.findViewById(R.id.net_worth_amount);
         Log.e(TAG, "oncreateview");
         setNetWorth();
-//        AlarmReceiver alarmReceiver = new AlarmReceiver();
-//        alarmReceiver.setAlarm(getContext());
-//        populateChart();
         return rootView;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(getString(R.string.funds_array_list), mFundsArrayList);
     }
 
     public void readFirebaseFundsList() {
@@ -112,22 +98,29 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                String key = dataSnapshot.getKey();
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
+                Log.e(TAG,fundInfo.getFundName());
+
                 if (!alreadyPresent(fundInfo)) {
                     mFundsArrayList.add(fundInfo);
                 }
+//                readFIrebaseDataOnce();
+
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
                 reflectChange(fundInfo);
+//                readFIrebaseDataOnce();
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
                 reflectRemoval(fundInfo);
+//                readFIrebaseDataOnce();
             }
 
             @Override
@@ -144,11 +137,13 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     }
 
     public boolean alreadyPresent(FundInfo fundInfo) {
-        for (int i = 0; i < mFundsArrayList.size(); i++) {
-            if (mFundsArrayList.get(i).getScode().equals(fundInfo.getScode())) {
-                mFundsArrayList.remove(i);
-                mFundsArrayList.add(i, fundInfo);
-                return true;
+        if (mFundsArrayList.size() > 0) {
+            for (int i = 0; i < mFundsArrayList.size(); i++) {
+                if (mFundsArrayList.get(i).getScode().equals(fundInfo.getScode())) {
+                    mFundsArrayList.remove(i);
+                    mFundsArrayList.add(i, fundInfo);
+                    return true;
+                }
             }
         }
         return false;
@@ -213,27 +208,18 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
                 Object value = dataSnapshot.getValue();
                 String date = dataSnapshot.getKey();
                 String netWorth = String.valueOf(value);
-//                mEntries.add(mLabelIndex, new Entry(mLabelIndex, Float.valueOf(netWorth)));
-//                mLabels.add(mLabelIndex, date.substring(0, 5));
                 if (date.equals(mTodaysDate)) {
                     netWorth = getString(R.string.rupee_symbol) + netWorth;
                     mNetWorthAmountTextView.setText(netWorth);
                 }
-
-//                mChart.notifyDataSetChanged();
-//                populateChart();
-//                mLabelIndex++;
-//                Log.e(TAG, "networth count:" + String.valueOf(mEntries.size()));
                 processGraphData(dataSnapshot);
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//                String netWorth = dataSnapshot.getValue().toString();
                 changeNetworthList(dataSnapshot);
             }
 
@@ -321,7 +307,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             NetWorthGraphModel netWorthGraphModel = new NetWorthGraphModel(date,
                     dataSnapshot.getValue().toString());
             mGraphList.add(index, netWorthGraphModel);
-            mEntries.add(index,new Entry(index,Float.valueOf(mGraphList.get(index).getNetworth())));
+            mEntries.add(index, new Entry(index, Float.valueOf(mGraphList.get(index).getNetworth())));
         } catch (ParseException pe) {
             Log.e(TAG, pe.toString());
         }
@@ -347,7 +333,4 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         }
         populateChart();
     }
-
-
-
 }

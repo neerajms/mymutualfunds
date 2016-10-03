@@ -33,8 +33,10 @@
     <string name="shared_prefs_file_key" translatable="false">com.neerajms99b.neeraj.mymutualfunds.file_key</string>
     <string name="tag_fetch_graph_data" translatable="false">fetchGraphData</string>
     <string name="key_graph_fetched" translatable="false">graphDataFetched</string>
-    <string name="stock_values">Stock Values</string>
-    <string name="chart_description">NAV for the last few quarter ends</string>
+    <string name="net_worth_graph_value">Net worth values</string>
+    <string name="net_worth_graph_description">Net worth for the last few days</string>
+    <string name="nav_chart_description">NAV for the last few quarter ends</string>
+    <string name="nav_chart_values">Net Asset Value</string>
     <string name="total_value">Total value:</string>
     <string name="key_fund_nav" translatable="false">mNav</string>
     <string name="key_units_in_hand" translatable="false">unitsInHand</string>

@@ -197,7 +197,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
 
     public void populateChart() {
         LineDataSet lineDataSet = new LineDataSet(mEntries,
-                getString(R.string.stock_values));
+                getString(R.string.nav_chart_values));
         lineDataSet.setDrawCircles(false);
         lineDataSet.setDrawFilled(false);
 //        lineDataSet.setFillColor(getResources().getColor(android.R.color.holo_blue_light));
@@ -237,7 +237,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
         LineData data = new LineData(lineDataSet);
-        mChart.setDescription(getString(R.string.chart_description));
+        mChart.setDescription(getString(R.string.nav_chart_description));
         mChart.setData(data);
         mChart.animateY(0);
     }

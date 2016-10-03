@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
     android:orientation="vertical"
     tools:showIn="@layout/activity_main">
 
@@ -66,8 +65,8 @@
                     android:id="@+id/net_worth_change"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/text_view_layout_margin"
                     android:layout_marginBottom="@dimen/text_view_layout_margin"
+                    android:layout_marginTop="@dimen/text_view_layout_margin"
                     android:gravity="center_vertical" />
             </LinearLayout>
 
@@ -79,8 +78,14 @@
             <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/chart_networth"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/historical_graph_height"
-                android:layout_margin="@dimen/historical_graph_layout_margin" />
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_8dp"
+                android:layout_marginLeft="@dimen/margin_8dp"
+                android:layout_marginRight="@dimen/margin_8dp"
+                android:layout_marginStart="@dimen/margin_8dp"
+                android:layout_marginTop="@dimen/margin_8dp"
+                android:layout_marginBottom="@dimen/margin_16dp"
+                android:minHeight="@dimen/historical_graph_height" />
 
         </LinearLayout>
 

@@ -274,11 +274,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     }
 
     public void populateChart() {
-        if (mNetWorthChange != null){
-            setNetWorthChange();
-        }
         LineDataSet lineDataSet = new LineDataSet(mEntries,
-                getString(R.string.stock_values));
+                getString(R.string.net_worth_graph_value));
         lineDataSet.setDrawCircles(true);
         lineDataSet.setDrawCircleHole(true);
         lineDataSet.setCircleColorHole(getResources().getColor(R.color.colorAccent));
@@ -321,7 +318,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
 
         LineData data = new LineData(lineDataSet);
-        mChart.setDescription(getString(R.string.chart_description));
+        mChart.setDescription(getString(R.string.net_worth_graph_description));
         mChart.setData(data);
         mChart.animateY(0);
     }
@@ -364,32 +361,48 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     }
 
     public void calculateNetWorthChange() {
+        float netWorthLatest = 0.0f;
+        float netWorthPrevious = 0.0f;
+        float changeValue = 0.0f;
+        float changePercent = 0.0f;
+        mIsNetChangeNegative = false;
         if (mGraphList.size() >= 2) {
-            float netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
-            float netWorthPrevious = Float.parseFloat(mGraphList.get(mGraphList.size() - 2).getNetworth());
-            float changeValue = netWorthLatest - netWorthPrevious;
-            float changePercent = Math.abs(changeValue) * 100 / netWorthPrevious;
-            String changePercentStr = String.format("%.2f",changePercent);
-            if (changeValue<0){
+            netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
+            netWorthPrevious = Float.parseFloat(mGraphList.get(mGraphList.size() - 2).getNetworth());
+            changeValue = netWorthLatest - netWorthPrevious;
+            changePercent = Math.abs(changeValue) * 100 / netWorthPrevious;
+            String changePercentStr = String.format("%.2f", changePercent);
+            if (changeValue < 0) {
                 mIsNetChangeNegative = true;
-            }else {
-                mIsNetChangeNegative = false;
             }
-
-            mNetWorthChange = String.valueOf(Math.abs(changeValue))+"("+changePercentStr+"%)";
+            mNetWorthChange = String.valueOf(Math.abs(changeValue)) + "(" + changePercentStr + "%)";
+            Log.e(TAG, "netChPerc: " + String.valueOf(changeValue) + " " + String.valueOf(changePercent) + "%");
+        } else if (mGraphList.size() == 1) {
+            netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
+            netWorthPrevious = 0.0f;
+            changeValue = netWorthLatest - netWorthPrevious;
+            changePercent = Math.abs(changeValue) * 100 / netWorthPrevious;
+            String changePercentStr = String.format("%.2f", changePercent);
+            if (changeValue < 0) {
+                mIsNetChangeNegative = true;
+            }
+            mNetWorthChange = String.valueOf(Math.abs(changeValue)) + "(" + changePercentStr + "%)";
             Log.e(TAG, "netChPerc: " + String.valueOf(changeValue) + " " + String.valueOf(changePercent) + "%");
         }
     }
-    public void setNetWorthChange(){
-        mNetWorthChangeTextView.setText(mNetWorthChange);
-        if (mIsNetChangeNegative){
-            mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorRed));
-            mChangeArrow.setImageResource(R.drawable.ic_action_down);
-            mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorRed));
-        }else {
-            mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorGreen));
-            mChangeArrow.setImageResource(R.drawable.ic_action_up);
-            mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+
+    public void setNetWorthChange() {
+        if (mNetWorthChange != null) {
+            mNetWorthChangeTextView.setText(mNetWorthChange);
+            if (mIsNetChangeNegative) {
+                mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorRed));
+                mChangeArrow.setImageResource(R.drawable.ic_action_down);
+                mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorRed));
+            } else {
+                mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+                mChangeArrow.setImageResource(R.drawable.ic_action_up);
+                mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+            }
         }
     }
 }

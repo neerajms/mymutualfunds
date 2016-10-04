@@ -337,14 +337,19 @@ public class FetchFundsTask extends GcmTaskService {
             DatabaseReference myRef = database.getReference(mFirebaseUser.getUid())
                     .child(mContext.getString(R.string.firebase_child_funds)).child(scode);
             JSONObject jsonObject = object.getJSONObject(scode);
-            String nav = jsonObject.getString("nav");
+            String nav = jsonObject.getString(KEY_NAV);
+            String fundName = jsonObject.getString(KEY_FUNDNAME);
             JSONObject jsonObject1 = jsonObject.getJSONObject(KEY_CHANGE);
             String changePercent = jsonObject1.getString(KEY_CHANGE_PERCENT);
             String changeValue = jsonObject1.getString(KEY_CHANGE_VALUE);
             Log.e(TAG, nav + " " + changePercent + " " + changeValue);
-            myRef.child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
-            myRef.child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
-            myRef.child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
+            Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
+                    new String[]{FundsContentProvider.FUND_SCODE}, null, null, null);
+            if (cursor.moveToFirst()) {
+                myRef.child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
+                myRef.child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
+                myRef.child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
+            }
         } catch (JSONException je) {
             Log.e(TAG, je.toString());
         }

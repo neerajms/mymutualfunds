@@ -62,13 +62,13 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
             mFundName.setText(fundName);
         }
 
-        public void setFundNAV(String fundNav,boolean isNegative) {
-            if (isNegative){
+        public void setFundNAV(String fundNav, boolean isNegative) {
+            if (isNegative) {
                 mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorRed));
-            }else {
+            } else {
                 mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
             }
-            String nav = String.format("%.2f",Double.valueOf(fundNav));
+            String nav = String.format("%.2f", Double.valueOf(fundNav));
             mFundNAV.setText(nav);
         }
 
@@ -76,18 +76,18 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
             mUnits.setText(units);
         }
 
-        public void setChange(double changeValue,double changePercent,boolean isNegative){
-            if (isNegative){
+        public void setChange(double changeValue, double changePercent, boolean isNegative) {
+            if (isNegative) {
                 mChange.setTextColor(mCallBack.getResources().getColor(R.color.colorRed));
                 mArrow.setImageResource(R.drawable.ic_action_down);
                 mArrow.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 mChange.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
                 mArrow.setImageResource(R.drawable.ic_action_up);
                 mArrow.setVisibility(View.VISIBLE);
             }
-            String change = String.valueOf(Math.abs(changeValue))+
-                    "("+String.valueOf(Math.abs(changePercent))+"%"+")";
+            String change = String.valueOf(Math.abs(changeValue)) +
+                    "(" + String.valueOf(Math.abs(changePercent)) + "%" + ")";
             mChange.setText(change);
         }
 
@@ -95,7 +95,7 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
             return mEditButton;
         }
 
-        public CardView getFundCardView(){
+        public CardView getFundCardView() {
             return mFundCardView;
         }
     }
@@ -104,15 +104,15 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
     protected void populateViewHolder(FundHolder viewHolder, final FundInfo model, int position) {
         mCallBack.addScodeToDatabase(model.getScode());
         double changeValue = Double.valueOf(model.getChangeValue());
-        double changePercent = Double.valueOf(model.getChangePercent().substring(0,model.getChangePercent().length()-1));
+        double changePercent = Double.valueOf(model.getChangePercent().substring(0, model.getChangePercent().length() - 1));
         boolean isNegative = false;
-        if (changeValue < 0.0){
+        if (changeValue < 0.0) {
             isNegative = true;
         }
         viewHolder.setFundName(model.getFundName());
-        viewHolder.setFundNAV(model.getNav(),isNegative);
+        viewHolder.setFundNAV(model.getNav(), isNegative);
         viewHolder.setUnits(model.getUnits());
-        viewHolder.setChange(changeValue,changePercent,isNegative);
+        viewHolder.setChange(changeValue, changePercent, isNegative);
         viewHolder.getEditButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -122,7 +122,7 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         viewHolder.getFundCardView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCallBack.showGraph(model.getScode(),model.getFundName(),model.getNav(),model.getUnits());
+                mCallBack.showGraph(model.getScode(), model.getFundName(), model.getNav(), model.getUnits());
             }
         });
     }
@@ -152,7 +152,7 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         arrow.setVisibility(View.INVISIBLE);
         ImageButton editButton = (ImageButton) cardView.findViewById(R.id.edit_units);
         FundHolder viewHolder = new FundHolder(cardView, fundNameTextView, fundNAVTextView,
-                units, change, editButton,arrow);
+                units, change, editButton, arrow);
         return viewHolder;
     }
 

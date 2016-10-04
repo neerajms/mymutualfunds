@@ -120,6 +120,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
                 reflectChange(fundInfo);
+                calculateNetWorth();
+                storeNetWorthInFirebase();
 //                readFIrebaseDataOnce();
             }
 
@@ -127,6 +129,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
                 reflectRemoval(fundInfo);
+                calculateNetWorth();
+                storeNetWorthInFirebase();
 //                readFIrebaseDataOnce();
             }
 
@@ -164,6 +168,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 break;
             }
         }
+        Log.e(TAG,"reflect change executed");
     }
 
     public void calculateNetWorth() {
@@ -173,7 +178,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             mNetWorth = mNetWorth + (Float.parseFloat(fundInfo.getNav())
                     * Float.parseFloat(fundInfo.getUnits()));
         }
-        storeNetWorthInFirebase();
         Log.e(TAG, String.valueOf(mNetWorth));
     }
 
@@ -193,9 +197,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
     @Override
     public void updateNetWorth() {
-        calculateNetWorth();
-        setNetWorth();
-        setNetWorthChange();
+//        setNetWorth();
+//        setNetWorthChange();
     }
 
     public void reflectRemoval(FundInfo fundInfo) {
@@ -219,17 +222,10 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 Object value = dataSnapshot.getValue();
                 String date = dataSnapshot.getKey();
                 String netWorth = String.valueOf(value);
-//                String netWorthToday = null;
-//                String netWorthYesterday = null;
                 if (date.equals(mToday)) {
-//                    netWorthToday = netWorth;
                     netWorth = getString(R.string.rupee_symbol) + netWorth;
                     mNetWorthAmountTextView.setText(netWorth);
                 }
-// else if (date.equals(mYesterday)){
-//                    netWorthYesterday = netWorth;
-//                }
-//                if (netWorthToday != null && netWorthYesterday != null)
                 processGraphData(dataSnapshot);
                 calculateNetWorthChange();
                 setNetWorthChange();
@@ -239,6 +235,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 changeNetworthList(dataSnapshot);
                 calculateNetWorthChange();
+                setNetWorth();
                 setNetWorthChange();
             }
 
@@ -375,7 +372,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             if (changeValue < 0) {
                 mIsNetChangeNegative = true;
             }
-            mNetWorthChange = String.valueOf(Math.abs(changeValue)) + "(" + changePercentStr + "%)";
+            mNetWorthChange = String.format("%.2f",Math.abs(changeValue)) + "(" + changePercentStr + "%)";
             Log.e(TAG, "netChPerc: " + String.valueOf(changeValue) + " " + String.valueOf(changePercent) + "%");
         } else if (mGraphList.size() == 1) {
             netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
@@ -386,7 +383,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             if (changeValue < 0) {
                 mIsNetChangeNegative = true;
             }
-            mNetWorthChange = String.valueOf(Math.abs(changeValue)) + "(" + changePercentStr + "%)";
+            mNetWorthChange = String.format("%.2f",Math.abs(changeValue)) + "(" + changePercentStr + "%)";
             Log.e(TAG, "netChPerc: " + String.valueOf(changeValue) + " " + String.valueOf(changePercent) + "%");
         }
     }

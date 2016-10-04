@@ -7,8 +7,8 @@
     <string name="basic_search_results_parcelable" translatable="false">basic_fund_info_parcelable</string>
     <string name="tag_search_scode" translatable="false">search_scode</string>
     <string name="tag_search_fundname" translatable="false">search_fund</string>
-    <string name="key_scode" translatable="false">scode</string>
-    <string name="key_fundname" translatable="false">fund_name</string>
+    <string name="key_scode" translatable="false">mScode</string>
+    <string name="key_fundname" translatable="false">mFundName</string>
     <string name="key_toast_message" translatable="false">toast_message</string>
     <string name="unique_constraint_failed_message">Fund already in portfolio</string>
     <string name="fund_added_message">Fund added to portfolio</string>

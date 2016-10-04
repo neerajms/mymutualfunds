@@ -49,7 +49,7 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/funds_recycler_view"
-        android:layout_width="match_parent"
+        style="@style/screenLayoutStyle"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/funds_recycler_view_top_margin" />
 

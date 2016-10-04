@@ -63,13 +63,15 @@ public class FetchFundsTask extends GcmTaskService {
 
     public FetchFundsTask(Context context) {
         mContext = context;
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
     }
 
     @Override
     public int onRunTask(TaskParams taskParams) {
-
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        if (mContext == null){
+            mContext = this;
+        }
         if (taskParams.getTag().equals("force")) {
             HttpResponse<JsonNode> response;
             ArrayList<BasicFundInfoParcelable> fundsArrayList = new ArrayList<BasicFundInfoParcelable>();
@@ -338,7 +340,6 @@ public class FetchFundsTask extends GcmTaskService {
                     .child(mContext.getString(R.string.firebase_child_funds)).child(scode);
             JSONObject jsonObject = object.getJSONObject(scode);
             String nav = jsonObject.getString(KEY_NAV);
-            String fundName = jsonObject.getString(KEY_FUNDNAME);
             JSONObject jsonObject1 = jsonObject.getJSONObject(KEY_CHANGE);
             String changePercent = jsonObject1.getString(KEY_CHANGE_PERCENT);
             String changeValue = jsonObject1.getString(KEY_CHANGE_VALUE);

@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.PagerAdapter;
-import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
+import com.neerajms99b.neeraj.mymutualfunds.service.Alarm;
 
 import java.util.Calendar;
 
@@ -37,13 +37,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        setAlarm(this);
+        Alarm alarmManager = new Alarm();
+//        setAlarm(this);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser == null) {
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
+            setAlarm(this);
             return;
         }
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
@@ -121,15 +123,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void setAlarm(Context context) {
         Log.e(TAG, "AlarmService set");
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, FundsIntentService.class);
-        intent.putExtra("tag", context.getString(R.string.tag_update_nav));
-        mPendingIntent = PendingIntent.getService(context, 0, intent, 0);
+        Intent intent = new Intent(context, Alarm.class);
+//        intent.putExtra("tag", context.getString(R.string.tag_update_nav));
+        mPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 6);
-        calendar.set(Calendar.MINUTE, 50);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                1000 * 60, mPendingIntent);
+        mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, mPendingIntent);
     }
 
     public class BootReceiver extends BroadcastReceiver {

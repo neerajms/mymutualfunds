@@ -50,6 +50,7 @@
     <string name="key_change_value" translatable="false">mChangeValue</string>
     <string name="tag_insert_scodes" translatable="false">insertScodes</string>
     <string name="message_failed_to_add_fund">Failed to add fund, please try again</string>
+    <string name="retrigger_update_nav" translatable="false">retriggerUpdateNAV</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>

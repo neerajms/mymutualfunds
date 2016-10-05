@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         Log.e(TAG, "AlarmService set");
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, Alarm.class);
-//        intent.putExtra("tag", context.getString(R.string.tag_update_nav));
+        intent.putExtra("tag", context.getString(R.string.tag_update_nav));
         mPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());

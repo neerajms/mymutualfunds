@@ -330,7 +330,15 @@ public class FetchFundsTask extends GcmTaskService {
             }
         } catch (UnirestException ue) {
             Log.e(TAG, ue.toString());
+        }finally {
+            retriggerTask();
         }
+    }
+
+    public void retriggerTask(){
+        Intent intent = new Intent(mContext,Alarm.class);
+        intent.putExtra("tag",mContext.getString(R.string.retrigger_update_nav));
+        mContext.sendBroadcast(intent);
     }
 
     public void extractInfoFromJson(String scode, JSONObject object) {

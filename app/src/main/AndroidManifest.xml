@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".ui.MyFirebaseApp"
@@ -56,18 +56,25 @@
             android:name=".data.FundsContentProvider"
             android:authorities="com.neerajms99b.neeraj.mymutualfunds.data" />
 
-        <activity android:name=".ui.GraphActivity"/>
+        <activity
+            android:name=".ui.GraphActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.MainActivity" />
+        </activity>
 
-        <receiver android:name=".ui.MainActivity$BootReceiver"
+        <receiver
+            android:name=".ui.MainActivity$BootReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".service.Alarm"/>
-        
-        <receiver android:name=".ui.SearchActivity$NetworkReceiver"/>
+        <receiver android:name=".service.Alarm" />
+
+        <receiver android:name=".ui.SearchActivity$NetworkReceiver" />
 
     </application>
 

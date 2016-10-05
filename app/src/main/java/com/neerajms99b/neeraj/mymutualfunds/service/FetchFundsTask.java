@@ -343,7 +343,6 @@ public class FetchFundsTask extends GcmTaskService {
             }
         } catch (UnirestException ue) {
             Log.e(TAG, ue.toString());
-        } finally {
             retriggerTask();
         }
     }

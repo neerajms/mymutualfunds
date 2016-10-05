@@ -72,10 +72,11 @@ public class FetchFundsTask extends GcmTaskService {
         if (mContext == null) {
             mContext = this;
         }
-        if (taskParams.getTag().equals("force")) {
+        if (taskParams.getTag().equals(mContext.getString(R.string.tag_search_fund))) {
             HttpResponse<JsonNode> response;
             ArrayList<BasicFundInfoParcelable> fundsArrayList = new ArrayList<BasicFundInfoParcelable>();
-            String fundName = taskParams.getExtras().getString(KEY_FUNDNAME);
+            String fundName = taskParams.getExtras().getString(
+                    mContext.getString(R.string.key_fund_search_word));
             String query = "{\"search\":\"" + fundName + "\"}";
             try {
                 response = Unirest.post(FUNDS_BASE_URL)
@@ -349,7 +350,7 @@ public class FetchFundsTask extends GcmTaskService {
 
     public void retriggerTask() {
         Intent intent = new Intent(mContext, Alarm.class);
-        intent.putExtra("tag", mContext.getString(R.string.retrigger_update_nav));
+        intent.putExtra(mContext.getString(R.string.key_tag), mContext.getString(R.string.retrigger_update_nav));
         mContext.sendBroadcast(intent);
     }
 

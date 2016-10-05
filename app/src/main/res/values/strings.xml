@@ -54,6 +54,9 @@
     <string name="message_fund_not_found">Fund not found</string>
     <string name="message_something_went_wrong">Something went wrong, please try again</string>
     <string name="message_offline">Offline</string>
+    <string name="key_tag" translatable="false">tag</string>
+    <string name="tag_search_fund" translatable="false">searchFund</string>
+    <string name="key_fund_search_word" translatable="false">fundSearchWord</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>

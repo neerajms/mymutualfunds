@@ -125,7 +125,7 @@ public class SearchActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Intent intentService = new Intent(context, FundsIntentService.class);
-                intentService.putExtra("tag", getString(R.string.tag_search_scode));
+                intentService.putExtra(context.getString(R.string.key_tag), getString(R.string.tag_search_scode));
                 intentService.putExtra(getString(R.string.key_scode), mScodesList.get(i));
                 startService(intentService);
             }
@@ -178,7 +178,7 @@ public class SearchActivity extends AppCompatActivity {
                 showList();
                 mSwipeRefreshLayout.setRefreshing(false);
             } else if (intent.getExtras().containsKey(getString(R.string.key_toast_message))) {
-                if (mSwipeRefreshLayout.isRefreshing()){
+                if (mSwipeRefreshLayout.isRefreshing()) {
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
                 Toast.makeText(context,
@@ -215,7 +215,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mNetworkReceiver = new NetworkReceiver();
-        mContext.registerReceiver(mNetworkReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        mContext.registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter(getResources().getString(R.string.gcmtask_intent)));
     }
@@ -230,22 +230,21 @@ public class SearchActivity extends AppCompatActivity {
     public void onSubmission(String query) {
         mSwipeRefreshLayout.setRefreshing(true);
         Intent intentService = new Intent(mContext, FundsIntentService.class);
-        intentService.putExtra("tag", "force");
-        intentService.putExtra("fund", query);
+        intentService.putExtra(mContext.getString(R.string.key_tag), getString(R.string.tag_search_fund));
+        intentService.putExtra(mContext.getString(R.string.key_fund_search_word), query);
         startService(intentService);
-//        Uri uri = Uri.parse(mRecentString + query);
-//        mCursor = getContentResolver().query(uri, null, null, null, null);
         ContentValues contentValues = new ContentValues();
         contentValues.put(FundsContentProvider.SEARCH_WORD, query);
         getContentResolver().insert(FundsContentProvider.mUriRecentSearch, contentValues);
     }
+
     public class NetworkReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (isInternetOn(context)){
+            if (isInternetOn(context)) {
                 mSearchView.setVisibility(View.VISIBLE);
                 mDisconnectedIndicator.setVisibility(View.INVISIBLE);
-            }else {
+            } else {
                 mSearchView.setVisibility(View.INVISIBLE);
                 mDisconnectedIndicator.setVisibility(View.VISIBLE);
             }
@@ -258,4 +257,5 @@ public class SearchActivity extends AppCompatActivity {
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
+
 }

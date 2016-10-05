@@ -74,8 +74,6 @@
 
         <receiver android:name=".service.Alarm" />
 
-        <receiver android:name=".ui.SearchActivity$NetworkReceiver" />
-
     </application>
 
 </manifest>

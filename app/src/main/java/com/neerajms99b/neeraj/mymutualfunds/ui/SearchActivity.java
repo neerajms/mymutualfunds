@@ -167,6 +167,9 @@ public class SearchActivity extends AppCompatActivity {
                 showList();
                 mSwipeRefreshLayout.setRefreshing(false);
             } else if (intent.getExtras().containsKey(getString(R.string.key_toast_message))) {
+                if (mSwipeRefreshLayout.isRefreshing()){
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
                 Toast.makeText(context,
                         intent.getExtras().getString(getString(R.string.key_toast_message)),
                         Toast.LENGTH_SHORT).show();

@@ -69,7 +69,7 @@ public class FetchFundsTask extends GcmTaskService {
     public int onRunTask(TaskParams taskParams) {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        if (mContext == null){
+        if (mContext == null) {
             mContext = this;
         }
         if (taskParams.getTag().equals("force")) {
@@ -84,22 +84,34 @@ public class FetchFundsTask extends GcmTaskService {
                         .header(ACCEPT_PARAM, ACCEPT_VALUE)
                         .body(query)
                         .asJson();
-                JsonNode jsonNodeHttpResponse = response.getBody();
+                if (response.getBody().toString().equals("[]")) {
+                    throw new UnirestException(mContext.getString(R.string.message_fund_not_found));
+                }
+
+
                 try {
+                    JsonNode jsonNodeHttpResponse = response.getBody();
                     JSONArray jsonArray = jsonNodeHttpResponse.getArray();
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONArray innerJsonArray = jsonArray.getJSONArray(i);
                         fundsArrayList.add(new BasicFundInfoParcelable(innerJsonArray.getString(0),
                                 innerJsonArray.getString(3)));
-                        Log.d(TAG, innerJsonArray.getString(3));
+                        Log.e(TAG, innerJsonArray.getString(3));
                     }
 
                 } catch (JSONException e) {
-                    Log.d(TAG, e.toString());
+                    sendToast(mContext.getString(R.string.message_something_went_wrong));
+                    Log.e(TAG, e.toString());
                 }
             } catch (UnirestException e) {
-                Log.d(TAG, e.toString());
+                if (e.getMessage().equals(mContext.getString(R.string.message_fund_not_found))) {
+                    sendToast(mContext.getString(R.string.message_fund_not_found));
+                } else {
+                    sendToast(mContext.getString(R.string.message_something_went_wrong));
+                }
+                Log.e(TAG, e.toString());
             }
+
             if (fundsArrayList.size() > 0) {
                 Bundle dataBundle = new Bundle();
                 dataBundle.putParcelableArrayList(mContext.getString(R.string.basic_search_results_parcelable), fundsArrayList);
@@ -156,11 +168,11 @@ public class FetchFundsTask extends GcmTaskService {
                     Map<String, Object> fund = info.toMap();
                     myRef.child(mContext.getString(R.string.firebase_child_funds)).child(scode).setValue(fund);
                     sendToast(mContext.getString(R.string.fund_added_message));
-                }else {
+                } else {
                     sendToast(mContext.getString(R.string.message_failed_to_add_fund));
                     Uri uriDelete = Uri.parse(FundsContentProvider.mUriHistorical.toString() +
                             "/" + scode);
-                    mContext.getContentResolver().delete(uriDelete,null,null);
+                    mContext.getContentResolver().delete(uriDelete, null, null);
                 }
             }
         } else if (taskParams.getTag().equals(mContext.getResources().getString(R.string.tag_update_nav))) {
@@ -330,14 +342,14 @@ public class FetchFundsTask extends GcmTaskService {
             }
         } catch (UnirestException ue) {
             Log.e(TAG, ue.toString());
-        }finally {
+        } finally {
             retriggerTask();
         }
     }
 
-    public void retriggerTask(){
-        Intent intent = new Intent(mContext,Alarm.class);
-        intent.putExtra("tag",mContext.getString(R.string.retrigger_update_nav));
+    public void retriggerTask() {
+        Intent intent = new Intent(mContext, Alarm.class);
+        intent.putExtra("tag", mContext.getString(R.string.retrigger_update_nav));
         mContext.sendBroadcast(intent);
     }
 

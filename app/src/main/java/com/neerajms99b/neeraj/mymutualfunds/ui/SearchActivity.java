@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -22,12 +24,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SearchSuggestionsAdapter;
-import com.neerajms99b.neeraj.mymutualfunds.models.BasicFundInfoParcelable;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
+import com.neerajms99b.neeraj.mymutualfunds.models.BasicFundInfoParcelable;
 import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 import java.util.ArrayList;
@@ -45,6 +48,9 @@ public class SearchActivity extends AppCompatActivity {
     public Context mContext;
     public String mRecentString;
     public Cursor mCursor;
+    private NetworkReceiver mNetworkReceiver;
+    private SearchView mSearchView;
+    private TextView mDisconnectedIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +65,13 @@ public class SearchActivity extends AppCompatActivity {
         mAdapter = new SearchSuggestionsAdapter(this, mCursor, 0);
         final Context context = this;
 
-        final SearchView search = (SearchView) findViewById(R.id.search);
-        search.setIconified(false);
-        search.setLayoutParams(new Toolbar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
-        search.setSuggestionsAdapter(mAdapter);
-        search.setQueryHint(getString(R.string.search_hint));
-        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView = (SearchView) findViewById(R.id.search);
+        mSearchView.setIconified(false);
+        mSearchView.setLayoutParams(new Toolbar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        mSearchView.setSuggestionsAdapter(mAdapter);
+        mSearchView.setQueryHint(getString(R.string.search_hint));
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 onSubmission(query);
@@ -77,7 +84,8 @@ public class SearchActivity extends AppCompatActivity {
                     Uri uri = Uri.parse(mRecentString + newText);
                     mCursor = getContentResolver().query(uri, null, null, null, null);
                     if (mCursor.moveToFirst()) {
-                        Log.d(TAG, mCursor.getString(mCursor.getColumnIndex(FundsContentProvider.SEARCH_WORD)));
+                        Log.d(TAG, mCursor.getString(
+                                mCursor.getColumnIndex(FundsContentProvider.SEARCH_WORD)));
                         mAdapter.changeCursor(mCursor);
                         mAdapter.notifyDataSetChanged();
                     } else {
@@ -87,7 +95,7 @@ public class SearchActivity extends AppCompatActivity {
                 return false;
             }
         });
-        search.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+        mSearchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
             @Override
             public boolean onSuggestionSelect(int position) {
                 return false;
@@ -96,10 +104,13 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onSuggestionClick(int position) {
                 Cursor cursor = mAdapter.getCursor();
-                onSubmission(cursor.getString(cursor.getColumnIndex(FundsContentProvider.SEARCH_WORD)));
+                onSubmission(cursor.getString(
+                        cursor.getColumnIndex(FundsContentProvider.SEARCH_WORD)));
                 return true;
             }
         });
+        mDisconnectedIndicator = (TextView) findViewById(R.id.disconnected_indicator);
+        mDisconnectedIndicator.setVisibility(View.INVISIBLE);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_search_swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(null);
         mSwipeRefreshLayout.setEnabled(false);
@@ -203,6 +214,8 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mNetworkReceiver = new NetworkReceiver();
+        mContext.registerReceiver(mNetworkReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter(getResources().getString(R.string.gcmtask_intent)));
     }
@@ -210,6 +223,7 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        mContext.unregisterReceiver(mNetworkReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
@@ -224,5 +238,24 @@ public class SearchActivity extends AppCompatActivity {
         ContentValues contentValues = new ContentValues();
         contentValues.put(FundsContentProvider.SEARCH_WORD, query);
         getContentResolver().insert(FundsContentProvider.mUriRecentSearch, contentValues);
+    }
+    public class NetworkReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isInternetOn(context)){
+                mSearchView.setVisibility(View.VISIBLE);
+                mDisconnectedIndicator.setVisibility(View.INVISIBLE);
+            }else {
+                mSearchView.setVisibility(View.INVISIBLE);
+                mDisconnectedIndicator.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public boolean isInternetOn(Context context) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 }

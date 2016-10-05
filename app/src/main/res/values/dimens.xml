@@ -33,5 +33,8 @@
     <dimen name="suggestion_text_size">18sp</dimen>
     <dimen name="net_worth_card_view_top_margin">112dp</dimen>
     <dimen name="layout_max_width">640dp</dimen>
+    <dimen name="disconnected_indicator_top_margin">24dp</dimen>
+    <dimen name="disconnected_image_size">56dp</dimen>
+    <dimen name="offline_text_size">20sp</dimen>
 
 </resources>

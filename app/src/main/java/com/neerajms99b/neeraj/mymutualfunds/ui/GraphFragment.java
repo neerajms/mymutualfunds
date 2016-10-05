@@ -62,7 +62,6 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         mEntriesString = new ArrayList<String>();
         mLabels = new ArrayList<String>();
         mEntries = new ArrayList<>();
-
     }
 
     @Override

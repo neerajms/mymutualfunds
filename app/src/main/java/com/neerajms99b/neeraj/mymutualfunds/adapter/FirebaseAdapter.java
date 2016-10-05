@@ -79,11 +79,11 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         public void setChange(double changeValue, double changePercent, boolean isNegative) {
             if (isNegative) {
                 mChange.setTextColor(mCallBack.getResources().getColor(R.color.colorRed));
-                mArrow.setImageResource(R.drawable.ic_action_down);
+                mArrow.setImageResource(R.drawable.ic_arrow_down);
                 mArrow.setVisibility(View.VISIBLE);
             } else {
                 mChange.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
-                mArrow.setImageResource(R.drawable.ic_action_up);
+                mArrow.setImageResource(R.drawable.ic_arrow_up);
                 mArrow.setVisibility(View.VISIBLE);
             }
             String change = String.valueOf(Math.abs(changeValue)) +

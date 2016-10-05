@@ -208,7 +208,7 @@ public class FetchFundsTask extends GcmTaskService {
             }
             cursor.close();
         } else if (taskParams.getTag().equals(mContext.getString(R.string.tag_fetch_graph_data))) {
-            String scode = taskParams.getExtras().getString(KEY_SCODE);
+            String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
             Calendar date = Calendar.getInstance();
             SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
             SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
@@ -303,6 +303,7 @@ public class FetchFundsTask extends GcmTaskService {
 
     public String getGraph(String scode, String date) {
         String nav = null;
+        Log.e(TAG,scode);
         try {
             String requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + date + "\"" + "}";
             HttpResponse<JsonNode> response = Unirest.post("https://mutualfundsnav.p.mashape.com/historical")
@@ -311,7 +312,7 @@ public class FetchFundsTask extends GcmTaskService {
                     .header(ACCEPT_PARAM, ACCEPT_VALUE)
                     .body(requestBody)
                     .asJson();
-            Log.d(TAG, response.toString());
+            Log.d(TAG, response.getBody().toString());
             JsonNode jsonNode = response.getBody();
             try {
                 JSONObject jsonObject = jsonNode.getObject();

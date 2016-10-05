@@ -94,7 +94,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mNetWorthChangeTextView = (TextView) rootView.findViewById(R.id.net_worth_change);
         mChangeArrow = (ImageView) rootView.findViewById(R.id.net_worth_arrow);
         Log.e(TAG, "oncreateview");
-        setNetWorth();
         return rootView;
     }
 
@@ -105,15 +104,12 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                String key = dataSnapshot.getKey();
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
                 Log.e(TAG, fundInfo.getFundName());
 
                 if (!alreadyPresent(fundInfo)) {
                     mFundsArrayList.add(fundInfo);
                 }
-//                readFIrebaseDataOnce();
-
             }
 
             @Override
@@ -122,7 +118,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 reflectChange(fundInfo);
                 calculateNetWorth();
                 storeNetWorthInFirebase();
-//                readFIrebaseDataOnce();
             }
 
             @Override
@@ -131,7 +126,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 reflectRemoval(fundInfo);
                 calculateNetWorth();
                 storeNetWorthInFirebase();
-//                readFIrebaseDataOnce();
             }
 
             @Override
@@ -181,11 +175,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         Log.e(TAG, String.valueOf(mNetWorth));
     }
 
-    public void setNetWorth() {
-        String netWorthStr = getString(R.string.rupee_symbol) + String.format("%.2f", mNetWorth);
-        mNetWorthAmountTextView.setText(netWorthStr);
-    }
-
     public void storeNetWorthInFirebase() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -198,7 +187,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     @Override
     public void updateNetWorth() {
 //        setNetWorth();
-//        setNetWorthChange();
+//        setNetWorth();
     }
 
     public void reflectRemoval(FundInfo fundInfo) {
@@ -219,16 +208,9 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Object value = dataSnapshot.getValue();
-                String date = dataSnapshot.getKey();
-                String netWorth = String.valueOf(value);
-                if (date.equals(mToday)) {
-                    netWorth = getString(R.string.rupee_symbol) + netWorth;
-                    mNetWorthAmountTextView.setText(netWorth);
-                }
                 processGraphData(dataSnapshot);
                 calculateNetWorthChange();
-                setNetWorthChange();
+                setNetWorth();
             }
 
             @Override
@@ -236,7 +218,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 changeNetworthList(dataSnapshot);
                 calculateNetWorthChange();
                 setNetWorth();
-                setNetWorthChange();
             }
 
             @Override
@@ -378,7 +359,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
             netWorthPrevious = 0.0f;
             changeValue = netWorthLatest - netWorthPrevious;
-            changePercent = Math.abs(changeValue) * 100 / netWorthPrevious;
+            changePercent = Math.abs(changeValue) * 100;
             String changePercentStr = String.format("%.2f", changePercent);
             if (changeValue < 0) {
                 mIsNetChangeNegative = true;
@@ -386,18 +367,21 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             mNetWorthChange = String.format("%.2f",Math.abs(changeValue)) + "(" + changePercentStr + "%)";
             Log.e(TAG, "netChPerc: " + String.valueOf(changeValue) + " " + String.valueOf(changePercent) + "%");
         }
+        mNetWorth = netWorthLatest;
     }
 
-    public void setNetWorthChange() {
+    public void setNetWorth() {
         if (mNetWorthChange != null) {
             mNetWorthChangeTextView.setText(mNetWorthChange);
+            String netWorthStr = getString(R.string.rupee_symbol) + String.format("%.2f", mNetWorth);
+            mNetWorthAmountTextView.setText(netWorthStr);
             if (mIsNetChangeNegative) {
                 mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorRed));
-                mChangeArrow.setImageResource(R.drawable.ic_action_down);
+                mChangeArrow.setImageResource(R.drawable.ic_arrow_down);
                 mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorRed));
             } else {
                 mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorGreen));
-                mChangeArrow.setImageResource(R.drawable.ic_action_up);
+                mChangeArrow.setImageResource(R.drawable.ic_arrow_up);
                 mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorGreen));
             }
         }

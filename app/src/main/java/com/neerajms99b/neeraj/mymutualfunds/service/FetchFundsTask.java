@@ -1,11 +1,15 @@
 package com.neerajms99b.neeraj.mymutualfunds.service;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -24,6 +28,7 @@ import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.models.BasicFundInfoParcelable;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
+import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,6 +62,7 @@ public class FetchFundsTask extends GcmTaskService {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private ArrayList<String> mFundsScodesArrayList;
+    private boolean mIsUpdateSuccessful;
 
     public FetchFundsTask() {
     }
@@ -177,7 +183,7 @@ public class FetchFundsTask extends GcmTaskService {
                 }
             }
         } else if (taskParams.getTag().equals(mContext.getResources().getString(R.string.tag_update_nav))) {
-
+            mIsUpdateSuccessful = false;
             Log.e("fetchfundstask", "executed");
             Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
                     new String[]{FundsContentProvider.FUND_SCODE}, null, null, null);
@@ -208,6 +214,9 @@ public class FetchFundsTask extends GcmTaskService {
                 }
             }
             cursor.close();
+            if (mIsUpdateSuccessful) {
+                showNotification();
+            }
         } else if (taskParams.getTag().equals(mContext.getString(R.string.tag_fetch_graph_data))) {
             String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
             Calendar date = Calendar.getInstance();
@@ -304,7 +313,7 @@ public class FetchFundsTask extends GcmTaskService {
 
     public String getGraph(String scode, String date) {
         String nav = null;
-        Log.e(TAG,scode);
+        Log.e(TAG, scode);
         try {
             String requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + date + "\"" + "}";
             HttpResponse<JsonNode> response = Unirest.post("https://mutualfundsnav.p.mashape.com/historical")
@@ -344,6 +353,7 @@ public class FetchFundsTask extends GcmTaskService {
             }
         } catch (UnirestException ue) {
             Log.e(TAG, ue.toString());
+            mIsUpdateSuccessful = false;
             retriggerTask();
         }
     }
@@ -372,8 +382,33 @@ public class FetchFundsTask extends GcmTaskService {
                 myRef.child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
                 myRef.child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
             }
+            mIsUpdateSuccessful = true;
         } catch (JSONException je) {
             Log.e(TAG, je.toString());
         }
+    }
+
+    public void showNotification() {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(mContext)
+                        .setSmallIcon(R.drawable.notification_icon)
+                        .setContentTitle(mContext.getString(R.string.notification_title))
+                        .setContentText(mContext.getString(R.string.notification_content));
+
+        Intent resultIntent = new Intent(mContext, MainActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(0, mBuilder.build());
     }
 }

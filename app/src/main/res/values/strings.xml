@@ -57,6 +57,8 @@
     <string name="key_tag" translatable="false">tag</string>
     <string name="tag_search_fund" translatable="false">searchFund</string>
     <string name="key_fund_search_word" translatable="false">fundSearchWord</string>
+    <string name="notification_title">Values updated</string>
+    <string name="notification_content">Click here to see the updated values</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>

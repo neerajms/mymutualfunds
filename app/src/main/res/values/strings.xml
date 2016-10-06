@@ -60,6 +60,10 @@
     <string name="notification_title">Values updated</string>
     <string name="notification_content">Click here to see the updated values</string>
     <string name="notification_id" translatable="false">99</string>
+    <string name="action_update_widget_data" translatable="false">actionUpdateWidgetData</string>
+    <string name="key_widget_data_bundle" translatable="false">widgetDataBundle</string>
+    <string name="key_net_worth_change" translatable="false">netWorthChange</string>
+    <string name="key_is_net_change_negative" translatable="false">isNetWorthNegative</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>

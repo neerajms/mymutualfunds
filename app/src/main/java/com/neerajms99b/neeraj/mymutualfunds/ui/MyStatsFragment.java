@@ -1,5 +1,6 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -29,6 +30,7 @@ import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.UpdateFragment;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.models.NetWorthGraphModel;
+import com.neerajms99b.neeraj.mymutualfunds.widget.FundsWidgetProvider;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -211,6 +213,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 processGraphData(dataSnapshot);
                 calculateNetWorthChange();
                 setNetWorth();
+                setNetWorthInWidget();
             }
 
             @Override
@@ -218,6 +221,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 changeNetworthList(dataSnapshot);
                 calculateNetWorthChange();
                 setNetWorth();
+                setNetWorthInWidget();
             }
 
             @Override
@@ -359,13 +363,10 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
             netWorthPrevious = 0.0f;
             changeValue = netWorthLatest - netWorthPrevious;
-            changePercent = Math.abs(changeValue) * 100;
-            String changePercentStr = String.format("%.2f", changePercent);
             if (changeValue < 0) {
                 mIsNetChangeNegative = true;
             }
-            mNetWorthChange = String.format("%.2f",Math.abs(changeValue)) + "(" + changePercentStr + "%)";
-            Log.e(TAG, "netChPerc: " + String.valueOf(changeValue) + " " + String.valueOf(changePercent) + "%");
+            mNetWorthChange = String.format("%.2f",Math.abs(changeValue));
         }
         mNetWorth = netWorthLatest;
     }
@@ -385,5 +386,16 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorGreen));
             }
         }
+    }
+    public void setNetWorthInWidget(){
+        String netWorth = String.format("%.2f",mNetWorth);
+        Bundle bundle = new Bundle();
+        bundle.putString(getString(R.string.key_net_worth),netWorth);
+        bundle.putString(getString(R.string.key_net_worth_change),mNetWorthChange);
+        bundle.putBoolean(getString(R.string.key_is_net_change_negative),mIsNetChangeNegative);
+        Intent intent = new Intent(getContext(), FundsWidgetProvider.class);
+        intent.setAction(getString(R.string.action_update_widget_data));
+        intent.putExtra(getString(R.string.key_widget_data_bundle),bundle);
+        getContext().sendBroadcast(intent);
     }
 }

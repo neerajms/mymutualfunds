@@ -59,6 +59,7 @@
     <string name="key_fund_search_word" translatable="false">fundSearchWord</string>
     <string name="notification_title">Values updated</string>
     <string name="notification_content">Click here to see the updated values</string>
+    <string name="notification_id" translatable="false">99</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>

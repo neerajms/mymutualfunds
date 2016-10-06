@@ -1,5 +1,6 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        dismissNotification();
         mAlarmManager = new Alarm();
 //        setAlarm(this);
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -113,5 +115,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         intent.putExtra(getString(R.string.key_fund_nav), fundNav);
         intent.putExtra(getString(R.string.key_units_in_hand), units);
         startActivity(intent);
+    }
+
+    public void dismissNotification(){
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(Integer.parseInt(getString(R.string.notification_id)));
     }
 }

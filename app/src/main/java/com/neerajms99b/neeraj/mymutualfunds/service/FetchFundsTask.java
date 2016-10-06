@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -175,6 +176,7 @@ public class FetchFundsTask extends GcmTaskService {
                     Map<String, Object> fund = info.toMap();
                     myRef.child(mContext.getString(R.string.firebase_child_funds)).child(scode).setValue(fund);
                     sendToast(mContext.getString(R.string.fund_added_message));
+//                    showNotification();
                 } else {
                     sendToast(mContext.getString(R.string.message_failed_to_add_fund));
                     Uri uriDelete = Uri.parse(FundsContentProvider.mUriHistorical.toString() +
@@ -389,6 +391,9 @@ public class FetchFundsTask extends GcmTaskService {
     }
 
     public void showNotification() {
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        long[] v = {100,200};
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.notification_icon)
@@ -405,10 +410,13 @@ public class FetchFundsTask extends GcmTaskService {
                         0,
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
-        
+
         mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
+        mBuilder.setSound(uri);
+        mBuilder.setVibrate(v);
+        NotificationManager notificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(0, mBuilder.build());
+        notificationManager.notify(Integer.parseInt(
+                mContext.getString(R.string.notification_id)), mBuilder.build());
     }
 }

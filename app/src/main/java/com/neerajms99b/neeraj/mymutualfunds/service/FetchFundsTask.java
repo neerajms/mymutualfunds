@@ -394,7 +394,7 @@ public class FetchFundsTask extends GcmTaskService {
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         long[] v = {100,200};
 
-        NotificationCompat.Builder mBuilder =
+        NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.notification_icon)
                         .setContentTitle(mContext.getString(R.string.notification_title))
@@ -411,12 +411,13 @@ public class FetchFundsTask extends GcmTaskService {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
-        mBuilder.setContentIntent(resultPendingIntent);
-        mBuilder.setSound(uri);
-        mBuilder.setVibrate(v);
+        builder.setContentIntent(resultPendingIntent);
+        builder.setSound(uri);
+        builder.setVibrate(v);
+        builder.setColor(mContext.getResources().getColor(R.color.colorPrimary));
         NotificationManager notificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(Integer.parseInt(
-                mContext.getString(R.string.notification_id)), mBuilder.build());
+                mContext.getString(R.string.notification_id)), builder.build());
     }
 }

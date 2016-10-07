@@ -33,9 +33,7 @@ public class FundsWidgetProvider extends AppWidgetProvider {
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
         int length = appWidgetIds.length;
         String action = intent.getAction();
-        if (length < 1) {
-            return;
-        } else {
+        if (length >= 1) {
             if (action != null && action.equals(context.getResources()
                     .getString(R.string.action_update_widget_data))) {
                 Bundle bundle = intent.getBundleExtra(

@@ -1,6 +1,5 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -30,7 +30,6 @@ import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.UpdateFragment;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.models.NetWorthGraphModel;
-import com.neerajms99b.neeraj.mymutualfunds.widget.FundsWidgetProvider;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,7 +43,6 @@ import java.util.Date;
  * Created by neeraj on 27/8/16.
  */
 public class MyStatsFragment extends Fragment implements UpdateFragment {
-    private MainActivity mCallBack;
     private FirebaseDatabase mDatabase;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -66,13 +64,21 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     private boolean mIsNetChangeNegative;
     private TextView mNetWorthChangeTextView;
     private ImageView mChangeArrow;
+    private static final String KEY_FIREBASE_FUNDS_CHILD = "funds";
+    private static final String KEY_NETWORTH = "net_worth";
+    private static final String NET_WORTH_GRAPH_VALUES = "Net worth values";
+    private static final String GRAPH_DESCRIPTION = "Net worth for the last few days";
+    private static final String KEY_NETWORTH_CHANGE = "netWorthChange";
+    private static final String KEY_NET_CHANGE_NEGATIVE = "isNetWorthNegative";
+    private static final String KEY_ACTION_UPDATE_WIDGET_DATA = "actionUpdateWidgetData";
+    private static final String KEY_WIDGET_DATA_BUNDLE = "widgetDataBundle";
+    private ProgressBar mProgressBarNetWorth;
+    private ProgressBar mProgressBarNetWorthGraph;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        mCallBack = (MainActivity) getActivity();
         mFundsArrayList = new ArrayList<FundInfo>();
         mDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -91,6 +97,9 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                              @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_stats, container, false);
         mChart = (LineChart) rootView.findViewById(R.id.chart_networth);
+        mProgressBarNetWorth = (ProgressBar) rootView.findViewById(R.id.progress_bar_networth);
+        mProgressBarNetWorthGraph =
+                (ProgressBar) rootView.findViewById(R.id.progress_bar_networth_graph);
         readFirebaseNetworthList();
         mNetWorthAmountTextView = (TextView) rootView.findViewById(R.id.net_worth_amount);
         mNetWorthChangeTextView = (TextView) rootView.findViewById(R.id.net_worth_change);
@@ -101,7 +110,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
     public void readFirebaseFundsList() {
         DatabaseReference fundsListReference =
-                mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
+                mDatabase.getReference(mFirebaseUser.getUid())
+                        .child(getString(R.string.firebase_child_funds));
         fundsListReference.keepSynced(true);
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
@@ -164,7 +174,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 break;
             }
         }
-        Log.e(TAG,"reflect change executed");
+        Log.e(TAG, "reflect change executed");
     }
 
     public void calculateNetWorth() {
@@ -182,14 +192,14 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         String date = dateFormat.format(calendar.getTime());
         DatabaseReference netWorthRef = mDatabase.getReference(
-                mFirebaseUser.getUid()).child(getString(R.string.key_net_worth));
+                mFirebaseUser.getUid()).child(KEY_NETWORTH);
         netWorthRef.child(date).setValue(String.format("%.2f", mNetWorth));
     }
 
     @Override
     public void updateNetWorth() {
-//        setNetWorth();
-//        setNetWorth();
+        setNetWorth();
+        populateChart();
     }
 
     public void reflectRemoval(FundInfo fundInfo) {
@@ -212,16 +222,21 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 processGraphData(dataSnapshot);
                 calculateNetWorthChange();
-                setNetWorth();
-                setNetWorthInWidget();
+                if (isAdded()) {
+                    setNetWorth();
+                }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 changeNetworthList(dataSnapshot);
                 calculateNetWorthChange();
-                setNetWorth();
-                setNetWorthInWidget();
+                if (isAdded()) {
+                    mProgressBarNetWorth.setVisibility(View.VISIBLE);
+                    mProgressBarNetWorthGraph.setVisibility(View.VISIBLE);
+                    setNetWorth();
+                    populateChart();
+                }
             }
 
             @Override
@@ -257,7 +272,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
     public void populateChart() {
         LineDataSet lineDataSet = new LineDataSet(mEntries,
-                getString(R.string.net_worth_graph_value));
+                NET_WORTH_GRAPH_VALUES);
         lineDataSet.setDrawCircles(true);
         lineDataSet.setDrawCircleHole(true);
         lineDataSet.setCircleColorHole(getResources().getColor(R.color.colorAccent));
@@ -300,9 +315,10 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
 
         LineData data = new LineData(lineDataSet);
-        mChart.setDescription(getString(R.string.net_worth_graph_description));
+        mChart.setDescription(GRAPH_DESCRIPTION);
         mChart.setData(data);
         mChart.animateY(0);
+        mProgressBarNetWorthGraph.setVisibility(View.INVISIBLE);
     }
 
     public void changeNetworthList(DataSnapshot dataSnapshot) {
@@ -319,7 +335,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         } catch (ParseException pe) {
             Log.e(TAG, pe.toString());
         }
-        populateChart();
     }
 
     public void processGraphData(DataSnapshot dataSnapshot) {
@@ -357,7 +372,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             if (changeValue < 0) {
                 mIsNetChangeNegative = true;
             }
-            mNetWorthChange = String.format("%.2f",Math.abs(changeValue)) + "(" + changePercentStr + "%)";
+            mNetWorthChange = String.format("%.2f", Math.abs(changeValue)) + "(" + changePercentStr + "%)";
             Log.e(TAG, "netChPerc: " + String.valueOf(changeValue) + " " + String.valueOf(changePercent) + "%");
         } else if (mGraphList.size() == 1) {
             netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
@@ -366,7 +381,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             if (changeValue < 0) {
                 mIsNetChangeNegative = true;
             }
-            mNetWorthChange = String.format("%.2f",Math.abs(changeValue));
+            mNetWorthChange = String.format("%.2f", Math.abs(changeValue));
         }
         mNetWorth = netWorthLatest;
     }
@@ -386,16 +401,18 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorGreen));
             }
         }
+        mProgressBarNetWorth.setVisibility(View.INVISIBLE);
     }
-    public void setNetWorthInWidget(){
-        String netWorth = String.format("%.2f",mNetWorth);
-        Bundle bundle = new Bundle();
-        bundle.putString(getString(R.string.key_net_worth),netWorth);
-        bundle.putString(getString(R.string.key_net_worth_change),mNetWorthChange);
-        bundle.putBoolean(getString(R.string.key_is_net_change_negative),mIsNetChangeNegative);
-        Intent intent = new Intent(getContext(), FundsWidgetProvider.class);
-        intent.setAction(getString(R.string.action_update_widget_data));
-        intent.putExtra(getString(R.string.key_widget_data_bundle),bundle);
-        getContext().sendBroadcast(intent);
-    }
+
+//    public void setNetWorthInWidget() {
+//        String netWorth = String.format("%.2f", mNetWorth);
+//        Bundle bundle = new Bundle();
+//        bundle.putString(KEY_NETWORTH, netWorth);
+//        bundle.putString(KEY_NETWORTH_CHANGE, mNetWorthChange);
+//        bundle.putBoolean(KEY_NET_CHANGE_NEGATIVE, mIsNetChangeNegative);
+//        Intent intent = new Intent(FundsWidgetProvider.class);
+//        intent.setAction(KEY_ACTION_UPDATE_WIDGET_DATA);
+//        intent.putExtra(KEY_WIDGET_DATA_BUNDLE, bundle);
+//        getActivity().sendBroadcast(intent);
+//    }
 }

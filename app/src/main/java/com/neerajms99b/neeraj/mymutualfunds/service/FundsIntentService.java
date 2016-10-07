@@ -62,5 +62,14 @@ public class FundsIntentService extends IntentService {
             fetchFundsTask.onRunTask(new TaskParams(
                     intent.getStringExtra(getString(R.string.key_tag)),bundle));
         }
+//        else if (intent.getStringExtra(getString(R.string.key_tag))
+//                .equals(getString(R.string.tag_store_net_worth_firebase))){
+//            Bundle bundle = new Bundle();
+//            bundle.putString(getString(R.string.key_net_worth),
+//                    intent.getStringExtra(getString(R.string.key_net_worth)));
+//            FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
+//            fetchFundsTask.onRunTask(new TaskParams(
+//                    intent.getStringExtra(getString(R.string.key_tag)),bundle));
+//        }
     }
 }

@@ -62,6 +62,7 @@ public class FetchFundsTask extends GcmTaskService {
     private Context mContext;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
+    private FirebaseDatabase mDatabase;
     private ArrayList<String> mFundsScodesArrayList;
     private boolean mIsUpdateSuccessful;
 
@@ -76,6 +77,7 @@ public class FetchFundsTask extends GcmTaskService {
     public int onRunTask(TaskParams taskParams) {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        mDatabase = FirebaseDatabase.getInstance();
         if (mContext == null) {
             mContext = this;
         }
@@ -292,6 +294,9 @@ public class FetchFundsTask extends GcmTaskService {
                 year--;
                 monthInt = 12;
             }
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FundsContentProvider.LAST_UPDATED, String.valueOf(currentQuarter) + "-" + yearString);
+            mContext.getContentResolver().update(uri, contentValues, null, null);
             Intent intent = new Intent();
             intent.setAction(mContext.getString(R.string.gcmtask_intent));
             intent.putExtra(mContext.getString(R.string.key_graph_fetched), true);
@@ -302,6 +307,15 @@ public class FetchFundsTask extends GcmTaskService {
                     taskParams.getExtras().getString(mContext.getString(R.string.key_scode)));
             mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, contentValues);
         }
+//        else if (taskParams.getTag().equals(mContext.getString(R.string.tag_store_net_worth_firebase))){
+//            Calendar calendar = Calendar.getInstance();
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+//            String date = dateFormat.format(calendar.getTime());
+//            DatabaseReference netWorthRef = mDatabase.getReference(
+//                    mFirebaseUser.getUid()).child(getString(R.string.key_net_worth));
+//            netWorthRef.child(date).setValue(taskParams.getExtras()
+//                    .getString(mContext.getString(R.string.key_net_worth)));
+//        }
         return 0;
     }
 
@@ -392,7 +406,7 @@ public class FetchFundsTask extends GcmTaskService {
 
     public void showNotification() {
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        long[] v = {100,200};
+        long[] v = {100, 200};
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(mContext)

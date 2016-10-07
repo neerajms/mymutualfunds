@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -47,6 +48,9 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     private ArrayList<String> mEntriesString;
     private ArrayList<Entry> mEntries;
     private LineChart mChart;
+    private int mCurrentQuarter;
+    private int mCurrentYear;
+    private ProgressBar mProgressBarNavGraph;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,12 +60,14 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         mFundName = bundle.getString(getString(R.string.key_fundname));
         mFundNav = bundle.getString(getString(R.string.key_fund_nav));
         mUnits = bundle.getString(getString(R.string.key_units_in_hand));
-        mTotalValue = getString(R.string.rupee_symbol) + String.format("%.2f",Float.parseFloat(mFundNav) * Float.parseFloat(mUnits));
+        mTotalValue = getString(R.string.rupee_symbol) + String.format("%.2f", Float.parseFloat(mFundNav) * Float.parseFloat(mUnits));
 
         mContext = getContext();
         mEntriesString = new ArrayList<String>();
         mLabels = new ArrayList<String>();
         mEntries = new ArrayList<>();
+
+        findCurrentQuarterAndYear();
     }
 
     @Override
@@ -69,6 +75,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_graph, container, false);
         mChart = (LineChart) rootView.findViewById(R.id.chart);
+        mProgressBarNavGraph = (ProgressBar) rootView.findViewById(R.id.progress_bar_nav_graph);
         TextView fundNameTextView = (TextView) rootView.findViewById(R.id.fund_name);
         TextView totalValueTextView = (TextView) rootView.findViewById(R.id.total_value);
         fundNameTextView.setText(mFundName);
@@ -86,14 +93,39 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(Loader loader, Cursor data) {
-        if (data.moveToFirst() && data.getString(data.getColumnIndex(FundsContentProvider.NAV_Q5))!=null) {
-
-            postExecute(data);
-            populateChart();
-
+        //If the NAV values are not available in the DB then fetch data
+        if (data.moveToFirst() &&
+                data.getString(data.getColumnIndex(FundsContentProvider.LAST_UPDATED)) != null) {
+            String lastUpdated = data.getString(data.getColumnIndex(FundsContentProvider.LAST_UPDATED));
+            Log.e(TAG, "lastupdated:" + lastUpdated);
+            Log.e(TAG, "current:" + String.valueOf(mCurrentQuarter) + "-" + String.valueOf(mCurrentYear));
+            String[] words = lastUpdated.split("-");
+            int lastUpdatedQuarter = Integer.parseInt(words[0]);
+            int lastUpdatedYear = Integer.parseInt(words[1]);
+            /*If the values were last updated in one of the previous quarters then fetch data,
+            * otherwise show data from DB*/
+            if (lastUpdatedYear == mCurrentYear) {
+                if (mCurrentQuarter > lastUpdatedQuarter) {
+                    mProgressBarNavGraph.setVisibility(View.VISIBLE);
+                    Intent intentService = new Intent(getContext(), FundsIntentService.class);
+                    intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_fetch_graph_data));
+                    intentService.putExtra(getString(R.string.key_scode), mScode);
+                    getActivity().startService(intentService);
+                } else {
+                    postExecute(data);
+                    populateChart();
+                }
+            } else if (mCurrentYear > lastUpdatedYear) {
+                mProgressBarNavGraph.setVisibility(View.VISIBLE);
+                Intent intentService = new Intent(getContext(), FundsIntentService.class);
+                intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_fetch_graph_data));
+                intentService.putExtra(getString(R.string.key_scode), mScode);
+                getActivity().startService(intentService);
+            }
         } else {
+            mProgressBarNavGraph.setVisibility(View.VISIBLE);
             Intent intentService = new Intent(getContext(), FundsIntentService.class);
-            intentService.putExtra("tag", getString(R.string.tag_fetch_graph_data));
+            intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_fetch_graph_data));
             intentService.putExtra(getString(R.string.key_scode), mScode);
             getActivity().startService(intentService);
         }
@@ -239,5 +271,16 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         mChart.setDescription(getString(R.string.nav_chart_description));
         mChart.setData(data);
         mChart.animateY(0);
+        mProgressBarNavGraph.setVisibility(View.INVISIBLE);
+    }
+
+    public void findCurrentQuarterAndYear() {
+        Calendar date = Calendar.getInstance();
+        SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
+        SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
+        String yearString = dateFormatYear.format(date.getTime());
+        String monthString = dateFormatMonth.format(date.getTime());
+        mCurrentQuarter = Integer.valueOf(monthString) / 4;
+        mCurrentYear = Integer.parseInt(yearString);
     }
 }

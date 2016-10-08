@@ -65,6 +65,18 @@
     <string name="key_net_worth_change" translatable="false">netWorthChange</string>
     <string name="key_is_net_change_negative" translatable="false">isNetWorthNegative</string>
     <string name="tag_store_net_worth_firebase" translatable="false">storeNetWorthInFirebase</string>
+    <string name="key_shared_prefs_my_stats" translatable="false">
+        com.neerajms99b.neeraj.mymutualfunds.ui.MyStatsFragment</string>
+    <string name="key_shared_prefs_funds_list" translatable="false">
+        com.neerajms99b.neeraj.mymutualfunds.ui.FundsListFragment</string>
+    <string name="key_is_firstrun" translatable="false">isFirstRun</string>
+    <string name="net_worth_showcase_title">Net-Worth</string>
+    <string name="net_worth_showcase_content">Shows how much your funds amount to in total</string>
+    <string name="net_worth_graph_showcase_title">Net-Worth Graph</string>
+    <string name="net_worth_graph_showcase_content">
+        Plots net-worth against date for a maximum of 30 days\nWe have started ploting your graph from today and it will grow day by day</string>
+    <string name="add_more_funds_showcase_title">Add Funds</string>
+    <string name="add_more_funds_showcase_content">You can add funds from the options menu</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>

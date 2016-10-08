@@ -49,4 +49,16 @@
         <item name="android:layout_marginTop">@dimen/disconnected_indicator_top_margin</item>
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
+
+    <style name="CustomShowcaseTheme" parent="ShowcaseView.Light">
+        <item name="sv_backgroundColor">#E6006064</item>
+        <item name="sv_showcaseColor">#00801A</item>
+        <item name="sv_detailTextAppearance">@style/customText</item>
+        <item name="sv_buttonText">Got It</item>
+        <item name="sv_tintButtonColor">false</item>
+    </style>
+    
+    <style name="customText" parent="TextAppearance.ShowcaseView.Detail.Light">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
 </resources>

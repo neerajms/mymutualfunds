@@ -1,16 +1,23 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
@@ -74,7 +81,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     private static final String KEY_WIDGET_DATA_BUNDLE = "widgetDataBundle";
     private ProgressBar mProgressBarNetWorth;
     private ProgressBar mProgressBarNetWorthGraph;
-
+    private SharedPreferences mSharedPreferences;
+    private FrameLayout mNetWorthFrame;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +97,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         getDates();
         readFirebaseFundsList();
         setHasOptionsMenu(false);
+        mSharedPreferences = getActivity().getSharedPreferences(
+                getString(R.string.key_shared_prefs_my_stats), Context.MODE_PRIVATE);
     }
 
     @Nullable
@@ -97,6 +107,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                              @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_stats, container, false);
         mChart = (LineChart) rootView.findViewById(R.id.chart_networth);
+        mChart.setVisibility(View.INVISIBLE);
         mProgressBarNetWorth = (ProgressBar) rootView.findViewById(R.id.progress_bar_networth);
         mProgressBarNetWorthGraph =
                 (ProgressBar) rootView.findViewById(R.id.progress_bar_networth_graph);
@@ -104,8 +115,55 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mNetWorthAmountTextView = (TextView) rootView.findViewById(R.id.net_worth_amount);
         mNetWorthChangeTextView = (TextView) rootView.findViewById(R.id.net_worth_change);
         mChangeArrow = (ImageView) rootView.findViewById(R.id.net_worth_arrow);
+        mNetWorthFrame = (FrameLayout) rootView.findViewById(R.id.net_worth_frame);
+        if (mSharedPreferences.getBoolean(getString(R.string.key_is_firstrun), true)) {
+            new ShowcaseView.Builder(getActivity())
+                    .withMaterialShowcase()
+                    .setStyle(R.style.CustomShowcaseTheme)
+                    .setShowcaseEventListener(new OnShowcaseEventListener() {
+                        @Override
+                        public void onShowcaseViewHide(ShowcaseView showcaseView) {
+                            new ShowcaseView.Builder(getActivity())
+                                    .withMaterialShowcase()
+                                    .setStyle(R.style.CustomShowcaseTheme)
+                                    .setTarget(new ViewTarget(mChart))
+                                    .setContentTitle(getString(R.string.net_worth_graph_showcase_title))
+                                    .setContentText(getString(R.string.net_worth_graph_showcase_content))
+                                    .hideOnTouchOutside()
+                                    .build();
+                        }
+
+                        @Override
+                        public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
+
+                        }
+
+                        @Override
+                        public void onShowcaseViewShow(ShowcaseView showcaseView) {
+
+                        }
+
+                        @Override
+                        public void onShowcaseViewTouchBlocked(MotionEvent motionEvent) {
+
+                        }
+                    })
+                    .setTarget(new ViewTarget(mNetWorthAmountTextView))
+                    .setContentTitle(getString(R.string.net_worth_showcase_title))
+                    .setContentText(getString(R.string.net_worth_showcase_content))
+                    .hideOnTouchOutside()
+                    .build();
+
+            mSharedPreferences.edit().putBoolean(getString(R.string.key_is_firstrun), false).apply();
+        }
         Log.e(TAG, "oncreateview");
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
     }
 
     public void readFirebaseFundsList() {
@@ -122,6 +180,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 if (!alreadyPresent(fundInfo)) {
                     mFundsArrayList.add(fundInfo);
                 }
+                calculateNetWorth();
+                storeNetWorthInFirebase();
             }
 
             @Override
@@ -157,8 +217,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         if (mFundsArrayList.size() > 0) {
             for (int i = 0; i < mFundsArrayList.size(); i++) {
                 if (mFundsArrayList.get(i).getScode().equals(fundInfo.getScode())) {
-                    mFundsArrayList.remove(i);
-                    mFundsArrayList.add(i, fundInfo);
                     return true;
                 }
             }
@@ -182,7 +240,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         for (int index = 0; index < mFundsArrayList.size(); index++) {
             FundInfo fundInfo = mFundsArrayList.get(index);
             mNetWorth = mNetWorth + (Float.parseFloat(fundInfo.getNav())
-                    * Float.parseFloat(fundInfo.getUnits()));
+                    * Integer.parseInt(fundInfo.getUnits()));
         }
         Log.e(TAG, String.valueOf(mNetWorth));
     }
@@ -319,6 +377,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mChart.setData(data);
         mChart.animateY(0);
         mProgressBarNetWorthGraph.setVisibility(View.INVISIBLE);
+        mChart.setVisibility(View.VISIBLE);
     }
 
     public void changeNetworthList(DataSnapshot dataSnapshot) {
@@ -403,16 +462,4 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         }
         mProgressBarNetWorth.setVisibility(View.INVISIBLE);
     }
-
-//    public void setNetWorthInWidget() {
-//        String netWorth = String.format("%.2f", mNetWorth);
-//        Bundle bundle = new Bundle();
-//        bundle.putString(KEY_NETWORTH, netWorth);
-//        bundle.putString(KEY_NETWORTH_CHANGE, mNetWorthChange);
-//        bundle.putBoolean(KEY_NET_CHANGE_NEGATIVE, mIsNetChangeNegative);
-//        Intent intent = new Intent(FundsWidgetProvider.class);
-//        intent.setAction(KEY_ACTION_UPDATE_WIDGET_DATA);
-//        intent.putExtra(KEY_WIDGET_DATA_BUNDLE, bundle);
-//        getActivity().sendBroadcast(intent);
-//    }
 }

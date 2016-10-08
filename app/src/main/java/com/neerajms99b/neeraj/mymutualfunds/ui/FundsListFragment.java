@@ -55,6 +55,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     private DatabaseReference mMyRef;
     private FirebaseAdapter mFirebaseAdapter;
     private final String TAG = FundsListFragment.class.getSimpleName();
+    private Menu mMenu;
 
     public FundsListFragment() {
     }
@@ -138,7 +139,7 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onResume() {
         super.onResume();
-//        restartLoader();
+
     }
 
 //    public void setNetWorthAmount(Cursor data) {

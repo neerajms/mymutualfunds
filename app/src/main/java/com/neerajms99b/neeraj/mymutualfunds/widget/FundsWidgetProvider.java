@@ -1,5 +1,6 @@
 package com.neerajms99b.neeraj.mymutualfunds.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -8,21 +9,47 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.neerajms99b.neeraj.mymutualfunds.R;
+import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivity;
 
 /**
  * Created by neeraj on 6/10/16.
  */
 
 public class FundsWidgetProvider extends AppWidgetProvider {
+    private FirebaseAuth mFirebaseAuth;
+    private Context mContext;
+    private FirebaseUser mFirebaseUser;
+    private static final String KEY_NET_WORTH = "net_worth";
+    private static final String KEY_ACTION_UPDATE_WIDGET_DATA = "actionUpdateWidgetData";
+    private static final String KEY_WIDGET_DATA_BUNDLE = "widgetDataBundle";
+    private String mLatestNetWorth;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
+        mContext = context;
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        if (mFirebaseUser != null) {
+            fireBaseReceiver();
+        }
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context,0,intent,0);
+            views.setOnClickPendingIntent(R.id.widget_frame,pendingIntent);
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
+
     }
 
     @Override
@@ -50,21 +77,51 @@ public class FundsWidgetProvider extends AppWidgetProvider {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget);
         remoteViews.setTextViewText(R.id.net_worth_amount_widget,
                 netWorth);
-        remoteViews.setTextViewText(R.id.net_worth_change_widget,
-                bundle.getString(context.getResources().getString(R.string.key_net_worth_change)));
-        if (bundle.getBoolean(context.getResources().getString(R.string.key_is_net_change_negative))) {
-            remoteViews.setTextColor(R.id.net_worth_amount_widget,
-                    context.getResources().getColor(R.color.colorRed));
-            remoteViews.setTextColor(R.id.net_worth_change_widget,
-                    context.getResources().getColor(R.color.colorRed));
-            remoteViews.setImageViewResource(R.id.net_worth_arrow_widget, R.drawable.ic_arrow_down);
-        } else {
-            remoteViews.setTextColor(R.id.net_worth_amount_widget,
-                    context.getResources().getColor(R.color.colorGreen));
-            remoteViews.setTextColor(R.id.net_worth_change_widget,
-                    context.getResources().getColor(R.color.colorGreen));
-            remoteViews.setImageViewResource(R.id.net_worth_arrow_widget, R.drawable.ic_arrow_up);
-        }
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+    }
+
+    public void fireBaseReceiver() {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference netWorthRef = database.getReference(
+                mFirebaseUser.getUid()).child(KEY_NET_WORTH);
+        ChildEventListener childEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mLatestNetWorth = dataSnapshot.getValue().toString();
+                setNetWorthInWidget();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                mLatestNetWorth = dataSnapshot.getValue().toString();
+                setNetWorthInWidget();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        netWorthRef.addChildEventListener(childEventListener);
+    }
+
+    public void setNetWorthInWidget() {
+        String netWorth = mLatestNetWorth;
+        Bundle bundle = new Bundle();
+        bundle.putString(KEY_NET_WORTH, netWorth);
+        Intent intent = new Intent(mContext,FundsWidgetProvider.class);
+        intent.setAction(KEY_ACTION_UPDATE_WIDGET_DATA);
+        intent.putExtra(KEY_WIDGET_DATA_BUNDLE, bundle);
+        mContext.sendBroadcast(intent);
     }
 }

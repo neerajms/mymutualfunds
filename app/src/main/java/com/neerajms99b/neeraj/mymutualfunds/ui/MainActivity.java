@@ -3,12 +3,17 @@ package com.neerajms99b.neeraj.mymutualfunds.ui;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Display;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.PointTarget;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.neerajms99b.neeraj.mymutualfunds.R;
@@ -26,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private final String TAG = MainActivity.class.getSimpleName();
     private BootReceiver mBootReceiver;
     private Alarm mAlarmManager;
+    private SharedPreferences mSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         dismissNotification();
+        mSharedPreferences = getSharedPreferences(
+                getString(R.string.key_shared_prefs_funds_list),MODE_PRIVATE);
         mAlarmManager = new Alarm();
 //        setAlarm(this);
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -95,6 +103,23 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         mViewPager.setCurrentItem(tab.getPosition());
+        if (tab.getPosition() == 1){
+            if (mSharedPreferences.getBoolean(getString(R.string.key_is_firstrun),true)) {
+                Display display = getWindowManager().getDefaultDisplay();
+                Point dispSize = new Point();
+                display.getSize(dispSize);
+                int maxX = dispSize.x;
+                new ShowcaseView.Builder(this)
+                        .withMaterialShowcase()
+                        .setStyle(R.style.CustomShowcaseTheme)
+                        .setTarget(new PointTarget(maxX - 20, 60))
+                        .setContentTitle(getString(R.string.add_more_funds_showcase_title))
+                        .setContentText(getString(R.string.add_more_funds_showcase_content))
+                        .hideOnTouchOutside()
+                        .build();
+                mSharedPreferences.edit().putBoolean(getString(R.string.key_is_firstrun),false).apply();
+            }
+        }
         mPagerAdapter.notifyDataSetChanged();
     }
 

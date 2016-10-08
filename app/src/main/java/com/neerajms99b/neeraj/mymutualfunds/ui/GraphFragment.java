@@ -75,6 +75,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_graph, container, false);
         mChart = (LineChart) rootView.findViewById(R.id.chart);
+        mChart.setVisibility(View.INVISIBLE);
         mProgressBarNavGraph = (ProgressBar) rootView.findViewById(R.id.progress_bar_nav_graph);
         TextView fundNameTextView = (TextView) rootView.findViewById(R.id.fund_name);
         TextView totalValueTextView = (TextView) rootView.findViewById(R.id.total_value);
@@ -272,6 +273,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         mChart.setData(data);
         mChart.animateY(0);
         mProgressBarNavGraph.setVisibility(View.INVISIBLE);
+        mChart.setVisibility(View.VISIBLE);
     }
 
     public void findCurrentQuarterAndYear() {

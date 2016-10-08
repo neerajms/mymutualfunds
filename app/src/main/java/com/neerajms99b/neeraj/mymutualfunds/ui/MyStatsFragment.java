@@ -83,6 +83,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     private ProgressBar mProgressBarNetWorthGraph;
     private SharedPreferences mSharedPreferences;
     private FrameLayout mNetWorthFrame;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -282,6 +283,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 calculateNetWorthChange();
                 if (isAdded()) {
                     setNetWorth();
+                    populateChart();
                 }
             }
 
@@ -409,11 +411,24 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         }
         mEntries.clear();
         mLabels.clear();
+        if (mGraphList.size() > 30) {
+            removeOldNetWorth();
+        }
         for (int i = 0; i < mGraphList.size(); i++) {
             mEntries.add(i, new Entry(i, Float.valueOf(mGraphList.get(i).getNetworth())));
             mLabels.add(i, mGraphList.get(i).getDate().toString().substring(4, 10));
         }
-        populateChart();
+    }
+
+    public void removeOldNetWorth() {
+        DatabaseReference netWorthRef = mDatabase.getReference(
+                mFirebaseUser.getUid()).child(KEY_NETWORTH);
+        Date date = mGraphList.get(0).getDate();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String dateStr = dateFormat.format(date);
+        Log.e(TAG, dateStr);
+        netWorthRef.child(dateStr).removeValue();
+        mGraphList.remove(0);
     }
 
     public void calculateNetWorthChange() {

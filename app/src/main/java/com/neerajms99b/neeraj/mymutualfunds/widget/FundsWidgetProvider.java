@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,7 +18,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.neerajms99b.neeraj.mymutualfunds.R;
+import com.neerajms99b.neeraj.mymutualfunds.models.NetWorthGraphModel;
 import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivity;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 
 /**
  * Created by neeraj on 6/10/16.
@@ -31,6 +38,8 @@ public class FundsWidgetProvider extends AppWidgetProvider {
     private static final String KEY_ACTION_UPDATE_WIDGET_DATA = "actionUpdateWidgetData";
     private static final String KEY_WIDGET_DATA_BUNDLE = "widgetDataBundle";
     private String mLatestNetWorth;
+    private ArrayList<NetWorthGraphModel> mNetWorthList;
+    private String TAG = FundsWidgetProvider.class.getSimpleName();
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -38,6 +47,7 @@ public class FundsWidgetProvider extends AppWidgetProvider {
         mContext = context;
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        mNetWorthList = new ArrayList<>();
         if (mFirebaseUser != null) {
             fireBaseReceiver();
         }
@@ -45,8 +55,8 @@ public class FundsWidgetProvider extends AppWidgetProvider {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
             Intent intent = new Intent(context, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context,0,intent,0);
-            views.setOnClickPendingIntent(R.id.widget_frame,pendingIntent);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+            views.setOnClickPendingIntent(R.id.widget_frame, pendingIntent);
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
 
@@ -87,13 +97,13 @@ public class FundsWidgetProvider extends AppWidgetProvider {
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mLatestNetWorth = dataSnapshot.getValue().toString();
+                getLatestNetWorth(dataSnapshot);
                 setNetWorthInWidget();
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                mLatestNetWorth = dataSnapshot.getValue().toString();
+                getLatestNetWorth(dataSnapshot);
                 setNetWorthInWidget();
             }
 
@@ -116,12 +126,25 @@ public class FundsWidgetProvider extends AppWidgetProvider {
     }
 
     public void setNetWorthInWidget() {
-        String netWorth = mLatestNetWorth;
+        String netWorth = mNetWorthList.get(mNetWorthList.size() - 1).getNetworth();
         Bundle bundle = new Bundle();
         bundle.putString(KEY_NET_WORTH, netWorth);
-        Intent intent = new Intent(mContext,FundsWidgetProvider.class);
+        Intent intent = new Intent(mContext, FundsWidgetProvider.class);
         intent.setAction(KEY_ACTION_UPDATE_WIDGET_DATA);
         intent.putExtra(KEY_WIDGET_DATA_BUNDLE, bundle);
         mContext.sendBroadcast(intent);
+    }
+
+    public void getLatestNetWorth(DataSnapshot dataSnapshot) {
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            Date date = format.parse(dataSnapshot.getKey());
+            NetWorthGraphModel netWorthGraphModel = new NetWorthGraphModel(date,
+                    dataSnapshot.getValue().toString());
+            mNetWorthList.add(netWorthGraphModel);
+            Collections.sort(mNetWorthList);
+        } catch (java.text.ParseException pe) {
+            Log.e(TAG, pe.toString());
+        }
     }
 }

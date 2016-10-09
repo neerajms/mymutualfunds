@@ -59,7 +59,6 @@ public class FundsWidgetProvider extends AppWidgetProvider {
             views.setOnClickPendingIntent(R.id.widget_frame, pendingIntent);
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
-
     }
 
     @Override
@@ -109,17 +108,14 @@ public class FundsWidgetProvider extends AppWidgetProvider {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         };
         netWorthRef.addChildEventListener(childEventListener);

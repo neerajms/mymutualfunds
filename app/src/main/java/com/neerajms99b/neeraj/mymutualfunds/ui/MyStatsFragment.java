@@ -26,6 +26,9 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.AxisValueFormatter;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -117,6 +120,20 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mNetWorthChangeTextView = (TextView) rootView.findViewById(R.id.net_worth_change);
         mChangeArrow = (ImageView) rootView.findViewById(R.id.net_worth_arrow);
         mNetWorthFrame = (FrameLayout) rootView.findViewById(R.id.net_worth_frame);
+        AdView mAdView = (AdView) rootView.findViewById(R.id.adView);
+        MobileAds.initialize(getActivity().getApplicationContext(), "ca-app-pub-3940256099942544~3347511713");
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+        return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        showCase();
+    }
+
+    public void showCase() {
         if (mSharedPreferences.getBoolean(getString(R.string.key_is_firstrun), true)) {
             new ShowcaseView.Builder(getActivity())
                     .withMaterialShowcase()
@@ -157,14 +174,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
             mSharedPreferences.edit().putBoolean(getString(R.string.key_is_firstrun), false).apply();
         }
-        Log.e(TAG, "oncreateview");
-        return rootView;
-    }
-
-    @Override
-    public void onResume() {
-
-        super.onResume();
     }
 
     public void readFirebaseFundsList() {
@@ -241,7 +250,7 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         for (int index = 0; index < mFundsArrayList.size(); index++) {
             FundInfo fundInfo = mFundsArrayList.get(index);
             mNetWorth = mNetWorth + (Float.parseFloat(fundInfo.getNav())
-                    * Integer.parseInt(fundInfo.getUnits()));
+                    * Float.parseFloat(fundInfo.getUnits()));
         }
         Log.e(TAG, String.valueOf(mNetWorth));
     }

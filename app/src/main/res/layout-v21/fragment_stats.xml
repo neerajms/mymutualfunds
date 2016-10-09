@@ -1,137 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scrollbars="none">
+    android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        style="@style/screenLayoutStyle"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:showIn="@layout/activity_main">
+        android:scrollbars="none">
 
-        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/card_view_net_worth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/cardview_layout_margin"
-            android:layout_marginLeft="@dimen/cardview_layout_margin"
-            android:layout_marginRight="@dimen/cardview_layout_margin"
-            android:layout_marginTop="@dimen/net_worth_card_view_top_margin"
-            android:minHeight="@dimen/cardview_minheight"
-            card_view:cardCornerRadius="2dp">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            style="@style/screenLayoutStyle"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:showIn="@layout/activity_main">
 
-            <LinearLayout
+            <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_view_net_worth"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/cardview_layout_margin"
+                android:layout_marginLeft="@dimen/cardview_layout_margin"
+                android:layout_marginRight="@dimen/cardview_layout_margin"
+                android:layout_marginTop="@dimen/net_worth_card_view_top_margin"
+                android:minHeight="@dimen/cardview_minheight"
+                card_view:cardCornerRadius="2dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/text_view_layout_margin"
-                    android:layout_marginLeft="@dimen/margin_8dp"
-                    android:layout_marginStart="@dimen/margin_8dp"
-                    android:layout_marginTop="@dimen/net_worth_heading_top_margin"
-                    android:gravity="center_vertical"
-                    android:text="@string/net_worth_label"
-                    android:textColor="@color/textColorBlack"
-                    android:textSize="@dimen/net_worth_heading_size" />
-
-                <View
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height=".5dp"
-                    android:background="@android:color/darker_gray" />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <ProgressBar
-                        android:id="@+id/progress_bar_networth"
-                        style="@android:style/Widget.Material.ProgressBar.Small"
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:indeterminate="true"
-                        android:progressTint="@color/colorAccent" />
+                        android:layout_marginBottom="@dimen/text_view_layout_margin"
+                        android:layout_marginLeft="@dimen/margin_8dp"
+                        android:layout_marginStart="@dimen/margin_8dp"
+                        android:layout_marginTop="@dimen/net_worth_heading_top_margin"
+                        android:gravity="center_vertical"
+                        android:text="@string/net_worth_label"
+                        android:textColor="@color/textColorBlack"
+                        android:textSize="@dimen/net_worth_heading_size" />
 
-                    <LinearLayout
+                    <View
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:layout_height=".5dp"
+                        android:background="@android:color/darker_gray" />
 
-                        <TextView
-                            android:id="@+id/net_worth_amount"
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ProgressBar
+                            android:id="@+id/progress_bar_networth"
+                            style="@android:style/Widget.Material.ProgressBar.Small"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="@dimen/margin_8dp"
-                            android:layout_marginStart="@dimen/margin_8dp"
-                            android:layout_marginTop="@dimen/text_view_layout_margin"
-                            android:gravity="center_vertical"
-                            android:textColor="@color/textColorBlack"
-                            android:textSize="@dimen/net_worth_text_size"
-                            android:textStyle="bold" />
+                            android:layout_gravity="center"
+                            android:indeterminate="true"
+                            android:progressTint="@color/colorAccent" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:id="@+id/net_worth_arrow"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="@dimen/margin_8dp" />
+                            android:orientation="vertical">
 
                             <TextView
-                                android:id="@+id/net_worth_change"
+                                android:id="@+id/net_worth_amount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="@dimen/text_view_layout_margin"
+                                android:layout_marginLeft="@dimen/margin_8dp"
+                                android:layout_marginStart="@dimen/margin_8dp"
                                 android:layout_marginTop="@dimen/text_view_layout_margin"
-                                android:gravity="center_vertical" />
+                                android:gravity="center_vertical"
+                                android:textColor="@color/textColorBlack"
+                                android:textSize="@dimen/net_worth_text_size"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:id="@+id/net_worth_arrow"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/net_worth_arrow_left_margin" />
+
+                                <TextView
+                                    android:id="@+id/net_worth_change"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="@dimen/text_view_layout_margin"
+                                    android:layout_marginTop="@dimen/text_view_layout_margin"
+                                    android:gravity="center_vertical" />
+                            </LinearLayout>
                         </LinearLayout>
-                    </LinearLayout>
-                </FrameLayout>
+                    </FrameLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height=".5dp"
-                    android:background="@android:color/darker_gray" />
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <ProgressBar
-                        android:id="@+id/progress_bar_networth_graph"
-                        style="@android:style/Widget.Material.ProgressBar.Large"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:indeterminate="true"
-                        android:progressTint="@color/colorAccent" />
-
-                    <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/chart_networth"
+                    <View
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/margin_16dp"
-                        android:layout_marginEnd="@dimen/margin_8dp"
-                        android:layout_marginLeft="@dimen/margin_8dp"
-                        android:layout_marginRight="@dimen/margin_8dp"
-                        android:layout_marginStart="@dimen/margin_8dp"
-                        android:layout_marginTop="@dimen/margin_8dp"
-                        android:minHeight="@dimen/historical_graph_height" />
-                </FrameLayout>
+                        android:layout_height=".5dp"
+                        android:background="@android:color/darker_gray" />
 
-            </LinearLayout>
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-        </android.support.v7.widget.CardView>
+                        <ProgressBar
+                            android:id="@+id/progress_bar_networth_graph"
+                            style="@android:style/Widget.Material.ProgressBar.Large"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:indeterminate="true"
+                            android:progressTint="@color/colorAccent" />
 
-    </LinearLayout>
-</ScrollView>
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/chart_networth"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/margin_16dp"
+                            android:layout_marginEnd="@dimen/margin_8dp"
+                            android:layout_marginLeft="@dimen/margin_8dp"
+                            android:layout_marginRight="@dimen/margin_8dp"
+                            android:layout_marginStart="@dimen/margin_8dp"
+                            android:layout_marginTop="@dimen/margin_8dp"
+                            android:minHeight="@dimen/historical_graph_height" />
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id" />
+</RelativeLayout>

@@ -13,7 +13,6 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.neerajms99b.neeraj.mymutualfunds.R;
-import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivity;
 
 import java.util.Calendar;
 
@@ -22,19 +21,16 @@ import java.util.Calendar;
  */
 
 public class Alarm extends BroadcastReceiver {
-    private final String TAG = MainActivity.class.getSimpleName();
     private AlarmManager mAlarmManager;
     private PendingIntent mPendingIntent;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String tag = intent.getStringExtra("tag");
+        String tag = intent.getStringExtra(context.getString(R.string.key_tag));
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
 
         if (tag.equals(context.getString(R.string.tag_update_nav))) {
-
-            Log.e("Alarm", "Alarm triggered");
             wakeLock.acquire();
             GcmNetworkManager gcmNetworkManager = GcmNetworkManager.getInstance(context);
             OneoffTask task = new OneoffTask.Builder()
@@ -45,10 +41,7 @@ public class Alarm extends BroadcastReceiver {
                     .build();
             gcmNetworkManager.schedule(task);
             wakeLock.release();
-
         } else if (tag.equals(context.getString(R.string.retrigger_update_nav))) {
-
-            Log.e("Alarm", "Alarm Re-triggered");
             wakeLock.acquire();
             GcmNetworkManager gcmNetworkManager = GcmNetworkManager.getInstance(context);
             OneoffTask task = new OneoffTask.Builder()
@@ -59,23 +52,19 @@ public class Alarm extends BroadcastReceiver {
                     .build();
             gcmNetworkManager.schedule(task);
             wakeLock.release();
-
         }
     }
 
     public void setAlarm(Context context) {
-
-        Log.e(TAG, "AlarmService set");
+        Log.e("alarm","alarm set");
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, Alarm.class);
-        intent.putExtra("tag", context.getString(R.string.tag_update_nav));
+        intent.putExtra(context.getString(R.string.key_tag), context.getString(R.string.tag_update_nav));
         mPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 1);
-        calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 6);
         mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, mPendingIntent);
-
     }
 }

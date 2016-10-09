@@ -1,14 +1,11 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -28,7 +25,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.FirebaseAdapter;
-import com.neerajms99b.neeraj.mymutualfunds.adapter.FundsListAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SimpleItemTouchHelper;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
@@ -37,8 +33,7 @@ import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class FundsListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private FundsListAdapter mFundsListAdapter;
+public class FundsListFragment extends Fragment{
     private RecyclerView mRecyclerView;
     public int CURSOR_LOADER_ID = 0;
     private TextView mNetWorthAmount;
@@ -67,7 +62,6 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance();
-//        mDatabase.setPersistenceEnabled(true);
         getFirebaseData();
     }
 
@@ -77,14 +71,9 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mCallBack = (MainActivity) getActivity();
-//        mNetWorthAmount = (TextView) rootView.findViewById(R.id.net_worth_amount);
-//        mNetWorthAmount.setText("₹0.00");
-//        mFundsListAdapter = new FundsListAdapter(null, this);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.funds_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//        mRecyclerView.setAdapter(mFundsListAdapter);
         mRecyclerView.setAdapter(mFirebaseAdapter);
-//        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         mItemTouchCallBack = new SimpleItemTouchHelper(mFirebaseAdapter);
         mItemTouchHelper = new ItemTouchHelper(mItemTouchCallBack);
@@ -119,52 +108,6 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//        return new CursorLoader(getActivity(), FundsContentProvider.mUri, null, null, null, null);
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mFundsListAdapter.swapCursor(data);
-
-        if (data.moveToFirst()) {
-            mFab.hide();
-        } else {
-            mFab.show();
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-    }
-
-//    public void setNetWorthAmount(Cursor data) {
-//        int units = 0;
-//        double nav = 0.0d;
-//        double netWorth = 0.0d;
-//        do {
-//            Log.d("inside", "while");
-//            units = 0;
-//            nav = 0.0d;
-////            if (data.getString(data.getColumnIndex(FundsContentProvider.UNITS_OWNED)) != null) {
-////                units = data.getInt(data.getColumnIndex(FundsContentProvider.UNITS_OWNED));
-////                nav = data.getDouble(data.getColumnIndex(FundsContentProvider.FUND_NAV));
-//                netWorth = netWorth + units * nav;
-//            }
-//        } while (data.moveToNext());
-//        mNetWorth = String.format("%.2f", netWorth);
-////        mNetWorthAmount.setText("₹" + mNetWorth);
-//    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mFundsListAdapter.swapCursor(null);
-    }
-
     public void editClicked(String scode) {
         Bundle bundle = new Bundle();
         bundle.putString(getString(R.string.key_scode), scode);
@@ -175,14 +118,8 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     public void unitsInput(String units, String scode) {
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(FundsContentProvider.UNITS_OWNED, units);
-//        String[] selectionArgs = {scode};
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
-        mMyRef.child(scode).child("mUnits").setValue(units);
-
-//        getContext().getContentResolver().update(FundsContentProvider.mUri, contentValues, FundsContentProvider.KEY_ID, selectionArgs);
-//        restartLoader();
+        mMyRef.child(scode).child(getString(R.string.key_units_in_hand)).setValue(units);
     }
 
     public void startSearchActivity() {
@@ -198,13 +135,8 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
         getActivity().getContentResolver().delete(uri, null, null);
     }
 
-    public void restartLoader() {
-        getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
-    }
-
     public void getFirebaseData() {
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
-//        myRef.keepSynced(true);
         Query query = mMyRef;
         mFirebaseAdapter = new FirebaseAdapter(FundInfo.class,
                 R.layout.main_activity_list_item, FirebaseAdapter.FundHolder.class, query, this);
@@ -213,14 +145,10 @@ public class FundsListFragment extends Fragment implements LoaderManager.LoaderC
     public void showGraph(String scode, String fundName, String fundNav, String units) {
         Log.d(TAG, scode);
         mCallBack.launchGraphActivity(scode, fundName, fundNav, units);
-//        Intent intentService = new Intent(getContext(), FundsIntentService.class);
-//        intentService.putExtra("tag",getString(R.string.tag_fetch_graph_data));
-//        intentService.putExtra(getString(R.string.key_scode),scode);
-//        getActivity().startService(intentService);
     }
     public void addScodeToDatabase(String scode){
         Intent intent = new Intent(getContext(), FundsIntentService.class);
-        intent.putExtra("tag",getString(R.string.tag_insert_scodes));
+        intent.putExtra(getString(R.string.key_tag),getString(R.string.tag_insert_scodes));
         intent.putExtra(getString(R.string.key_scode),scode);
         getContext().startService(intent);
     }

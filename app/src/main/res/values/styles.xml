@@ -18,18 +18,23 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="fundName">
-        <item name="android:fontFamily">@string/roboto_regular</item>
+    <style name="FundName">
         <item name="android:textSize">@dimen/fund_title</item>
         <item name="android:textColor">@color/textColorBlack</item>
     </style>
 
-    <style name="navValue">
-        <item name="android:fontFamily">@string/roboto_medium</item>
-        <item name="android:textSize">@dimen/fund_title</item>
+    <style name="NavValue">
+        <item name="android:textSize">@dimen/nav_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_marginEnd">@dimen/text_view_layout_margin</item>
+        <item name="android:layout_marginLeft">@dimen/text_view_layout_margin</item>
+        <item name="android:layout_marginRight">@dimen/text_view_layout_margin</item>
+        <item name="android:layout_marginStart">@dimen/text_view_layout_margin</item>
+        <item name="android:minWidth">@dimen/fund_nav_minWidth</item>
     </style>
 
-    <style name="suggestions_text_style">
+    <style name="SuggestionsTextStyle">
         <item name="android:layout_marginLeft">@dimen/text_view_layout_margin</item>
         <item name="android:layout_marginRight">@dimen/text_view_layout_margin</item>
         <item name="android:textColor">@android:color/black</item>
@@ -37,12 +42,12 @@
         <item name="android:minHeight">@dimen/suggestions_list_item_min_height</item>
     </style>
 
-    <style name="screenLayoutStyle">
+    <style name="ScreenLayoutStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_gravity">center_horizontal</item>
     </style>
 
-    <style name="disconnectedIndicatorStyle">
+    <style name="DisconnectedIndicatorStyle">
         <item name="android:gravity">center_horizontal</item>
         <item name="android:textSize">@dimen/offline_text_size</item>
         <item name="android:layout_gravity">center_horizontal</item>
@@ -53,12 +58,78 @@
     <style name="CustomShowcaseTheme" parent="ShowcaseView.Light">
         <item name="sv_backgroundColor">#E6006064</item>
         <item name="sv_showcaseColor">#00801A</item>
-        <item name="sv_detailTextAppearance">@style/customText</item>
+        <item name="sv_detailTextAppearance">@style/ShowcaseCustomText</item>
         <item name="sv_buttonText">Got It</item>
         <item name="sv_tintButtonColor">false</item>
     </style>
-    
-    <style name="customText" parent="TextAppearance.ShowcaseView.Detail.Light">
+
+    <style name="ShowcaseCustomText" parent="TextAppearance.ShowcaseView.Detail.Light">
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="StatsCardView">
+        <item name="android:layout_marginBottom">@dimen/cardview_layout_margin</item>
+        <item name="android:layout_marginLeft">@dimen/cardview_layout_margin</item>
+        <item name="android:layout_marginRight">@dimen/cardview_layout_margin</item>
+        <item name="android:layout_marginTop">@dimen/margin_8dp</item>
+    </style>
+
+    <style name="NetWorthLabel">
+        <item name="android:layout_marginBottom">@dimen/text_view_layout_margin</item>
+        <item name="android:layout_marginLeft">@dimen/margin_8dp</item>
+        <item name="android:layout_marginStart">@dimen/margin_8dp</item>
+        <item name="android:layout_marginTop">@dimen/net_worth_heading_top_margin</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@color/textColorBlack</item>
+        <item name="android:textSize">@dimen/net_worth_heading_size</item>
+    </style>
+
+    <style name="NetWorthAmount">
+        <item name="android:layout_marginLeft">@dimen/margin_8dp</item>
+        <item name="android:layout_marginStart">@dimen/margin_8dp</item>
+        <item name="android:layout_marginTop">@dimen/text_view_layout_margin</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@color/textColorBlack</item>
+        <item name="android:textSize">@dimen/net_worth_text_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="NetWorthChange">
+        <item name="android:layout_marginBottom">@dimen/text_view_layout_margin</item>
+        <item name="android:layout_marginTop">@dimen/text_view_layout_margin</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="GraphStyle">
+        <item name="android:layout_marginBottom">@dimen/margin_16dp</item>
+        <item name="android:layout_marginEnd">@dimen/margin_8dp</item>
+        <item name="android:layout_marginLeft">@dimen/margin_8dp</item>
+        <item name="android:layout_marginRight">@dimen/margin_8dp</item>
+        <item name="android:layout_marginStart">@dimen/margin_8dp</item>
+        <item name="android:layout_marginTop">@dimen/margin_8dp</item>
+        <item name="android:minHeight">@dimen/historical_graph_height</item>
+    </style>
+
+    <style name="NetWorthAmountWidget">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/net_worth_text_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="NetWorthAmountLabelWidget">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">@dimen/net_worth_text_size</item>
+    </style>
+
+    <style name="WidgetLinearLayout">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:background">@drawable/shape</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">@dimen/margin_8dp</item>
+    </style>
+
 </resources>

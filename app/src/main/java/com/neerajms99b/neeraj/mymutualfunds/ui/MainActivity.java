@@ -19,17 +19,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.PagerAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.service.Alarm;
-import com.neerajms99b.neeraj.mymutualfunds.service.BootReceiver;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
-    //    private FloatingActionButton mFab;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private Context mContext;
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
     private final String TAG = MainActivity.class.getSimpleName();
-    private BootReceiver mBootReceiver;
     private Alarm mAlarmManager;
     private SharedPreferences mSharedPreferences;
 
@@ -41,9 +38,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setSupportActionBar(toolbar);
         dismissNotification();
         mSharedPreferences = getSharedPreferences(
-                getString(R.string.key_shared_prefs_funds_list),MODE_PRIVATE);
+                getString(R.string.key_shared_prefs_funds_list), MODE_PRIVATE);
         mAlarmManager = new Alarm();
-//        setAlarm(this);
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser == null) {
@@ -63,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
             }
 
             @Override
@@ -73,38 +68,16 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
             }
         });
         mContext = this;
-//        mFab = (FloatingActionButton) findViewById(R.id.fab);
-//        mFab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                startSearchActivity();
-//            }
-//        });
-//        hideFab();
     }
-
-//    public void startSearchActivity() {
-//        Intent intent = new Intent(mContext, SearchActivity.class);
-//        startActivity(intent);
-//    }
-
-//    public void hideFab() {
-//        mFab.hide();
-//    }
-//
-//    public void showFab() {
-//        mFab.show();
-//    }
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         mViewPager.setCurrentItem(tab.getPosition());
-        if (tab.getPosition() == 1){
-            if (mSharedPreferences.getBoolean(getString(R.string.key_is_firstrun),true)) {
+        if (tab.getPosition() == 1) {
+            if (mSharedPreferences.getBoolean(getString(R.string.key_is_firstrun), true)) {
                 Display display = getWindowManager().getDefaultDisplay();
                 Point dispSize = new Point();
                 display.getSize(dispSize);
@@ -117,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                         .setContentText(getString(R.string.add_more_funds_showcase_content))
                         .hideOnTouchOutside()
                         .build();
-                mSharedPreferences.edit().putBoolean(getString(R.string.key_is_firstrun),false).apply();
+                mSharedPreferences.edit().putBoolean(getString(R.string.key_is_firstrun), false).apply();
             }
         }
         mPagerAdapter.notifyDataSetChanged();
@@ -125,12 +98,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
-
     }
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-
     }
 
     public void launchGraphActivity(String scode, String fundName, String fundNav, String units) {
@@ -142,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         startActivity(intent);
     }
 
-    public void dismissNotification(){
+    public void dismissNotification() {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(Integer.parseInt(getString(R.string.notification_id)));

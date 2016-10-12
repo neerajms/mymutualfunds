@@ -45,6 +45,7 @@ import java.util.Map;
  */
 public class FetchFundsTask extends GcmTaskService {
     private final String FUNDS_BASE_URL = "https://mutualfundsnav.p.mashape.com/";
+    private final String FUNDS_HISTORICAL_URL = "https://mutualfundsnav.p.mashape.com/historical";
     private final String KEY_PARAM = "X-Mashape-Key";
     private final String CONTENT_TYPE_PARAM = "Content-Type";
     private final String ACCEPT_PARAM = "Accept";
@@ -295,7 +296,8 @@ public class FetchFundsTask extends GcmTaskService {
                 monthInt = 12;
             }
             ContentValues contentValues = new ContentValues();
-            contentValues.put(FundsContentProvider.LAST_UPDATED, String.valueOf(currentQuarter) + "-" + yearString);
+            contentValues.put(FundsContentProvider.LAST_UPDATED,
+                    String.valueOf(currentQuarter) + "-" + yearString);
             mContext.getContentResolver().update(uri, contentValues, null, null);
             Intent intent = new Intent();
             intent.setAction(mContext.getString(R.string.gcmtask_intent));
@@ -307,15 +309,6 @@ public class FetchFundsTask extends GcmTaskService {
                     taskParams.getExtras().getString(mContext.getString(R.string.key_scode)));
             mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, contentValues);
         }
-//        else if (taskParams.getTag().equals(mContext.getString(R.string.tag_store_net_worth_firebase))){
-//            Calendar calendar = Calendar.getInstance();
-//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-//            String date = dateFormat.format(calendar.getTime());
-//            DatabaseReference netWorthRef = mDatabase.getReference(
-//                    mFirebaseUser.getUid()).child(getString(R.string.key_net_worth));
-//            netWorthRef.child(date).setValue(taskParams.getExtras()
-//                    .getString(mContext.getString(R.string.key_net_worth)));
-//        }
         return 0;
     }
 
@@ -332,7 +325,7 @@ public class FetchFundsTask extends GcmTaskService {
         Log.e(TAG, scode);
         try {
             String requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + date + "\"" + "}";
-            HttpResponse<JsonNode> response = Unirest.post("https://mutualfundsnav.p.mashape.com/historical")
+            HttpResponse<JsonNode> response = Unirest.post(FUNDS_HISTORICAL_URL)
                     .header(KEY_PARAM, KEY_VALUE)
                     .header(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE)
                     .header(ACCEPT_PARAM, ACCEPT_VALUE)

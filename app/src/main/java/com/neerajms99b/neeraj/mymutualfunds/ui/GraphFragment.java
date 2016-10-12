@@ -60,7 +60,8 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         mFundName = bundle.getString(getString(R.string.key_fundname));
         mFundNav = bundle.getString(getString(R.string.key_fund_nav));
         mUnits = bundle.getString(getString(R.string.key_units_in_hand));
-        mTotalValue = getString(R.string.rupee_symbol) + String.format("%.2f", Float.parseFloat(mFundNav) * Float.parseFloat(mUnits));
+        mTotalValue = getString(R.string.rupee_symbol) +
+                String.format("%.2f", Float.parseFloat(mFundNav) * Float.parseFloat(mUnits));
 
         mContext = getContext();
         mEntriesString = new ArrayList<String>();
@@ -107,28 +108,16 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
             * otherwise show data from DB*/
             if (lastUpdatedYear == mCurrentYear) {
                 if (mCurrentQuarter > lastUpdatedQuarter) {
-                    mProgressBarNavGraph.setVisibility(View.VISIBLE);
-                    Intent intentService = new Intent(getContext(), FundsIntentService.class);
-                    intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_fetch_graph_data));
-                    intentService.putExtra(getString(R.string.key_scode), mScode);
-                    getActivity().startService(intentService);
+                    triggerDataFetch();
                 } else {
                     postExecute(data);
                     populateChart();
                 }
             } else if (mCurrentYear > lastUpdatedYear) {
-                mProgressBarNavGraph.setVisibility(View.VISIBLE);
-                Intent intentService = new Intent(getContext(), FundsIntentService.class);
-                intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_fetch_graph_data));
-                intentService.putExtra(getString(R.string.key_scode), mScode);
-                getActivity().startService(intentService);
+                triggerDataFetch();
             }
         } else {
-            mProgressBarNavGraph.setVisibility(View.VISIBLE);
-            Intent intentService = new Intent(getContext(), FundsIntentService.class);
-            intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_fetch_graph_data));
-            intentService.putExtra(getString(R.string.key_scode), mScode);
-            getActivity().startService(intentService);
+            triggerDataFetch();
         }
     }
 
@@ -140,6 +129,14 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
             }
         }
     };
+
+    public void triggerDataFetch() {
+        mProgressBarNavGraph.setVisibility(View.VISIBLE);
+        Intent intentService = new Intent(getContext(), FundsIntentService.class);
+        intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_fetch_graph_data));
+        intentService.putExtra(getString(R.string.key_scode), mScode);
+        getActivity().startService(intentService);
+    }
 
     @Override
     public void onResume() {
@@ -161,6 +158,16 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
+    }
+
+    public void findCurrentQuarterAndYear() {
+        Calendar date = Calendar.getInstance();
+        SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
+        SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
+        String yearString = dateFormatYear.format(date.getTime());
+        String monthString = dateFormatMonth.format(date.getTime());
+        mCurrentQuarter = Integer.valueOf(monthString) / 4;
+        mCurrentYear = Integer.parseInt(yearString);
     }
 
     public void postExecute(Cursor data) {
@@ -274,15 +281,5 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         mChart.animateY(0);
         mProgressBarNavGraph.setVisibility(View.INVISIBLE);
         mChart.setVisibility(View.VISIBLE);
-    }
-
-    public void findCurrentQuarterAndYear() {
-        Calendar date = Calendar.getInstance();
-        SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
-        SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
-        String yearString = dateFormatYear.format(date.getTime());
-        String monthString = dateFormatMonth.format(date.getTime());
-        mCurrentQuarter = Integer.valueOf(monthString) / 4;
-        mCurrentYear = Integer.parseInt(yearString);
     }
 }

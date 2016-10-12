@@ -41,16 +41,17 @@
 
             <TextView
                 android:id="@+id/disconnected_indicator"
+                style="@style/DisconnectedIndicatorStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableTop="@drawable/ic_cloud_off_black_48px"
-                android:text="@string/message_offline"
-                style="@style/disconnectedIndicatorStyle"/>
+                android:text="@string/message_offline" />
 
             <ListView
                 android:id="@+id/funds_listview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
         </FrameLayout>
 
     </android.support.v4.widget.SwipeRefreshLayout>

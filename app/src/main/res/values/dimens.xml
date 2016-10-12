@@ -21,12 +21,12 @@
     <dimen name="net_worth_card_padding">16dp</dimen>
     <dimen name="input_dialog_margin">24dp</dimen>
     <dimen name="funds_recycler_view_top_margin">104dp</dimen>
-    <dimen name="fund_title">16sp</dimen>
+    <dimen name="fund_title">14sp</dimen>
     <dimen name="nav_text">16sp</dimen>
-    <dimen name="nav_change_text">16sp</dimen>
+    <dimen name="nav_change_text">14sp</dimen>
     <dimen name="units_in_hand_text">14sp</dimen>
     <dimen name="fund_nav_minWidth">72dp</dimen>
-    <dimen name="historical_graph_height">400dp</dimen>
+    <dimen name="historical_graph_height">310dp</dimen>
     <dimen name="total_value_text_size">16sp</dimen>
     <dimen name="fund_name_in_detail_view">20sp</dimen>
     <dimen name="suggestions_list_item_min_height">56dp</dimen>
@@ -37,6 +37,7 @@
     <dimen name="disconnected_image_size">56dp</dimen>
     <dimen name="offline_text_size">20sp</dimen>
     <dimen name="graph_frag_top_margin">58dp</dimen>
-    <dimen name="net_worth_arrow_left_margin">3dp</dimen>
-
+    <dimen name="net_worth_arrow_left_margin">6dp</dimen>
+    <dimen name="net_worth_arrow_width">20dp</dimen>
+    <dimen name="stats_page_scroll_view_bottom_margin">50dp</dimen>
 </resources>

@@ -98,11 +98,14 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mEntries = new ArrayList<>();
         mLabels = new ArrayList<String>();
         mGraphList = new ArrayList<>();
+
+        //Get the current and previous date
         getDates();
+        //Read the funds list
         readFirebaseFundsList();
-        setHasOptionsMenu(false);
         mSharedPreferences = getActivity().getSharedPreferences(
                 getString(R.string.key_shared_prefs_my_stats), Context.MODE_PRIVATE);
+        setHasOptionsMenu(false);
     }
 
     @Nullable
@@ -110,18 +113,24 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_stats, container, false);
-        mChart = (LineChart) rootView.findViewById(R.id.chart_networth);
-        mChart.setVisibility(View.INVISIBLE);
+        Log.e(TAG, "Createview");
         mProgressBarNetWorth = (ProgressBar) rootView.findViewById(R.id.progress_bar_networth);
         mProgressBarNetWorthGraph =
                 (ProgressBar) rootView.findViewById(R.id.progress_bar_networth_graph);
-        readFirebaseNetworthList();
         mNetWorthAmountTextView = (TextView) rootView.findViewById(R.id.net_worth_amount);
         mNetWorthChangeTextView = (TextView) rootView.findViewById(R.id.net_worth_change);
         mChangeArrow = (ImageView) rootView.findViewById(R.id.net_worth_arrow);
         mNetWorthFrame = (FrameLayout) rootView.findViewById(R.id.net_worth_frame);
+        mChart = (LineChart) rootView.findViewById(R.id.chart_networth);
+        mChart.setVisibility(View.INVISIBLE);
+
+        //Read net-worth list from firebase
+        readFirebaseNetworthList();
+
+        //AdMob
         AdView mAdView = (AdView) rootView.findViewById(R.id.adView);
-        MobileAds.initialize(getActivity().getApplicationContext(), "ca-app-pub-3940256099942544~3347511713");
+        MobileAds.initialize(getActivity().getApplicationContext(),
+                getString(R.string.mobileads_initialize_string));
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
         return rootView;
@@ -130,49 +139,26 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.e(TAG, "Resume");
         showCase();
     }
 
-    public void showCase() {
-        if (mSharedPreferences.getBoolean(getString(R.string.key_is_firstrun), true)) {
-            new ShowcaseView.Builder(getActivity())
-                    .withMaterialShowcase()
-                    .setStyle(R.style.CustomShowcaseTheme)
-                    .setShowcaseEventListener(new OnShowcaseEventListener() {
-                        @Override
-                        public void onShowcaseViewHide(ShowcaseView showcaseView) {
-                            new ShowcaseView.Builder(getActivity())
-                                    .withMaterialShowcase()
-                                    .setStyle(R.style.CustomShowcaseTheme)
-                                    .setTarget(new ViewTarget(mChart))
-                                    .setContentTitle(getString(R.string.net_worth_graph_showcase_title))
-                                    .setContentText(getString(R.string.net_worth_graph_showcase_content))
-                                    .hideOnTouchOutside()
-                                    .build();
-                        }
+    @Override
+    public void updateNetWorth() {
+        setNetWorth();
+        populateChart();
+    }
 
-                        @Override
-                        public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
-
-                        }
-
-                        @Override
-                        public void onShowcaseViewShow(ShowcaseView showcaseView) {
-
-                        }
-
-                        @Override
-                        public void onShowcaseViewTouchBlocked(MotionEvent motionEvent) {
-
-                        }
-                    })
-                    .setTarget(new ViewTarget(mNetWorthAmountTextView))
-                    .setContentTitle(getString(R.string.net_worth_showcase_title))
-                    .setContentText(getString(R.string.net_worth_showcase_content))
-                    .hideOnTouchOutside()
-                    .build();
-
-            mSharedPreferences.edit().putBoolean(getString(R.string.key_is_firstrun), false).apply();
+    public void getDates() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+        mToday = format.format(calendar.getTime());
+        try {
+            calendar.setTime(format.parse(mToday));
+            calendar.add(Calendar.DATE, -1);
+            mYesterday = format.format(calendar.getTime());
+        } catch (ParseException pe) {
+            Log.e(TAG, pe.toString());
         }
     }
 
@@ -212,71 +198,13 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         };
         fundsListReference.addChildEventListener(childEventListener);
-    }
-
-    public boolean alreadyPresent(FundInfo fundInfo) {
-        if (mFundsArrayList.size() > 0) {
-            for (int i = 0; i < mFundsArrayList.size(); i++) {
-                if (mFundsArrayList.get(i).getScode().equals(fundInfo.getScode())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public void reflectChange(FundInfo fundInfoNew) {
-        for (int index = 0; index < mFundsArrayList.size(); index++) {
-            if (mFundsArrayList.get(index).getScode().equals(fundInfoNew.getScode())) {
-                mFundsArrayList.remove(index);
-                mFundsArrayList.add(index, fundInfoNew);
-                break;
-            }
-        }
-        Log.e(TAG, "reflect change executed");
-    }
-
-    public void calculateNetWorth() {
-        mNetWorth = 0;
-        for (int index = 0; index < mFundsArrayList.size(); index++) {
-            FundInfo fundInfo = mFundsArrayList.get(index);
-            mNetWorth = mNetWorth + (Float.parseFloat(fundInfo.getNav())
-                    * Float.parseFloat(fundInfo.getUnits()));
-        }
-        Log.e(TAG, String.valueOf(mNetWorth));
-    }
-
-    public void storeNetWorthInFirebase() {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        String date = dateFormat.format(calendar.getTime());
-        DatabaseReference netWorthRef = mDatabase.getReference(
-                mFirebaseUser.getUid()).child(KEY_NETWORTH);
-        netWorthRef.child(date).setValue(String.format("%.2f", mNetWorth));
-    }
-
-    @Override
-    public void updateNetWorth() {
-        setNetWorth();
-        populateChart();
-    }
-
-    public void reflectRemoval(FundInfo fundInfo) {
-        for (int index = 0; index < mFundsArrayList.size(); index++) {
-            if (mFundsArrayList.get(index).getScode().equals(fundInfo.getScode())) {
-                mFundsArrayList.remove(index);
-                break;
-            }
-        }
     }
 
     public void readFirebaseNetworthList() {
@@ -310,85 +238,136 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         };
         netWorthRef.addChildEventListener(childEventListener);
     }
 
-    public void getDates() {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-        mToday = format.format(calendar.getTime());
-        try {
-            calendar.setTime(format.parse(mToday));
-            calendar.add(Calendar.DATE, -1);
-            mYesterday = format.format(calendar.getTime());
-        } catch (ParseException pe) {
-            Log.e(TAG, pe.toString());
+    public void showCase() {
+        if (mSharedPreferences.getBoolean(getString(R.string.key_is_firstrun), true)) {
+            new ShowcaseView.Builder(getActivity())
+                    .withMaterialShowcase()
+                    .setStyle(R.style.CustomShowcaseTheme)
+                    .setShowcaseEventListener(new OnShowcaseEventListener() {
+                        @Override
+                        public void onShowcaseViewHide(ShowcaseView showcaseView) {
+                            new ShowcaseView.Builder(getActivity())
+                                    .withMaterialShowcase()
+                                    .setStyle(R.style.CustomShowcaseTheme)
+                                    .setTarget(new ViewTarget(mChart))
+                                    .setContentTitle(getString(R.string.net_worth_graph_showcase_title))
+                                    .setContentText(getString(R.string.net_worth_graph_showcase_content))
+                                    .hideOnTouchOutside()
+                                    .build();
+                        }
+
+                        @Override
+                        public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
+                        }
+
+                        @Override
+                        public void onShowcaseViewShow(ShowcaseView showcaseView) {
+                        }
+
+                        @Override
+                        public void onShowcaseViewTouchBlocked(MotionEvent motionEvent) {
+                        }
+                    })
+                    .setTarget(new ViewTarget(mNetWorthAmountTextView))
+                    .setContentTitle(getString(R.string.net_worth_showcase_title))
+                    .setContentText(getString(R.string.net_worth_showcase_content))
+                    .hideOnTouchOutside()
+                    .build();
+
+            mSharedPreferences.edit().putBoolean(getString(R.string.key_is_firstrun), false).apply();
         }
     }
 
-    public void populateChart() {
-        LineDataSet lineDataSet = new LineDataSet(mEntries,
-                NET_WORTH_GRAPH_VALUES);
-        lineDataSet.setDrawCircles(true);
-        lineDataSet.setDrawCircleHole(true);
-        lineDataSet.setCircleColorHole(getResources().getColor(R.color.colorAccent));
-        lineDataSet.setCircleRadius(4.5f);
-//        lineDataSet.setDrawFilled(true);
-//        lineDataSet.setFillColor(getResources().getColor(R.color.colorAccent));
-        lineDataSet.setColor(getResources().getColor(R.color.colorAccent), 220);
-//        lineDataSet.setFillAlpha(220);
-        lineDataSet.setDrawValues(false);
-        lineDataSet.setLineWidth(3.5f);
-
-        YAxis yAxisLeft = mChart.getAxisLeft();
-        yAxisLeft.setTextColor(getResources().getColor(android.R.color.black));
-        yAxisLeft.setDrawGridLines(false);
-
-        YAxis yAxisRight = mChart.getAxisRight();
-        yAxisRight.setDrawLabels(false);
-//        yAxisRight.setTextColor(getResources().getColor(android.R.color.white));
-        yAxisRight.setDrawGridLines(false);
-        yAxisRight.setDrawAxisLine(false);
-
-        AxisValueFormatter formatter = new AxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return mLabels.get((int) value);
+    public boolean alreadyPresent(FundInfo fundInfo) {
+        if (mFundsArrayList.size() > 0) {
+            for (int i = 0; i < mFundsArrayList.size(); i++) {
+                if (mFundsArrayList.get(i).getScode().equals(fundInfo.getScode())) {
+                    return true;
+                }
             }
+        }
+        return false;
+    }
 
-            @Override
-            public int getDecimalDigits() {
-                return 0;
+    public void reflectChange(FundInfo fundInfoNew) {
+        for (int index = 0; index < mFundsArrayList.size(); index++) {
+            if (mFundsArrayList.get(index).getScode().equals(fundInfoNew.getScode())) {
+                mFundsArrayList.remove(index);
+                mFundsArrayList.add(index, fundInfoNew);
+                break;
             }
-        };
+        }
+        Log.e(TAG, "reflect change executed");
+    }
 
-        XAxis xAxis = mChart.getXAxis();
-        xAxis.setDrawGridLines(false);
-        xAxis.setAvoidFirstLastClipping(true);
-        xAxis.setTextColor(getResources().getColor(android.R.color.black));
-        xAxis.setValueFormatter(formatter);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+    public void reflectRemoval(FundInfo fundInfo) {
+        for (int index = 0; index < mFundsArrayList.size(); index++) {
+            if (mFundsArrayList.get(index).getScode().equals(fundInfo.getScode())) {
+                mFundsArrayList.remove(index);
+                break;
+            }
+        }
+    }
 
+    public void calculateNetWorth() {
+        mNetWorth = 0;
+        for (int index = 0; index < mFundsArrayList.size(); index++) {
+            FundInfo fundInfo = mFundsArrayList.get(index);
+            mNetWorth = mNetWorth + (Float.parseFloat(fundInfo.getNav())
+                    * Float.parseFloat(fundInfo.getUnits()));
+        }
+        Log.e(TAG, String.valueOf(mNetWorth));
+    }
 
-        LineData data = new LineData(lineDataSet);
-        mChart.setDescription(GRAPH_DESCRIPTION);
-        mChart.setData(data);
-        mChart.animateY(0);
-        mProgressBarNetWorthGraph.setVisibility(View.INVISIBLE);
-        mChart.setVisibility(View.VISIBLE);
+    public void calculateNetWorthChange() {
+        float netWorthLatest = 0.0f;
+        float netWorthPrevious = 0.0f;
+        float changeValue = 0.0f;
+        float changePercent = 0.0f;
+        mIsNetChangeNegative = false;
+        if (mGraphList.size() >= 2) {
+            netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
+            netWorthPrevious = Float.parseFloat(mGraphList.get(mGraphList.size() - 2).getNetworth());
+            changeValue = netWorthLatest - netWorthPrevious;
+            changePercent = Math.abs(changeValue) * 100 / netWorthPrevious;
+            String changePercentStr = String.format("%.2f", changePercent);
+            if (changeValue < 0) {
+                mIsNetChangeNegative = true;
+            }
+            mNetWorthChange = String.format("%.2f", Math.abs(changeValue)) + "(" + changePercentStr + "%)";
+            Log.e(TAG, "netChPerc: " + String.valueOf(changeValue) + " " + String.valueOf(changePercent) + "%");
+        } else if (mGraphList.size() == 1) {
+            netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
+            netWorthPrevious = 0.0f;
+            changeValue = netWorthLatest - netWorthPrevious;
+            if (changeValue < 0) {
+                mIsNetChangeNegative = true;
+            }
+            mNetWorthChange = String.format("%.2f", Math.abs(changeValue));
+        }
+        mNetWorth = netWorthLatest;
+    }
+
+    public void storeNetWorthInFirebase() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String date = dateFormat.format(calendar.getTime());
+        DatabaseReference netWorthRef = mDatabase.getReference(
+                mFirebaseUser.getUid()).child(KEY_NETWORTH);
+        netWorthRef.child(date).setValue(String.format("%.2f", mNetWorth));
     }
 
     public void changeNetworthList(DataSnapshot dataSnapshot) {
@@ -440,35 +419,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mGraphList.remove(0);
     }
 
-    public void calculateNetWorthChange() {
-        float netWorthLatest = 0.0f;
-        float netWorthPrevious = 0.0f;
-        float changeValue = 0.0f;
-        float changePercent = 0.0f;
-        mIsNetChangeNegative = false;
-        if (mGraphList.size() >= 2) {
-            netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
-            netWorthPrevious = Float.parseFloat(mGraphList.get(mGraphList.size() - 2).getNetworth());
-            changeValue = netWorthLatest - netWorthPrevious;
-            changePercent = Math.abs(changeValue) * 100 / netWorthPrevious;
-            String changePercentStr = String.format("%.2f", changePercent);
-            if (changeValue < 0) {
-                mIsNetChangeNegative = true;
-            }
-            mNetWorthChange = String.format("%.2f", Math.abs(changeValue)) + "(" + changePercentStr + "%)";
-            Log.e(TAG, "netChPerc: " + String.valueOf(changeValue) + " " + String.valueOf(changePercent) + "%");
-        } else if (mGraphList.size() == 1) {
-            netWorthLatest = Float.parseFloat(mGraphList.get(mGraphList.size() - 1).getNetworth());
-            netWorthPrevious = 0.0f;
-            changeValue = netWorthLatest - netWorthPrevious;
-            if (changeValue < 0) {
-                mIsNetChangeNegative = true;
-            }
-            mNetWorthChange = String.format("%.2f", Math.abs(changeValue));
-        }
-        mNetWorth = netWorthLatest;
-    }
-
     public void setNetWorth() {
         if (mNetWorthChange != null) {
             mNetWorthChangeTextView.setText(mNetWorthChange);
@@ -485,5 +435,52 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             }
         }
         mProgressBarNetWorth.setVisibility(View.INVISIBLE);
+    }
+
+    public void populateChart() {
+        LineDataSet lineDataSet = new LineDataSet(mEntries,
+                NET_WORTH_GRAPH_VALUES);
+        lineDataSet.setDrawCircles(true);
+        lineDataSet.setDrawCircleHole(true);
+        lineDataSet.setCircleColorHole(getResources().getColor(R.color.colorAccent));
+        lineDataSet.setCircleRadius(4.5f);
+        lineDataSet.setColor(getResources().getColor(R.color.colorAccent), 220);
+        lineDataSet.setDrawValues(false);
+        lineDataSet.setLineWidth(3.5f);
+
+        YAxis yAxisLeft = mChart.getAxisLeft();
+        yAxisLeft.setTextColor(getResources().getColor(android.R.color.black));
+        yAxisLeft.setDrawGridLines(false);
+
+        YAxis yAxisRight = mChart.getAxisRight();
+        yAxisRight.setDrawLabels(false);
+        yAxisRight.setDrawGridLines(false);
+        yAxisRight.setDrawAxisLine(false);
+
+        AxisValueFormatter formatter = new AxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return mLabels.get((int) value);
+            }
+
+            @Override
+            public int getDecimalDigits() {
+                return 0;
+            }
+        };
+
+        XAxis xAxis = mChart.getXAxis();
+        xAxis.setDrawGridLines(false);
+        xAxis.setAvoidFirstLastClipping(true);
+        xAxis.setTextColor(getResources().getColor(android.R.color.black));
+        xAxis.setValueFormatter(formatter);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        LineData data = new LineData(lineDataSet);
+        mChart.setDescription(GRAPH_DESCRIPTION);
+        mChart.setData(data);
+        mChart.animateY(0);
+        mProgressBarNetWorthGraph.setVisibility(View.INVISIBLE);
+        mChart.setVisibility(View.VISIBLE);
     }
 }

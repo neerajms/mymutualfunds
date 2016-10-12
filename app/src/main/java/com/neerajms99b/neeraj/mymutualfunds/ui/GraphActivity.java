@@ -17,11 +17,14 @@ public class GraphActivity extends AppCompatActivity {
         setContentView(R.layout.activity_graph);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_graph_activity);
         setSupportActionBar(toolbar);
+
         Intent intent = getIntent();
         String scode = intent.getExtras().getString(getString(R.string.key_scode));
         String fundName = intent.getExtras().getString(getString(R.string.key_fundname));
         String fundNav = intent.getExtras().getString(getString(R.string.key_fund_nav));
         String units = intent.getExtras().getString(getString(R.string.key_units_in_hand));
+
+        //Send data to GraphFragment
         GraphFragment fragment = new GraphFragment();
         Bundle bundle = new Bundle();
         bundle.putString(getString(R.string.key_scode), scode);
@@ -32,8 +35,8 @@ public class GraphActivity extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.graph_fragment, fragment);
         transaction.commit();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

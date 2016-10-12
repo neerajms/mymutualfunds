@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,24 +31,17 @@ import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class FundsListFragment extends Fragment{
+public class FundsListFragment extends Fragment {
     private RecyclerView mRecyclerView;
-    public int CURSOR_LOADER_ID = 0;
-    private TextView mNetWorthAmount;
-    private String mNetWorth;
     private ItemTouchHelper mItemTouchHelper;
     private ItemTouchHelper.Callback mItemTouchCallBack;
     private MainActivity mCallBack;
-    public final String ARG_OBJECT = "funds_list";
-    private FloatingActionButton mFab;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
-    private Query mQuery;
     private FirebaseDatabase mDatabase;
     private DatabaseReference mMyRef;
     private FirebaseAdapter mFirebaseAdapter;
     private final String TAG = FundsListFragment.class.getSimpleName();
-    private Menu mMenu;
 
     public FundsListFragment() {
     }
@@ -78,14 +69,6 @@ public class FundsListFragment extends Fragment{
         mItemTouchCallBack = new SimpleItemTouchHelper(mFirebaseAdapter);
         mItemTouchHelper = new ItemTouchHelper(mItemTouchCallBack);
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
-        mFab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startSearchActivity();
-            }
-        });
-        mFab.hide();
         return rootView;
     }
 
@@ -97,15 +80,23 @@ public class FundsListFragment extends Fragment{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_add_fund) {
             startSearchActivity();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void getFirebaseData() {
+        mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
+        Query query = mMyRef;
+        mFirebaseAdapter = new FirebaseAdapter(FundInfo.class,
+                R.layout.main_activity_list_item, FirebaseAdapter.FundHolder.class, query, this);
+    }
+
+    public void startSearchActivity() {
+        Intent intent = new Intent(getActivity(), SearchActivity.class);
+        startActivity(intent);
     }
 
     public void editClicked(String scode) {
@@ -122,11 +113,6 @@ public class FundsListFragment extends Fragment{
         mMyRef.child(scode).child(getString(R.string.key_units_in_hand)).setValue(units);
     }
 
-    public void startSearchActivity() {
-        Intent intent = new Intent(getActivity(), SearchActivity.class);
-        startActivity(intent);
-    }
-
     public void deleteFirebaseNode(int position) {
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
         String scode = mFirebaseAdapter.getItem(position).getScode();
@@ -135,21 +121,15 @@ public class FundsListFragment extends Fragment{
         getActivity().getContentResolver().delete(uri, null, null);
     }
 
-    public void getFirebaseData() {
-        mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
-        Query query = mMyRef;
-        mFirebaseAdapter = new FirebaseAdapter(FundInfo.class,
-                R.layout.main_activity_list_item, FirebaseAdapter.FundHolder.class, query, this);
-    }
-
     public void showGraph(String scode, String fundName, String fundNav, String units) {
         Log.d(TAG, scode);
         mCallBack.launchGraphActivity(scode, fundName, fundNav, units);
     }
-    public void addScodeToDatabase(String scode){
+
+    public void addScodeToDatabase(String scode) {
         Intent intent = new Intent(getContext(), FundsIntentService.class);
-        intent.putExtra(getString(R.string.key_tag),getString(R.string.tag_insert_scodes));
-        intent.putExtra(getString(R.string.key_scode),scode);
+        intent.putExtra(getString(R.string.key_tag), getString(R.string.tag_insert_scodes));
+        intent.putExtra(getString(R.string.key_scode), scode);
         getContext().startService(intent);
     }
 }

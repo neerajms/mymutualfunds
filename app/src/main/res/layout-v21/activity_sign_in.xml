@@ -9,10 +9,11 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/sign_in_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="@dimen/margin_16dp"
         android:text="@string/sign_in"
         android:textColor="@android:color/white"
         android:textSize="30sp"
@@ -22,12 +23,13 @@
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="96dp"
         android:visibility="visible" />
 
     <ProgressBar
         android:id="@+id/progress_bar_sign_in"
-        style="@android:style/Widget.ProgressBar.Large"
+        style="@android:style/Widget.Material.ProgressBar.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

@@ -1,6 +1,7 @@
 package com.neerajms99b.neeraj.mymutualfunds.adapter;
 
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -64,11 +65,19 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
 
         public void setFundNAV(String fundNav, boolean isNegative) {
             if (isNegative) {
-                mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorRed));
+                if (Build.VERSION.SDK_INT >= 23) {
+                    mFundNAV.setTextColor(ContextCompat.getColor(mCallBack.getContext(), R.color.colorRed));
+                } else {
+                    mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorRed));
+                }
             } else {
-                mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
+                if (Build.VERSION.SDK_INT >= 23) {
+                    mFundNAV.setTextColor(ContextCompat.getColor(mCallBack.getContext(), R.color.colorGreen));
+                } else {
+                    mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
+                }
             }
-            String nav = String.format("%.2f", Double.valueOf(fundNav));
+            String nav = String.format("%.2f", Float.parseFloat(fundNav));
             mFundNAV.setText(nav);
         }
 
@@ -82,7 +91,11 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
                 mArrow.setImageResource(R.drawable.ic_arrow_down);
                 mArrow.setVisibility(View.VISIBLE);
             } else {
-                mChange.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
+                if (Build.VERSION.SDK_INT >= 23) {
+                    mChange.setTextColor(ContextCompat.getColor(mCallBack.getContext(), R.color.colorGreen));
+                } else {
+                    mChange.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
+                }
                 mArrow.setImageResource(R.drawable.ic_arrow_up);
                 mArrow.setVisibility(View.VISIBLE);
             }

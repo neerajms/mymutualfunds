@@ -49,9 +49,6 @@ public class FundsWidgetProvider extends AppWidgetProvider {
         }
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
-//            Intent intent = new Intent(context, MainActivity.class);
-//            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-//            views.setOnClickPendingIntent(R.id.widget_frame, pendingIntent);
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
     }

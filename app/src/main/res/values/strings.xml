@@ -1,7 +1,4 @@
 <resources>
-    <string name="app_name">My Mutual Funds</string>
-    <string name="action_add_fund">Add more funds</string>
-    <string name="search_hint" translatable="true">Enter fund name or scheme code</string>
     <string name="gcmtask_intent" translatable="false">info_from_gcmtask</string>
     <string name="search_data_bundle" translatable="false">data_bundle</string>
     <string name="basic_search_results_parcelable" translatable="false">basic_fund_info_parcelable</string>
@@ -10,55 +7,27 @@
     <string name="key_scode" translatable="false">mScode</string>
     <string name="key_fundname" translatable="false">mFundName</string>
     <string name="key_toast_message" translatable="false">toast_message</string>
-    <string name="unique_constraint_failed_message">Fund already in portfolio</string>
-    <string name="fund_added_message">Fund added to portfolio</string>
-    <string name="units_title">Enter number of units</string>
-    <string name="alert_dialog_ok">Submit</string>
-    <string name="alert_dialog_cancel">Cancel</string>
     <string name="notify_data_change" translatable="false">notify</string>
-    <string name="net_worth_label">Net Worth</string>
     <string name="key_net_worth" translatable="false">net_worth</string>
-    <string name="title_activity_my_stats">MyStatsActivity</string>
-    <string name="action_settings">Settings</string>
-    <string name="tab_my_stats">My Stats</string>
-    <string name="tab_my_funds">My Funds</string>
     <string name="key_tab_position" translatable="false">tab_position</string>
-    <string name="sign_in">Sign In</string>
-    <string name="units_in_hand">Units in hand</string>
-    <string name="net_asset_value_title">Net Asset Value</string>
-    <string name="change_title">Change</string>
     <string name="roboto_medium" translatable="false">sans-serif-medium</string>
     <string name="roboto_regular" translatable="false">sans-serif</string>
     <string name="scode_shared_pref_key" translatable="false">scodeInSharedPreferences</string>
     <string name="shared_prefs_file_key" translatable="false">com.neerajms99b.neeraj.mymutualfunds.file_key</string>
     <string name="tag_fetch_graph_data" translatable="false">fetchGraphData</string>
     <string name="key_graph_fetched" translatable="false">graphDataFetched</string>
-    <string name="net_worth_graph_value">Net worth values</string>
-    <string name="net_worth_graph_description">Net worth for the last few days</string>
-    <string name="nav_chart_description">NAV for the last few quarter ends</string>
-    <string name="nav_chart_values">Net Asset Value</string>
-    <string name="total_value">Total value:</string>
     <string name="key_fund_nav" translatable="false">mNav</string>
     <string name="key_units_in_hand" translatable="false">mUnits</string>
     <string name="firebase_child_funds" translatable="false">funds</string>
-    <string name="menu_clear_history">Clear search history</string>
-    <string name="history_cleared_toast">Cleared all search history</string>
-    <string name="nothing_to_clear_toast">Nothing to clear in history</string>
     <string name="rupee_symbol" translatable="false">₹</string>
     <string name="funds_array_list" translatable="false">fundsArrayList</string>
     <string name="key_change_percent" translatable="false">mChangePercent</string>
     <string name="key_change_value" translatable="false">mChangeValue</string>
     <string name="tag_insert_scodes" translatable="false">insertScodes</string>
-    <string name="message_failed_to_add_fund">Failed to add fund, please try again</string>
     <string name="retrigger_update_nav" translatable="false">retriggerUpdateNAV</string>
-    <string name="message_fund_not_found">Fund not found</string>
-    <string name="message_something_went_wrong">Something went wrong, please try again</string>
-    <string name="message_offline">Offline</string>
     <string name="key_tag" translatable="false">tag</string>
     <string name="tag_search_fund" translatable="false">searchFund</string>
     <string name="key_fund_search_word" translatable="false">fundSearchWord</string>
-    <string name="notification_title">Values updated</string>
-    <string name="notification_content">Click here to see the updated values</string>
     <string name="notification_id" translatable="false">99</string>
     <string name="action_update_widget_data" translatable="false">actionUpdateWidgetData</string>
     <string name="key_widget_data_bundle" translatable="false">widgetDataBundle</string>
@@ -70,6 +39,43 @@
     <string name="key_shared_prefs_funds_list" translatable="false">
         com.neerajms99b.neeraj.mymutualfunds.ui.FundsListFragment</string>
     <string name="key_is_firstrun" translatable="false">isFirstRun</string>
+    <string name="intent_action_boot_completed" translatable="false">android.intent.action.BOOT_COMPLETED</string>
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="mobileads_initialize_string" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>
+
+    <string name="app_name">My Mutual Funds</string>
+    <string name="action_add_fund">Add funds</string>
+    <string name="search_hint">Enter fund name or scheme code</string>
+    <string name="unique_constraint_failed_message">Fund already in portfolio</string>
+    <string name="fund_added_message">Fund added to portfolio</string>
+    <string name="units_title">Enter number of units</string>
+    <string name="alert_dialog_ok">Submit</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+    <string name="net_worth_label">Net Worth</string>
+    <string name="title_activity_my_stats">MyStatsActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="tab_my_stats">My Stats</string>
+    <string name="tab_my_funds">My Funds</string>
+    <string name="sign_in">Sign In</string>
+    <string name="units_in_hand">Units in hand</string>
+    <string name="net_asset_value_title">Net Asset Value</string>
+    <string name="change_title">Change</string>
+    <string name="net_worth_graph_value">Net worth values</string>
+    <string name="net_worth_graph_description">Net worth for the last few days</string>
+    <string name="nav_chart_description">NAV for the last few quarter ends</string>
+    <string name="nav_chart_values">Net Asset Value</string>
+    <string name="total_value">Total value:</string>
+    <string name="menu_clear_history">Clear search history</string>
+    <string name="history_cleared_toast">Cleared all search history</string>
+    <string name="nothing_to_clear_toast">Nothing to clear in history</string>
+    <string name="message_failed_to_add_fund">Failed to add fund, please try again</string>
+    <string name="message_fund_not_found">Fund not found</string>
+    <string name="message_something_went_wrong">Something went wrong, please try again</string>
+    <string name="message_offline">Offline</string>
+    <string name="notification_title">Values updated</string>
+    <string name="notification_content">Click here to see the updated values</string>
+    <string name="sign_in_failed">Sign in failed</string>
     <string name="net_worth_showcase_title">Net-Worth</string>
     <string name="net_worth_showcase_content">Shows how much your funds amount to in total</string>
     <string name="net_worth_graph_showcase_title">Net-Worth Graph</string>
@@ -77,11 +83,5 @@
         Plots net-worth against date for a maximum of 30 days\nWe have started ploting your graph from today and it will grow day by day</string>
     <string name="add_more_funds_showcase_title">Add Funds</string>
     <string name="add_more_funds_showcase_content">You can add funds from the options menu</string>
-    <string name="intent_action_boot_completed" translatable="false">android.intent.action.BOOT_COMPLETED</string>
-    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="sign_in_failed">Sign in failed</string>
-    <string name="mobileads_initialize_string" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>
+
 </resources>

@@ -1,25 +1,16 @@
 <resources>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="fab_margin">32dp</dimen>
-    <dimen name="padding_list">16dp</dimen>
     <dimen name="search_result_listitem_textsize">16sp</dimen>
     <dimen name="cardview_layout_margin">8dp</dimen>
-    <dimen name="text_view_layout_margin">8dp</dimen>
     <dimen name="cardview_minheight">70dp</dimen>
-    <dimen name="main_relativelayout_bottom_padding">8dp</dimen>
-    <dimen name="net_worth_card_height">100dp</dimen>
-    <dimen name="net_worth_card_marginbottom">8dp</dimen>
-    <dimen name="recyclerview_toppadding">4dp</dimen>
     <dimen name="net_worth_cardview_elevation">6dp</dimen>
     <dimen name="net_worth_heading_size">16sp</dimen>
-    <dimen name="net_worth_heading_top_margin">8dp</dimen>
     <dimen name="margin_8dp">8dp</dimen>
     <dimen name="margin_16dp">16dp</dimen>
     <dimen name="net_worth_text_size">20sp</dimen>
     <dimen name="net_worth_card_padding">16dp</dimen>
     <dimen name="input_dialog_margin">24dp</dimen>
-    <dimen name="funds_recycler_view_top_margin">104dp</dimen>
     <dimen name="fund_title">14sp</dimen>
     <dimen name="nav_text">16sp</dimen>
     <dimen name="nav_change_text">14sp</dimen>

@@ -60,7 +60,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/text_view_layout_margin"
+                android:layout_margin="@dimen/margin_8dp"
                 android:layout_weight="0"
                 android:text="@string/units_in_hand"
                 android:textSize="@dimen/units_in_hand_text" />
@@ -69,7 +69,7 @@
                 android:id="@+id/units"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/text_view_layout_margin"
+                android:layout_margin="@dimen/margin_8dp"
                 android:layout_weight="1"
                 android:textSize="@dimen/units_in_hand_text" />
 

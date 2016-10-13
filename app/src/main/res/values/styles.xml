@@ -1,8 +1,6 @@
 <resources>
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -33,10 +31,10 @@
         <item name="android:textSize">@dimen/nav_text</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_gravity">center_vertical</item>
-        <item name="android:layout_marginEnd">@dimen/text_view_layout_margin</item>
-        <item name="android:layout_marginLeft">@dimen/text_view_layout_margin</item>
-        <item name="android:layout_marginRight">@dimen/text_view_layout_margin</item>
-        <item name="android:layout_marginStart">@dimen/text_view_layout_margin</item>
+        <item name="android:layout_marginEnd">@dimen/margin_8dp</item>
+        <item name="android:layout_marginLeft">@dimen/margin_8dp</item>
+        <item name="android:layout_marginRight">@dimen/margin_8dp</item>
+        <item name="android:layout_marginStart">@dimen/margin_8dp</item>
         <item name="android:minWidth">@dimen/fund_nav_minWidth</item>
     </style>
 
@@ -85,10 +83,10 @@
     </style>
 
     <style name="NetWorthLabel">
-        <item name="android:layout_marginBottom">@dimen/text_view_layout_margin</item>
+        <item name="android:layout_marginBottom">@dimen/margin_8dp</item>
         <item name="android:layout_marginLeft">@dimen/margin_8dp</item>
         <item name="android:layout_marginStart">@dimen/margin_8dp</item>
-        <item name="android:layout_marginTop">@dimen/net_worth_heading_top_margin</item>
+        <item name="android:layout_marginTop">@dimen/margin_8dp</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:textColor">@color/textColorBlack</item>
         <item name="android:textSize">@dimen/net_worth_heading_size</item>
@@ -97,7 +95,7 @@
     <style name="NetWorthAmount">
         <item name="android:layout_marginLeft">@dimen/margin_8dp</item>
         <item name="android:layout_marginStart">@dimen/margin_8dp</item>
-        <item name="android:layout_marginTop">@dimen/text_view_layout_margin</item>
+        <item name="android:layout_marginTop">@dimen/margin_8dp</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:textColor">@color/textColorBlack</item>
         <item name="android:textSize">@dimen/net_worth_text_size</item>
@@ -105,8 +103,8 @@
     </style>
 
     <style name="NetWorthChange">
-        <item name="android:layout_marginBottom">@dimen/text_view_layout_margin</item>
-        <item name="android:layout_marginTop">@dimen/text_view_layout_margin</item>
+        <item name="android:layout_marginBottom">@dimen/margin_8dp</item>
+        <item name="android:layout_marginTop">@dimen/margin_8dp</item>
         <item name="android:gravity">center_vertical</item>
     </style>
 

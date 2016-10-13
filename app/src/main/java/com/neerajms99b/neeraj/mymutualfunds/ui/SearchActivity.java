@@ -9,7 +9,9 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -68,7 +70,6 @@ public class SearchActivity extends AppCompatActivity {
         mRecentString = FundsContentProvider.mUriRecentSearch.toString() + "/";
         mContext = this;
         mAdapter = new SearchSuggestionsAdapter(this, mCursor, 0);
-        final Context context = this;
 
         mSearchView = (SearchView) findViewById(R.id.search);
         initializeSearchView();
@@ -79,7 +80,11 @@ public class SearchActivity extends AppCompatActivity {
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_search_swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(null);
         mSwipeRefreshLayout.setEnabled(false);
-        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        if (Build.VERSION.SDK_INT >= 23) {
+            mSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(mContext, R.color.colorAccent));
+        } else {
+            mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        }
 
         mFundsListAdapter = new ArrayAdapter<>(this, R.layout.search_results_list_item,
                 R.id.list_item, mArrayList);

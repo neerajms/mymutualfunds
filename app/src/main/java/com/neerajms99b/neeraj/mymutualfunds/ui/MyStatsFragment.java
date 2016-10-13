@@ -2,9 +2,11 @@ package com.neerajms99b.neeraj.mymutualfunds.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -400,13 +402,23 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             String netWorthStr = getString(R.string.rupee_symbol) + String.format("%.2f", mNetWorth);
             mNetWorthAmountTextView.setText(netWorthStr);
             if (mIsNetChangeNegative) {
-                mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorRed));
+                if (Build.VERSION.SDK_INT >= 23) {
+                    mNetWorthChangeTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorRed));
+                    mNetWorthAmountTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorRed));
+                } else {
+                    mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorRed));
+                    mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorRed));
+                }
                 mChangeArrow.setImageResource(R.drawable.ic_arrow_down);
-                mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorRed));
             } else {
-                mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+                if (Build.VERSION.SDK_INT >= 23) {
+                    mNetWorthChangeTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorGreen));
+                    mNetWorthAmountTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorGreen));
+                } else {
+                    mNetWorthChangeTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+                    mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorGreen));
+                }
                 mChangeArrow.setImageResource(R.drawable.ic_arrow_up);
-                mNetWorthAmountTextView.setTextColor(getResources().getColor(R.color.colorGreen));
             }
         }
         mProgressBarNetWorth.setVisibility(View.INVISIBLE);
@@ -417,14 +429,23 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 NET_WORTH_GRAPH_VALUES);
         lineDataSet.setDrawCircles(true);
         lineDataSet.setDrawCircleHole(true);
-        lineDataSet.setCircleColorHole(getResources().getColor(R.color.colorAccent));
+        if (Build.VERSION.SDK_INT >= 23) {
+            lineDataSet.setCircleColorHole(ContextCompat.getColor(getContext(), R.color.colorAccent));
+            lineDataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent), 220);
+        } else {
+            lineDataSet.setCircleColorHole(getResources().getColor(R.color.colorAccent));
+            lineDataSet.setColor(getResources().getColor(R.color.colorAccent), 220);
+        }
         lineDataSet.setCircleRadius(4.5f);
-        lineDataSet.setColor(getResources().getColor(R.color.colorAccent), 220);
         lineDataSet.setDrawValues(false);
         lineDataSet.setLineWidth(3.5f);
 
         YAxis yAxisLeft = mChart.getAxisLeft();
-        yAxisLeft.setTextColor(getResources().getColor(android.R.color.black));
+        if (Build.VERSION.SDK_INT >= 23) {
+            yAxisLeft.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+        } else {
+            yAxisLeft.setTextColor(getResources().getColor(android.R.color.black));
+        }
         yAxisLeft.setDrawGridLines(false);
 
         YAxis yAxisRight = mChart.getAxisRight();
@@ -447,7 +468,11 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         XAxis xAxis = mChart.getXAxis();
         xAxis.setDrawGridLines(false);
         xAxis.setAvoidFirstLastClipping(true);
-        xAxis.setTextColor(getResources().getColor(android.R.color.black));
+        if (Build.VERSION.SDK_INT >= 23) {
+            xAxis.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+        } else {
+            xAxis.setTextColor(getResources().getColor(android.R.color.black));
+        }
         xAxis.setValueFormatter(formatter);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 

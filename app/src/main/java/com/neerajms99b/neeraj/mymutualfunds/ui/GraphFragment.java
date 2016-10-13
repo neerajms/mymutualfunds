@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
@@ -237,12 +239,20 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
                 getString(R.string.nav_chart_values));
         lineDataSet.setDrawCircles(false);
         lineDataSet.setDrawFilled(false);
-        lineDataSet.setColor(getResources().getColor(R.color.colorAccent), 220);
+        if (Build.VERSION.SDK_INT >= 23) {
+            lineDataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent), 220);
+        } else {
+            lineDataSet.setColor(getResources().getColor(R.color.colorAccent), 220);
+        }
         lineDataSet.setDrawValues(false);
         lineDataSet.setLineWidth(3.5f);
 
         YAxis yAxisLeft = mChart.getAxisLeft();
-        yAxisLeft.setTextColor(getResources().getColor(android.R.color.black));
+        if (Build.VERSION.SDK_INT >= 23) {
+            yAxisLeft.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+        } else {
+            yAxisLeft.setTextColor(getResources().getColor(android.R.color.black));
+        }
         yAxisLeft.setDrawGridLines(false);
 
         YAxis yAxisRight = mChart.getAxisRight();
@@ -265,10 +275,13 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         XAxis xAxis = mChart.getXAxis();
         xAxis.setDrawGridLines(false);
         xAxis.setAvoidFirstLastClipping(true);
-        xAxis.setTextColor(getResources().getColor(android.R.color.black));
+        if (Build.VERSION.SDK_INT >= 23) {
+            xAxis.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+        } else {
+            xAxis.setTextColor(getResources().getColor(android.R.color.black));
+        }
         xAxis.setValueFormatter(formatter);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-
 
         LineData data = new LineData(lineDataSet);
         mChart.setDescription(getString(R.string.nav_chart_description));

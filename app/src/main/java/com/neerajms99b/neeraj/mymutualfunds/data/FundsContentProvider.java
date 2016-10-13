@@ -46,10 +46,10 @@ public class FundsContentProvider extends ContentProvider {
 
     static {
         mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        mUriMatcher.addURI(AUTHORITY,TABLE_NAME_RECENT_SEARCH + "/*",1);
+        mUriMatcher.addURI(AUTHORITY, TABLE_NAME_RECENT_SEARCH + "/*", 1);
         mUriMatcher.addURI(AUTHORITY, TABLE_NAME_HISTORICAL + "/#", 2);
-        mUriMatcher.addURI(AUTHORITY,TABLE_NAME_RECENT_SEARCH,3);
-        mUriMatcher.addURI(AUTHORITY,TABLE_NAME_HISTORICAL,4);
+        mUriMatcher.addURI(AUTHORITY, TABLE_NAME_RECENT_SEARCH, 3);
+        mUriMatcher.addURI(AUTHORITY, TABLE_NAME_HISTORICAL, 4);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class FundsContentProvider extends ContentProvider {
         switch (mUriMatcher.match(uri)) {
             case 1:
                 qb.setTables(TABLE_NAME_RECENT_SEARCH);
-                selection = SEARCH_WORD + " LIKE \'%" + uri.getLastPathSegment()+"%\'";
+                selection = SEARCH_WORD + " LIKE \'%" + uri.getLastPathSegment() + "%\'";
                 break;
 
             case 2:
@@ -114,10 +114,9 @@ public class FundsContentProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(tempUri, null);
                 return tempUri;
             }
-        }catch (SQLiteConstraintException sce){
+        } catch (SQLiteConstraintException sce) {
             return null;
         }
-//        throw new SQLException("Failed to add a record into " + uri);
         return null;
     }
 
@@ -125,7 +124,7 @@ public class FundsContentProvider extends ContentProvider {
     public int delete(Uri uri, String column, String[] args) {
         int deleted = 0;
         String whereClause = null;
-        switch (mUriMatcher.match(uri)){
+        switch (mUriMatcher.match(uri)) {
             case 3:
                 deleted = database.delete(TABLE_NAME_RECENT_SEARCH, null, args);
                 break;
@@ -140,7 +139,7 @@ public class FundsContentProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionValues) {
         int result = 0;
-        switch (mUriMatcher.match(uri)){
+        switch (mUriMatcher.match(uri)) {
             case 1:
                 selection = SEARCH_WORD + "=" + uri.getLastPathSegment();
                 result = database.update(TABLE_NAME_RECENT_SEARCH, contentValues, selection, selectionValues);

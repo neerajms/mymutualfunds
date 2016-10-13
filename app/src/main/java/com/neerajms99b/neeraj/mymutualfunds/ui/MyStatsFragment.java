@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -53,39 +52,31 @@ import java.util.Date;
  * Created by neeraj on 27/8/16.
  */
 public class MyStatsFragment extends Fragment implements UpdateFragment {
-    private FirebaseDatabase mDatabase;
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseUser mFirebaseUser;
-    private float mNetWorth;
-    private String TAG = MyStatsFragment.class.getSimpleName();
-    private ArrayList<FundInfo> mFundsArrayList;
-    private TextView mNetWorthAmountTextView;
-    private String mToday;
-    private String mYesterday;
-    private ArrayList<String> mLabels;
-    private ArrayList<String> mEntriesString;
-    private ArrayList<Entry> mEntries;
-    private LineChart mChart;
-    private int mLabelIndex;
-    private ArrayList<NetWorthGraphModel> mGraphList;
-    private float mNetWorthFire;
-    private Iterable<DataSnapshot> mDataSnapshotIterable;
-    private String mNetWorthChange;
-    private boolean mIsNetChangeNegative;
-    private TextView mNetWorthChangeTextView;
-    private ImageView mChangeArrow;
-    private static final String KEY_FIREBASE_FUNDS_CHILD = "funds";
     private static final String KEY_NETWORTH = "net_worth";
     private static final String NET_WORTH_GRAPH_VALUES = "Net worth values";
     private static final String GRAPH_DESCRIPTION = "Net worth for the last few days";
-    private static final String KEY_NETWORTH_CHANGE = "netWorthChange";
-    private static final String KEY_NET_CHANGE_NEGATIVE = "isNetWorthNegative";
-    private static final String KEY_ACTION_UPDATE_WIDGET_DATA = "actionUpdateWidgetData";
-    private static final String KEY_WIDGET_DATA_BUNDLE = "widgetDataBundle";
+    private static final String TAG = MyStatsFragment.class.getSimpleName();
+
+    private FirebaseDatabase mDatabase;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+
+    private LineChart mChart;
+    private ArrayList<String> mLabels;
+    private ArrayList<Entry> mEntries;
+    private ArrayList<NetWorthGraphModel> mGraphList;
+
+    private ArrayList<FundInfo> mFundsArrayList;
+    private float mNetWorth;
+    private TextView mNetWorthAmountTextView;
+    private TextView mNetWorthChangeTextView;
+    private String mNetWorthChange;
+    private boolean mIsNetChangeNegative;
+    private ImageView mChangeArrow;
+
     private ProgressBar mProgressBarNetWorth;
     private ProgressBar mProgressBarNetWorthGraph;
     private SharedPreferences mSharedPreferences;
-    private FrameLayout mNetWorthFrame;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,8 +90,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mLabels = new ArrayList<String>();
         mGraphList = new ArrayList<>();
 
-        //Get the current and previous date
-        getDates();
         //Read the funds list
         readFirebaseFundsList();
         mSharedPreferences = getActivity().getSharedPreferences(
@@ -113,14 +102,12 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_stats, container, false);
-        Log.e(TAG, "Createview");
         mProgressBarNetWorth = (ProgressBar) rootView.findViewById(R.id.progress_bar_networth);
         mProgressBarNetWorthGraph =
                 (ProgressBar) rootView.findViewById(R.id.progress_bar_networth_graph);
         mNetWorthAmountTextView = (TextView) rootView.findViewById(R.id.net_worth_amount);
         mNetWorthChangeTextView = (TextView) rootView.findViewById(R.id.net_worth_change);
         mChangeArrow = (ImageView) rootView.findViewById(R.id.net_worth_arrow);
-        mNetWorthFrame = (FrameLayout) rootView.findViewById(R.id.net_worth_frame);
         mChart = (LineChart) rootView.findViewById(R.id.chart_networth);
         mChart.setVisibility(View.INVISIBLE);
 
@@ -139,27 +126,14 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.e(TAG, "Resume");
+        //A demo of the app on the first run
         showCase();
     }
 
     @Override
-    public void updateNetWorth() {
+    public void updateNetWorth() {//Called on switching from My Funds tab to My Stats tab
         setNetWorth();
         populateChart();
-    }
-
-    public void getDates() {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-        mToday = format.format(calendar.getTime());
-        try {
-            calendar.setTime(format.parse(mToday));
-            calendar.add(Calendar.DATE, -1);
-            mYesterday = format.format(calendar.getTime());
-        } catch (ParseException pe) {
-            Log.e(TAG, pe.toString());
-        }
     }
 
     public void readFirebaseFundsList() {
@@ -202,13 +176,13 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, databaseError.toString());
             }
         };
         fundsListReference.addChildEventListener(childEventListener);
     }
 
     public void readFirebaseNetworthList() {
-        mLabelIndex = 0;
         mEntries.clear();
         mLabels.clear();
         DatabaseReference netWorthRef = mDatabase.getReference(
@@ -246,11 +220,13 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, databaseError.toString());
             }
         };
         netWorthRef.addChildEventListener(childEventListener);
     }
 
+    //A demo of the app on the first run
     public void showCase() {
         if (mSharedPreferences.getBoolean(getString(R.string.key_is_firstrun), true)) {
             new ShowcaseView.Builder(getActivity())
@@ -329,7 +305,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             mNetWorth = mNetWorth + (Float.parseFloat(fundInfo.getNav())
                     * Float.parseFloat(fundInfo.getUnits()));
         }
-        Log.e(TAG, String.valueOf(mNetWorth));
     }
 
     public void calculateNetWorthChange() {

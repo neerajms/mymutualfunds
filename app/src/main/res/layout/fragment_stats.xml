@@ -12,9 +12,10 @@
         android:layout_marginBottom="@dimen/stats_page_scroll_view_bottom_margin"
         android:scrollbars="none">
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <com.neerajms99b.neeraj.mymutualfunds.ui.CustomLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             style="@style/ScreenLayoutStyle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             tools:showIn="@layout/activity_main">
@@ -119,7 +120,7 @@
 
             </android.support.v7.widget.CardView>
 
-        </LinearLayout>
+        </com.neerajms99b.neeraj.mymutualfunds.ui.CustomLinearLayout>
 
     </ScrollView>
 

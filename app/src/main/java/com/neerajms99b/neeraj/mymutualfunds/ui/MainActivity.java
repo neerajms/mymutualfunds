@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //to dismiss notification once the app is opened
         dismissNotification();
         mSharedPreferences = getSharedPreferences(
                 getString(R.string.key_shared_prefs_funds_list), MODE_PRIVATE);
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             // Not signed in, launch the Sign In activity
             startActivity(new Intent(this, SignInActivity.class));
             finish();
+            //Set the update alarm on first run
             mAlarmManager.setAlarm(this);
             return;
         }

@@ -99,8 +99,6 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         if (data.moveToFirst() &&
                 data.getString(data.getColumnIndex(FundsContentProvider.LAST_UPDATED)) != null) {
             String lastUpdated = data.getString(data.getColumnIndex(FundsContentProvider.LAST_UPDATED));
-            Log.e(TAG, "lastupdated:" + lastUpdated);
-            Log.e(TAG, "current:" + String.valueOf(mCurrentQuarter) + "-" + String.valueOf(mCurrentYear));
             String[] words = lastUpdated.split("-");
             int lastUpdatedQuarter = Integer.parseInt(words[0]);
             int lastUpdatedYear = Integer.parseInt(words[1]);
@@ -239,9 +237,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
                 getString(R.string.nav_chart_values));
         lineDataSet.setDrawCircles(false);
         lineDataSet.setDrawFilled(false);
-//        lineDataSet.setFillColor(getResources().getColor(android.R.color.holo_blue_light));
         lineDataSet.setColor(getResources().getColor(R.color.colorAccent), 220);
-//        lineDataSet.setFillAlpha(220);
         lineDataSet.setDrawValues(false);
         lineDataSet.setLineWidth(3.5f);
 
@@ -251,7 +247,6 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
 
         YAxis yAxisRight = mChart.getAxisRight();
         yAxisRight.setDrawLabels(false);
-//        yAxisRight.setTextColor(getResources().getColor(android.R.color.white));
         yAxisRight.setDrawGridLines(false);
         yAxisRight.setDrawAxisLine(false);
 

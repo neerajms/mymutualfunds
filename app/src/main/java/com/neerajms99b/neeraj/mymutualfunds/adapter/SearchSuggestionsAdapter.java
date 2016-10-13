@@ -29,7 +29,6 @@ public class SearchSuggestionsAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        float density = parent.getResources().getDisplayMetrics().density;
         LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.search_suggestions_list_item,parent,false);
         SearchView.LayoutParams layoutParams = new SearchView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

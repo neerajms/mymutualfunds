@@ -1,5 +1,6 @@
 package com.neerajms99b.neeraj.mymutualfunds.adapter;
 
+import android.os.Build;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,7 +24,6 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         implements ItemTouchHelperAdapter {
     private final int FIRST_CARD = 1;
     private FundsListFragment mCallBack;
-    private int mLastPosition = -1;
 
     public FirebaseAdapter(Class modelClass, int modelLayout, Class viewHolderClass, Query ref, FundsListFragment fundsListFragment) {
         super(modelClass, modelLayout, viewHolderClass, ref);
@@ -143,6 +143,10 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins((int) (leftMargin * density), (int) (topMargin * density),
                 (int) (rightMargin * density), (int) (bottomMargin * density));
+        if (Build.VERSION.SDK_INT >= 17) {
+            layoutParams.setMarginStart((int) (leftMargin * density));
+            layoutParams.setMarginEnd((int) (rightMargin * density));
+        }
         cardView.setLayoutParams(layoutParams);
         TextView fundNameTextView = (TextView) cardView.findViewById(R.id.fund_name);
         TextView fundNAVTextView = (TextView) cardView.findViewById(R.id.fund_nav);

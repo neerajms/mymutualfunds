@@ -44,6 +44,7 @@ import java.util.Map;
  * Created by neeraj on 8/8/16.
  */
 public class FetchFundsTask extends GcmTaskService {
+    private final String TAG = getClass().getSimpleName();
     private final String FUNDS_BASE_URL = "https://mutualfundsnav.p.mashape.com/";
     private final String FUNDS_HISTORICAL_URL = "https://mutualfundsnav.p.mashape.com/historical";
     private final String KEY_PARAM = "X-Mashape-Key";
@@ -52,14 +53,13 @@ public class FetchFundsTask extends GcmTaskService {
     private final String CONTENT_TYPE_VALUE = "application/json";
     private final String ACCEPT_VALUE = "application/json";
     private final String KEY_VALUE = BuildConfig.API_KEY;
-    private final String TAG = getClass().getSimpleName();
     private final String KEY_FUNDNAME = "fund";
     private final String KEY_NAV = "nav";
-    private final String KEY_SCODE = "scode";
     private final String KEY_CHANGE = "change";
     private final String KEY_CHANGE_VALUE = "value";
     private final String KEY_CHANGE_PERCENT = "percent";
     private final String KEY_QUARTER = "q";
+
     private Context mContext;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -107,7 +107,6 @@ public class FetchFundsTask extends GcmTaskService {
                         JSONArray innerJsonArray = jsonArray.getJSONArray(i);
                         fundsArrayList.add(new BasicFundInfoParcelable(innerJsonArray.getString(0),
                                 innerJsonArray.getString(3)));
-                        Log.e(TAG, innerJsonArray.getString(3));
                     }
 
                 } catch (JSONException e) {
@@ -155,9 +154,7 @@ public class FetchFundsTask extends GcmTaskService {
                             .header(ACCEPT_PARAM, ACCEPT_VALUE)
                             .body(query)
                             .asJson();
-                    Log.d(TAG, response.toString());
                     JsonNode jsonNodeHttpResponse = response.getBody();
-                    Log.d(TAG, jsonNodeHttpResponse.toString());
                     try {
                         JSONObject jsonObject = jsonNodeHttpResponse.getObject();
                         JSONObject jsonObject1 = jsonObject.getJSONObject(scode);
@@ -166,12 +163,11 @@ public class FetchFundsTask extends GcmTaskService {
                         JSONObject jsonObject2 = jsonObject1.getJSONObject(KEY_CHANGE);
                         changeValue = jsonObject2.getString(KEY_CHANGE_VALUE);
                         changePercent = jsonObject2.getString(KEY_CHANGE_PERCENT);
-                        Log.d(TAG, nav);
                     } catch (JSONException je) {
-                        Log.d(TAG, je.toString());
+                        Log.e(TAG, je.toString());
                     }
                 } catch (UnirestException ue) {
-                    Log.d(TAG, ue.toString());
+                    Log.e(TAG, ue.toString());
                 }
                 if (fundName != null && nav != null && changePercent != null && changeValue != null) {
                     String units = "0";
@@ -179,7 +175,6 @@ public class FetchFundsTask extends GcmTaskService {
                     Map<String, Object> fund = info.toMap();
                     myRef.child(mContext.getString(R.string.firebase_child_funds)).child(scode).setValue(fund);
                     sendToast(mContext.getString(R.string.fund_added_message));
-//                    showNotification();
                 } else {
                     sendToast(mContext.getString(R.string.message_failed_to_add_fund));
                     Uri uriDelete = Uri.parse(FundsContentProvider.mUriHistorical.toString() +
@@ -189,7 +184,6 @@ public class FetchFundsTask extends GcmTaskService {
             }
         } else if (taskParams.getTag().equals(mContext.getResources().getString(R.string.tag_update_nav))) {
             mIsUpdateSuccessful = false;
-            Log.e("fetchfundstask", "executed");
             Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
                     new String[]{FundsContentProvider.FUND_SCODE}, null, null, null);
             if (cursor.moveToFirst()) {
@@ -232,7 +226,6 @@ public class FetchFundsTask extends GcmTaskService {
             int currentQuarter = Integer.valueOf(monthString) / 4;
             int monthInt = 0;
             int yearInt = Integer.valueOf(yearString);
-            Log.d(TAG, String.valueOf(currentQuarter));
             switch (currentQuarter) {
                 case 0:
                     monthInt = 12;
@@ -261,20 +254,18 @@ public class FetchFundsTask extends GcmTaskService {
                     String month = String.format("%02d", monthInt);
 
                     String dateFull = day + "/" + month + "/" + String.valueOf(year);
-                    Log.d(TAG, dateFull);
                     String value = getGraph(scode, dateFull);
                     if (value != null) {
                         ContentValues navForQuarter = new ContentValues();
                         navForQuarter.put(KEY_QUARTER + quarter, value);
                         mContext.getContentResolver().update(uri, navForQuarter, null, null);
-                    } else {
-                        Log.d(TAG, dateFull);
+                    } else {//if in case values could not be retrieved in the first attempt
                         value = getGraph(scode, dateFull);
                         if (value != null) {
                             ContentValues navForQuarter = new ContentValues();
                             navForQuarter.put(KEY_QUARTER + quarter, value);
                             mContext.getContentResolver().update(uri, navForQuarter, null, null);
-                        } else {
+                        } else {//if in case values could not be retrieved in the second attempt
                             if (day.equals("31")) {
                                 day = "29";
                             } else {
@@ -322,7 +313,6 @@ public class FetchFundsTask extends GcmTaskService {
 
     public String getGraph(String scode, String date) {
         String nav = null;
-        Log.e(TAG, scode);
         try {
             String requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + date + "\"" + "}";
             HttpResponse<JsonNode> response = Unirest.post(FUNDS_HISTORICAL_URL)
@@ -331,16 +321,15 @@ public class FetchFundsTask extends GcmTaskService {
                     .header(ACCEPT_PARAM, ACCEPT_VALUE)
                     .body(requestBody)
                     .asJson();
-            Log.d(TAG, response.getBody().toString());
             JsonNode jsonNode = response.getBody();
             try {
                 JSONObject jsonObject = jsonNode.getObject();
                 nav = jsonObject.getString(KEY_NAV);
             } catch (JSONException je) {
-                Log.d(TAG, je.toString());
+                Log.e(TAG, je.toString());
             }
         } catch (UnirestException ue) {
-            Log.d(TAG, ue.toString());
+            Log.e(TAG, ue.toString());
         }
         return nav;
     }
@@ -355,7 +344,6 @@ public class FetchFundsTask extends GcmTaskService {
                     .body(query)
                     .asJson();
             JsonNode jsonNode = response.getBody();
-            Log.e(TAG, query.toString());
             JSONObject jsonObject = jsonNode.getObject();
             for (int index = 0; index < scodesArrayList.size(); index++) {
                 extractInfoFromJson(scodesArrayList.get(index), jsonObject);
@@ -383,7 +371,6 @@ public class FetchFundsTask extends GcmTaskService {
             JSONObject jsonObject1 = jsonObject.getJSONObject(KEY_CHANGE);
             String changePercent = jsonObject1.getString(KEY_CHANGE_PERCENT);
             String changeValue = jsonObject1.getString(KEY_CHANGE_VALUE);
-            Log.e(TAG, nav + " " + changePercent + " " + changeValue);
             Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
                     new String[]{FundsContentProvider.FUND_SCODE}, null, null, null);
             if (cursor.moveToFirst()) {

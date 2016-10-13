@@ -22,7 +22,6 @@ public class FundsIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.d(FundsIntentService.class.getName(), "intent service executed");
         if (intent.getStringExtra(getString(R.string.key_tag))
                 .equals(getString(R.string.tag_search_fund))) {
             Bundle bundle = new Bundle();
@@ -39,37 +38,27 @@ public class FundsIntentService extends IntentService {
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(
                     intent.getStringExtra(getString(R.string.key_tag)), bundle));
-        }else if (intent.getStringExtra(getString(R.string.key_tag))
-                .equals(getString(R.string.tag_fetch_graph_data))){
+        } else if (intent.getStringExtra(getString(R.string.key_tag))
+                .equals(getString(R.string.tag_fetch_graph_data))) {
             Bundle bundle = new Bundle();
             bundle.putString(getString(R.string.key_scode),
                     intent.getStringExtra(getString(R.string.key_scode)));
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(
-                    intent.getStringExtra(getString(R.string.key_tag)),bundle));
-        }else if (intent.getStringExtra(getString(R.string.key_tag))
-                .equals(getString(R.string.tag_update_nav))){
-            Log.e("intent service","intent received");
+                    intent.getStringExtra(getString(R.string.key_tag)), bundle));
+        } else if (intent.getStringExtra(getString(R.string.key_tag))
+                .equals(getString(R.string.tag_update_nav))) {
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(
                     intent.getStringExtra(getString(R.string.key_tag))));
-        }else if (intent.getStringExtra(getString(R.string.key_tag))
-                .equals(getString(R.string.tag_insert_scodes))){
+        } else if (intent.getStringExtra(getString(R.string.key_tag))
+                .equals(getString(R.string.tag_insert_scodes))) {
             Bundle bundle = new Bundle();
             bundle.putString(getString(R.string.key_scode),
                     intent.getStringExtra(getString(R.string.key_scode)));
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(
-                    intent.getStringExtra(getString(R.string.key_tag)),bundle));
+                    intent.getStringExtra(getString(R.string.key_tag)), bundle));
         }
-//        else if (intent.getStringExtra(getString(R.string.key_tag))
-//                .equals(getString(R.string.tag_store_net_worth_firebase))){
-//            Bundle bundle = new Bundle();
-//            bundle.putString(getString(R.string.key_net_worth),
-//                    intent.getStringExtra(getString(R.string.key_net_worth)));
-//            FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
-//            fetchFundsTask.onRunTask(new TaskParams(
-//                    intent.getStringExtra(getString(R.string.key_tag)),bundle));
-//        }
     }
 }

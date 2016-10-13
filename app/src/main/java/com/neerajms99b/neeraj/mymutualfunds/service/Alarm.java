@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.text.format.DateUtils;
-import android.util.Log;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
@@ -56,7 +55,6 @@ public class Alarm extends BroadcastReceiver {
     }
 
     public void setAlarm(Context context) {
-        Log.e("alarm","alarm set");
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, Alarm.class);
         intent.putExtra(context.getString(R.string.key_tag), context.getString(R.string.tag_update_nav));

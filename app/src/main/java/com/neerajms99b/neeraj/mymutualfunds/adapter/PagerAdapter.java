@@ -24,10 +24,6 @@ public class PagerAdapter extends FragmentPagerAdapter {
         } else if (i == 1) {
             fragment = new FundsListFragment();
         }
-//        Bundle args = new Bundle();
-//        // Our object is just an integer :-P
-//        args.putInt(FundsListFragment.ARG_OBJECT, i + 1);
-//        fragment.setArguments(args);
         return fragment;
     }
 

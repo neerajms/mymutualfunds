@@ -43,7 +43,7 @@ import com.neerajms99b.neeraj.mymutualfunds.R;
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    private static final String TAG = "SignInActivity";
+    private static final String TAG = SignInActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 9001;
 
     private SignInButton mSignInButton;
@@ -136,7 +136,6 @@ public class SignInActivity extends AppCompatActivity implements
                         } else {
                             Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                             startActivity(intent);
-
                             finish();
                         }
                     }

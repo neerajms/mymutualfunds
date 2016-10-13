@@ -53,6 +53,7 @@ public class FundsListFragment extends Fragment {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance();
+        //Initialize th firebase adapter
         getFirebaseData();
     }
 
@@ -87,6 +88,7 @@ public class FundsListFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    //Initialize firebase adapter
     public void getFirebaseData() {
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
         Query query = mMyRef;
@@ -99,6 +101,7 @@ public class FundsListFragment extends Fragment {
         startActivity(intent);
     }
 
+    //Show the input dialog when edit button is clicked
     public void editClicked(String scode) {
         Bundle bundle = new Bundle();
         bundle.putString(getString(R.string.key_scode), scode);
@@ -108,11 +111,13 @@ public class FundsListFragment extends Fragment {
         unitsInputDialogFragment.show(getFragmentManager(), null);
     }
 
+    //Edit the units is firebase
     public void unitsInput(String units, String scode) {
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
         mMyRef.child(scode).child(getString(R.string.key_units_in_hand)).setValue(units);
     }
 
+    //Called on swipe to dismiss
     public void deleteFirebaseNode(int position) {
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
         String scode = mFirebaseAdapter.getItem(position).getScode();
@@ -121,11 +126,14 @@ public class FundsListFragment extends Fragment {
         getActivity().getContentResolver().delete(uri, null, null);
     }
 
+    //Show the nav graph for each fund
     public void showGraph(String scode, String fundName, String fundNav, String units) {
         Log.d(TAG, scode);
         mCallBack.launchGraphActivity(scode, fundName, fundNav, units);
     }
 
+    /* Stores only the scode to Historical table, helps in knowing if the fund is already present
+     in the portfolio */
     public void addScodeToDatabase(String scode) {
         Intent intent = new Intent(getContext(), FundsIntentService.class);
         intent.putExtra(getString(R.string.key_tag), getString(R.string.tag_insert_scodes));

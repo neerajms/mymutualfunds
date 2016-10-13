@@ -1,6 +1,5 @@
 package com.neerajms99b.neeraj.mymutualfunds.widget;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -19,7 +18,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.models.NetWorthGraphModel;
-import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,13 +29,11 @@ import java.util.Date;
  */
 
 public class FundsWidgetProvider extends AppWidgetProvider {
-    private FirebaseAuth mFirebaseAuth;
     private Context mContext;
     private FirebaseUser mFirebaseUser;
     private static final String KEY_NET_WORTH = "net_worth";
     private static final String KEY_ACTION_UPDATE_WIDGET_DATA = "actionUpdateWidgetData";
     private static final String KEY_WIDGET_DATA_BUNDLE = "widgetDataBundle";
-    private String mLatestNetWorth;
     private ArrayList<NetWorthGraphModel> mNetWorthList;
     private String TAG = FundsWidgetProvider.class.getSimpleName();
 
@@ -45,18 +41,17 @@ public class FundsWidgetProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
         mContext = context;
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = firebaseAuth.getCurrentUser();
         mNetWorthList = new ArrayList<>();
         if (mFirebaseUser != null) {
             fireBaseReceiver();
         }
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
-            Intent intent = new Intent(context, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-            views.setOnClickPendingIntent(R.id.widget_frame, pendingIntent);
+//            Intent intent = new Intent(context, MainActivity.class);
+//            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+//            views.setOnClickPendingIntent(R.id.widget_frame, pendingIntent);
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
     }
@@ -116,6 +111,7 @@ public class FundsWidgetProvider extends AppWidgetProvider {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, databaseError.toString());
             }
         };
         netWorthRef.addChildEventListener(childEventListener);

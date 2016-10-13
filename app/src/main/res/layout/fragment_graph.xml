@@ -7,8 +7,9 @@
     android:scrollbars="none"
     tools:context="com.neerajms99b.neeraj.mymutualfunds.ui.GraphFragment">
 
-    <LinearLayout
+    <com.neerajms99b.neeraj.mymutualfunds.ui.CustomLinearLayout
         style="@style/ScreenLayoutStyle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
@@ -89,6 +90,6 @@
 
         </android.support.v7.widget.CardView>
 
-    </LinearLayout>
+    </com.neerajms99b.neeraj.mymutualfunds.ui.CustomLinearLayout>
 
 </ScrollView>

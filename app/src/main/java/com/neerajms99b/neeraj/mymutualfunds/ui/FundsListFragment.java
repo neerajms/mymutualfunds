@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,7 +31,7 @@ import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
  * A placeholder fragment containing a simple view.
  */
 public class FundsListFragment extends Fragment {
-    private RecyclerView mRecyclerView;
+    private StateSaveRecyclerView mRecyclerView;
     private ItemTouchHelper mItemTouchHelper;
     private ItemTouchHelper.Callback mItemTouchCallBack;
     private MainActivity mCallBack;
@@ -53,7 +52,7 @@ public class FundsListFragment extends Fragment {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance();
-        //Initialize th firebase adapter
+        //Initialize the firebase adapter
         getFirebaseData();
     }
 
@@ -63,7 +62,7 @@ public class FundsListFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mCallBack = (MainActivity) getActivity();
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.funds_recycler_view);
+        mRecyclerView = (StateSaveRecyclerView) rootView.findViewById(R.id.funds_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mFirebaseAdapter);
 
@@ -139,5 +138,6 @@ public class FundsListFragment extends Fragment {
         intent.putExtra(getString(R.string.key_tag), getString(R.string.tag_insert_scodes));
         intent.putExtra(getString(R.string.key_scode), scode);
         getContext().startService(intent);
+        mRecyclerView.restorePostion();
     }
 }

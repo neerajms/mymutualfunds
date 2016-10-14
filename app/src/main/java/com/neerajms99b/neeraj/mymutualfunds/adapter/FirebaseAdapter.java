@@ -77,7 +77,7 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
                     mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
                 }
             }
-            String nav = String.format("%.2f", Float.parseFloat(fundNav));
+            String nav = String.format("%.2f", Double.parseDouble(fundNav));
             mFundNAV.setText(nav);
         }
 

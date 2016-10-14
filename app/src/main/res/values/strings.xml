@@ -43,6 +43,7 @@
     <string name="banner_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
     <string name="mobileads_initialize_string" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>
+    <string name="key_scroll_position" translatable="false">scroll_position</string>
 
     <string name="app_name">My Mutual Funds</string>
     <string name="action_add_fund">Add funds</string>

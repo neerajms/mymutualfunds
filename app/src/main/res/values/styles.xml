@@ -150,4 +150,18 @@
         <item name="android:textSize">@dimen/search_result_listitem_textsize</item>
     </style>
 
+    <style name="SIgnInText">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_marginTop">@dimen/margin_16dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SignInButton">
+        <item name="android:layout_gravity">bottom|center_horizontal</item>
+        <item name="android:layout_marginBottom">96dp</item>
+        <item name="android:visibility">visible</item>
+    </style>
+
 </resources>

@@ -2,9 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?attr/listPreferredItemHeightLarge"
-    android:gravity="center_vertical"
     android:background="?android:selectableItemBackground"
+    android:contentDescription="@string/content_description_search_results_list_item"
+    android:gravity="center_vertical"
+    android:minHeight="?attr/listPreferredItemHeightLarge"
     android:orientation="vertical">
 
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"

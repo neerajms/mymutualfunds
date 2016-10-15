@@ -88,4 +88,20 @@
     <string name="historical_graph_message">Select a fund to see the historical graph here</string>
     <string name="message_not_connected">You are offline</string>
 
+    <string name="content_description_search_view">Search fund</string>
+    <string name="content_description_sign_in">Sign in</string>
+    <string name="content_description_arrow">Net worth status</string>
+    <string name="content_description_networth_amount">Net worth amount</string>
+    <string name="content_description_networth_change">Net worth change</string>
+    <string name="content_description_networth_graph">Net worth graph</string>
+    <string name="content_description_ad">Advertisement</string>
+    <string name="content_description_funds_list_item">Funds list item</string>
+    <string name="content_description_edit_button">Edit units</string>
+    <string name="content_description_search_results_list_item">Search results list item</string>
+    <string name="content_description_search_suggestion">Search suggestion</string>
+    <string name="content_description_units_edit_text">Enter units</string>
+    <string name="content_description_widget">Net worth widget</string>
+    <string name="content_description_historical_graph">Historical graph</string>
+    <string name="content_description_add_funds">Add funds</string>
+
 </resources>

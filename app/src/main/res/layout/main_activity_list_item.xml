@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:selectableItemBackground"
+    android:contentDescription="@string/content_description_funds_list_item"
     android:minHeight="@dimen/cardview_minheight"
     card_view:cardCornerRadius="2dp">
 
@@ -78,6 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?android:selectableItemBackground"
+                android:contentDescription="@string/content_description_edit_button"
                 android:src="@drawable/ic_action_edit" />
 
         </LinearLayout>

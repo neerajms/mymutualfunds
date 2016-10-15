@@ -23,7 +23,8 @@
             <android.support.v7.widget.SearchView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/search"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize" />
+                android:layout_height="?attr/actionBarSize"
+                android:contentDescription="@string/content_description_search_view"/>
 
         </android.support.v7.widget.Toolbar>
 

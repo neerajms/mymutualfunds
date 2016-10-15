@@ -83,7 +83,8 @@
                     android:id="@+id/chart"
                     style="@style/HistoricalGraphStyle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/content_description_historical_graph" />
 
             </FrameLayout>
 

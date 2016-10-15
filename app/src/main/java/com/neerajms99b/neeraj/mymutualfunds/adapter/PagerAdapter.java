@@ -44,8 +44,8 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getItemPosition(Object object) {
-        if (object instanceof UpdateFragment){
-            ((UpdateFragment)object).updateNetWorth();
+        if (object instanceof UpdateFragment) {
+            ((UpdateFragment) object).updateNetWorth();
         }
         return super.getItemPosition(object);
     }

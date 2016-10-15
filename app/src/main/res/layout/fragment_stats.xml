@@ -66,7 +66,8 @@
                                 android:id="@+id/net_worth_amount"
                                 style="@style/NetWorthAmount"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:contentDescription="@string/content_description_networth_amount" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -78,13 +79,15 @@
                                     android:layout_width="@dimen/net_worth_arrow_width"
                                     android:layout_height="wrap_content"
                                     android:layout_marginLeft="@dimen/net_worth_arrow_left_margin"
-                                    android:layout_marginStart="@dimen/net_worth_arrow_left_margin" />
+                                    android:layout_marginStart="@dimen/net_worth_arrow_left_margin"
+                                    android:contentDescription="@string/content_description_arrow" />
 
                                 <TextView
                                     android:id="@+id/net_worth_change"
                                     style="@style/NetWorthChange"
                                     android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" />
+                                    android:layout_height="wrap_content"
+                                    android:contentDescription="@string/content_description_networth_change" />
                             </LinearLayout>
 
                         </LinearLayout>
@@ -112,7 +115,8 @@
                             android:id="@+id/chart_networth"
                             style="@style/NetWorthGraphStyle"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/content_description_networth_graph" />
 
                     </FrameLayout>
 
@@ -130,6 +134,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:contentDescription="@string/content_description_ad"
         ads:adSize="BANNER"
         ads:adUnitId="@string/banner_ad_unit_id" />
 

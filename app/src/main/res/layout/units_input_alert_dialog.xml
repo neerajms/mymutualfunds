@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/input_dialog_margin"
         android:layout_marginRight="@dimen/input_dialog_margin"
+        android:contentDescription="@string/content_description_units_edit_text"
         android:inputType="number"
         android:maxLength="5" />
 

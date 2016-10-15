@@ -48,7 +48,7 @@
         <item name="android:minHeight">@dimen/suggestions_list_item_min_height</item>
     </style>
 
-    <style name="ScreenLayoutStyle">
+    <style name="MaxWidthLayout">
         <item name="android:maxWidth">@dimen/layout_max_width</item>
         <item name="android:layout_gravity">center_horizontal</item>
     </style>
@@ -108,7 +108,7 @@
         <item name="android:gravity">center_vertical</item>
     </style>
 
-    <style name="GraphStyle">
+    <style name="HistoricalGraphStyle">
         <item name="android:layout_marginBottom">@dimen/margin_16dp</item>
         <item name="android:layout_marginEnd">@dimen/margin_8dp</item>
         <item name="android:layout_marginLeft">@dimen/margin_8dp</item>
@@ -116,6 +116,16 @@
         <item name="android:layout_marginStart">@dimen/margin_8dp</item>
         <item name="android:layout_marginTop">@dimen/margin_8dp</item>
         <item name="android:minHeight">@dimen/historical_graph_height</item>
+    </style>
+
+    <style name="NetWorthGraphStyle">
+        <item name="android:layout_marginBottom">@dimen/margin_16dp</item>
+        <item name="android:layout_marginEnd">@dimen/margin_8dp</item>
+        <item name="android:layout_marginLeft">@dimen/margin_8dp</item>
+        <item name="android:layout_marginRight">@dimen/margin_8dp</item>
+        <item name="android:layout_marginStart">@dimen/margin_8dp</item>
+        <item name="android:layout_marginTop">@dimen/margin_8dp</item>
+        <item name="android:minHeight">@dimen/net_worth_graph_min_height</item>
     </style>
 
     <style name="NetWorthAmountWidget">
@@ -162,6 +172,11 @@
         <item name="android:layout_gravity">bottom|center_horizontal</item>
         <item name="android:layout_marginBottom">96dp</item>
         <item name="android:visibility">visible</item>
+    </style>
+
+    <style name="HistoricalGraphMessage">
+        <item name="android:textSize">@dimen/historical_graph_message_size</item>
+        <item name="android:layout_gravity">center</item>
     </style>
 
 </resources>

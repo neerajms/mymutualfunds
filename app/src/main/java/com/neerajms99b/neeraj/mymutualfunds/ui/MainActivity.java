@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private final String TAG = MainActivity.class.getSimpleName();
     private Alarm mAlarmManager;
     private SharedPreferences mSharedPreferences;
+    private TabLayout mTabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +53,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             return;
         }
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        final TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.tab_my_stats)));
-        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.tab_my_funds)));
-        tabLayout.addOnTabSelectedListener(this);
+        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        mTabLayout.addTab(mTabLayout.newTab().setText(getString(R.string.tab_my_stats)));
+        mTabLayout.addTab(mTabLayout.newTab().setText(getString(R.string.tab_my_funds)));
+        mTabLayout.addOnTabSelectedListener(this);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
             @Override
             public void onPageSelected(int position) {
-                tabLayout.getTabAt(position).select();
+                mTabLayout.getTabAt(position).select();
             }
 
             @Override

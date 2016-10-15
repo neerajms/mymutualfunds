@@ -3,12 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="@dimen/graph_frag_top_margin"
     android:scrollbars="none"
     tools:context="com.neerajms99b.neeraj.mymutualfunds.ui.GraphFragment">
 
     <com.neerajms99b.neeraj.mymutualfunds.ui.CustomLinearLayout
-        style="@style/ScreenLayoutStyle"
+        style="@style/MaxWidthLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -82,7 +81,7 @@
 
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/chart"
-                    style="@style/GraphStyle"
+                    style="@style/HistoricalGraphStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 

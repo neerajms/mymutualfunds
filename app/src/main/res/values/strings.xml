@@ -44,6 +44,7 @@
     <string name="mobileads_initialize_string" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>
     <string name="key_scroll_position" translatable="false">scroll_position</string>
+    <string name="graph_fragment_tag" translatable="false">graph_fragment</string>
 
     <string name="app_name">My Mutual Funds</string>
     <string name="action_add_fund">Add funds</string>
@@ -84,5 +85,6 @@
         Plots net-worth against date for a maximum of 30 days\nWe have started ploting your graph from today and it will grow day by day</string>
     <string name="add_more_funds_showcase_title">Add Funds</string>
     <string name="add_more_funds_showcase_content">You can add funds from the options menu</string>
+    <string name="historical_graph_message">Select a fund to see the historical graph here</string>
 
 </resources>

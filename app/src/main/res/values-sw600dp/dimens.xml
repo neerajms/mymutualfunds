@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="layout_max_width">520dp</dimen>
+    <dimen name="net_worth_graph_min_height">576dp</dimen>
+    <dimen name="historical_graph_height">544dp</dimen>
+</resources>

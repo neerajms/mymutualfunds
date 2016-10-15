@@ -141,7 +141,8 @@ public class SearchActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mNetworkReceiver = new NetworkReceiver();
-        mContext.registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        mContext.registerReceiver(mNetworkReceiver,
+                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mMessageReceiver, new IntentFilter(getResources().getString(R.string.gcmtask_intent)));
     }

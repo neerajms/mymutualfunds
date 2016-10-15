@@ -86,5 +86,6 @@
     <string name="add_more_funds_showcase_title">Add Funds</string>
     <string name="add_more_funds_showcase_content">You can add funds from the options menu</string>
     <string name="historical_graph_message">Select a fund to see the historical graph here</string>
+    <string name="message_not_connected">You are offline</string>
 
 </resources>

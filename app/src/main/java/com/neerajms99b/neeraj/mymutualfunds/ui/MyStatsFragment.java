@@ -147,13 +147,13 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
-                Log.e(TAG, fundInfo.getFundName());
-
-                if (!alreadyPresent(fundInfo)) {
-                    mFundsArrayList.add(fundInfo);
+                if (fundInfo.getScode() != null) {
+                    if (!alreadyPresent(fundInfo)) {
+                        mFundsArrayList.add(fundInfo);
+                    }
+                    calculateNetWorth();
+                    storeNetWorthInFirebase();
                 }
-                calculateNetWorth();
-                storeNetWorthInFirebase();
             }
 
             @Override

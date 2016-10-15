@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -53,6 +56,8 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     private int mCurrentQuarter;
     private int mCurrentYear;
     private ProgressBar mProgressBarNavGraph;
+    private NetworkReceiver mNetworkReceiver;
+    private boolean mTriggerFetch;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -131,16 +136,25 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     };
 
     public void triggerDataFetch() {
-        mProgressBarNavGraph.setVisibility(View.VISIBLE);
-        Intent intentService = new Intent(getContext(), FundsIntentService.class);
-        intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_fetch_graph_data));
-        intentService.putExtra(getString(R.string.key_scode), mScode);
-        getActivity().startService(intentService);
+        if (isInternetOn(mContext)) {
+            mProgressBarNavGraph.setVisibility(View.VISIBLE);
+            Intent intentService = new Intent(getContext(), FundsIntentService.class);
+            intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_fetch_graph_data));
+            intentService.putExtra(getString(R.string.key_scode), mScode);
+            getActivity().startService(intentService);
+        } else {
+            mProgressBarNavGraph.setVisibility(View.INVISIBLE);
+            messageNotConnected();
+            mTriggerFetch = true;
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        mNetworkReceiver = new NetworkReceiver();
+        mContext.registerReceiver(mNetworkReceiver,
+                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(
                 mMessageReceiver, new IntentFilter(getResources().getString(R.string.gcmtask_intent)));
     }
@@ -157,6 +171,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onPause() {
         super.onPause();
+        mContext.unregisterReceiver(mNetworkReceiver);
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMessageReceiver);
     }
 
@@ -289,5 +304,31 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         mChart.animateY(0);
         mProgressBarNavGraph.setVisibility(View.INVISIBLE);
         mChart.setVisibility(View.VISIBLE);
+    }
+
+    public class NetworkReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isInternetOn(context)) {
+                if (mTriggerFetch) {
+                    triggerDataFetch();
+                    mTriggerFetch = false;
+                }
+            } else {
+                mProgressBarNavGraph.setVisibility(View.INVISIBLE);
+                messageNotConnected();
+            }
+        }
+    }
+
+    public boolean isInternetOn(Context context) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    public void messageNotConnected() {
+        Toast.makeText(mContext, getString(R.string.message_not_connected), Toast.LENGTH_SHORT).show();
     }
 }

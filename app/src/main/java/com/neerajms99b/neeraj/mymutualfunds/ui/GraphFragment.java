@@ -144,7 +144,6 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
             getActivity().startService(intentService);
         } else {
             mProgressBarNavGraph.setVisibility(View.INVISIBLE);
-            messageNotConnected();
             mTriggerFetch = true;
         }
     }

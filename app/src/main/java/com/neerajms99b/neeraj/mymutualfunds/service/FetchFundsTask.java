@@ -373,12 +373,14 @@ public class FetchFundsTask extends GcmTaskService {
             String changeValue = jsonObject1.getString(KEY_CHANGE_VALUE);
             Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
                     new String[]{FundsContentProvider.FUND_SCODE}, null, null, null);
-            if (cursor.moveToFirst()) {
-                myRef.child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
-                myRef.child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
-                myRef.child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
+            if (nav != null && changePercent != null && changeValue != null) {
+                if (cursor.moveToFirst()) {
+                    myRef.child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
+                    myRef.child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
+                    myRef.child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
+                    mIsUpdateSuccessful = true;
+                }
             }
-            mIsUpdateSuccessful = true;
         } catch (JSONException je) {
             Log.e(TAG, je.toString());
         }

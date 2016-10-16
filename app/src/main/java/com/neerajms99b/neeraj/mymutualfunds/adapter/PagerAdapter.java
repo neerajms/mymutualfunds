@@ -33,16 +33,6 @@ public class PagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(int position) {
-        if (position == 0) {
-            return "My Stats";
-        } else if (position == 1) {
-            return "My Funds";
-        }
-        return null;
-    }
-
-    @Override
     public int getItemPosition(Object object) {
         if (object instanceof UpdateFragment) {
             ((UpdateFragment) object).updateNetWorth();

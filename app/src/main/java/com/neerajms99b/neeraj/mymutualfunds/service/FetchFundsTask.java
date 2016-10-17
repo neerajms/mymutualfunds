@@ -14,21 +14,25 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.neerajms99b.neeraj.mymutualfunds.BuildConfig;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.models.BasicFundInfoParcelable;
-import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
+import com.neerajms99b.neeraj.mymutualfunds.request.CustomRequest;
 import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivity;
 
 import org.json.JSONArray;
@@ -38,7 +42,11 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by neeraj on 8/8/16.
@@ -59,6 +67,7 @@ public class FetchFundsTask extends GcmTaskService {
     private final String KEY_CHANGE_VALUE = "value";
     private final String KEY_CHANGE_PERCENT = "percent";
     private final String KEY_QUARTER = "q";
+    private final String KEY_SCODE = "scode";
 
     private Context mContext;
     private FirebaseAuth mFirebaseAuth;
@@ -66,79 +75,39 @@ public class FetchFundsTask extends GcmTaskService {
     private FirebaseDatabase mDatabase;
     private ArrayList<String> mFundsScodesArrayList;
     private boolean mIsUpdateSuccessful;
+    private RequestQueue mRequestQueue;
+    private String mTaskParamTag;
 
     public FetchFundsTask() {
     }
 
     public FetchFundsTask(Context context) {
         mContext = context;
+        mRequestQueue = Volley.newRequestQueue(mContext);
     }
 
     @Override
     public int onRunTask(TaskParams taskParams) {
+        mTaskParamTag = taskParams.getTag();
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance();
         if (mContext == null) {
             mContext = this;
         }
-        if (taskParams.getTag().equals(mContext.getString(R.string.tag_search_fund))) {
-            HttpResponse<JsonNode> response;
+        if (mRequestQueue == null) {
+            mRequestQueue = Volley.newRequestQueue(mContext);
+        }
+
+        if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_fund))) {
             ArrayList<BasicFundInfoParcelable> fundsArrayList = new ArrayList<BasicFundInfoParcelable>();
             String fundName = taskParams.getExtras().getString(
                     mContext.getString(R.string.key_fund_search_word));
             String query = "{\"search\":\"" + fundName + "\"}";
-            try {
-                response = Unirest.post(FUNDS_BASE_URL)
-                        .header(KEY_PARAM, KEY_VALUE)
-                        .header(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE)
-                        .header(ACCEPT_PARAM, ACCEPT_VALUE)
-                        .body(query)
-                        .asJson();
-                if (response.getBody().toString().equals("[]")) {
-                    throw new UnirestException(mContext.getString(R.string.message_fund_not_found));
-                }
-
-
-                try {
-                    JsonNode jsonNodeHttpResponse = response.getBody();
-                    JSONArray jsonArray = jsonNodeHttpResponse.getArray();
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONArray innerJsonArray = jsonArray.getJSONArray(i);
-                        fundsArrayList.add(new BasicFundInfoParcelable(innerJsonArray.getString(0),
-                                innerJsonArray.getString(3)));
-                    }
-
-                } catch (JSONException e) {
-                    sendToast(mContext.getString(R.string.message_something_went_wrong));
-                    Log.e(TAG, e.toString());
-                }
-            } catch (UnirestException e) {
-                if (e.getMessage().equals(mContext.getString(R.string.message_fund_not_found))) {
-                    sendToast(mContext.getString(R.string.message_fund_not_found));
-                } else {
-                    sendToast(mContext.getString(R.string.message_something_went_wrong));
-                }
-                Log.e(TAG, e.toString());
-            }
-
-            if (fundsArrayList.size() > 0) {
-                Bundle dataBundle = new Bundle();
-                dataBundle.putParcelableArrayList(mContext.getString(R.string.basic_search_results_parcelable), fundsArrayList);
-                Intent intent = new Intent();
-                intent.setAction(mContext.getString(R.string.gcmtask_intent));
-                intent.putExtra(mContext.getString(R.string.search_data_bundle), dataBundle);
-                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-            }
-        } else if (taskParams.getTag().equals(mContext.getString(R.string.tag_search_scode))) {
-            HttpResponse<JsonNode> response;
-            String fundName = null;
-            String nav = null;
-            String changeValue = null;
-            String changePercent = null;
+            volleyRequestJsonArray(FUNDS_BASE_URL, query);
+        } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
+            ArrayList<String> scodesArrayList = new ArrayList<>();
             String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference(mFirebaseUser.getUid());
             ContentValues initial = new ContentValues();
             initial.put(FundsContentProvider.FUND_SCODE, scode);
             Uri resultUri = mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, initial);
@@ -146,43 +115,13 @@ public class FetchFundsTask extends GcmTaskService {
             if (resultUri == null) {
                 sendToast(mContext.getString(R.string.unique_constraint_failed_message));
             } else {
-                String query = "{\"scodes\":[\"" + scode + "\"]}";
-                try {
-                    response = Unirest.post(FUNDS_BASE_URL)
-                            .header(KEY_PARAM, KEY_VALUE)
-                            .header(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE)
-                            .header(ACCEPT_PARAM, ACCEPT_VALUE)
-                            .body(query)
-                            .asJson();
-                    JsonNode jsonNodeHttpResponse = response.getBody();
-                    try {
-                        JSONObject jsonObject = jsonNodeHttpResponse.getObject();
-                        JSONObject jsonObject1 = jsonObject.getJSONObject(scode);
-                        fundName = jsonObject1.getString(KEY_FUNDNAME);
-                        nav = String.format("%.2f", Float.parseFloat(jsonObject1.getString(KEY_NAV)));
-                        JSONObject jsonObject2 = jsonObject1.getJSONObject(KEY_CHANGE);
-                        changeValue = jsonObject2.getString(KEY_CHANGE_VALUE);
-                        changePercent = jsonObject2.getString(KEY_CHANGE_PERCENT);
-                    } catch (JSONException je) {
-                        Log.e(TAG, je.toString());
-                    }
-                } catch (UnirestException ue) {
-                    Log.e(TAG, ue.toString());
-                }
-                if (fundName != null && nav != null && changePercent != null && changeValue != null) {
-                    String units = "0";
-                    FundInfo info = new FundInfo(scode, fundName, nav, units, changeValue, changePercent);
-                    Map<String, Object> fund = info.toMap();
-                    myRef.child(mContext.getString(R.string.firebase_child_funds)).child(scode).setValue(fund);
-                    sendToast(mContext.getString(R.string.fund_added_message));
-                } else {
-                    sendToast(mContext.getString(R.string.message_failed_to_add_fund));
-                    Uri uriDelete = Uri.parse(FundsContentProvider.mUriHistorical.toString() +
-                            "/" + scode);
-                    mContext.getContentResolver().delete(uriDelete, null, null);
-                }
+                scodesArrayList.add(scode);
+                String scodes = "\"scodes\":[" + "\"" + scode + "\"";
+                String query = "{" + scodes + "]}";
+                volleyRequestJsonObject(FUNDS_BASE_URL, query, scodesArrayList, null);
             }
-        } else if (taskParams.getTag().equals(mContext.getResources().getString(R.string.tag_update_nav))) {
+        } else if (mTaskParamTag.equals(mContext.getResources().getString(R.string.tag_update_nav))) {
+            Log.d(TAG, "Auto update triggered");
             mIsUpdateSuccessful = false;
             Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
                     new String[]{FundsContentProvider.FUND_SCODE}, null, null, null);
@@ -198,7 +137,8 @@ public class FetchFundsTask extends GcmTaskService {
                     if (index == 4) {
                         scodes = scodes + "\"" + cursor.getString(
                                 cursor.getColumnIndex(FundsContentProvider.FUND_SCODE)) + "\"";
-                        fetchFundInfoFromApi(scodes, scodesArrayList);
+                        String query = "{" + scodes + "]}";
+                        volleySynchronous(FUNDS_BASE_URL, query, null, scodesArrayList);
                         scodes = "\"scodes\":[";
                         scodesArrayList.clear();
                     }
@@ -209,15 +149,18 @@ public class FetchFundsTask extends GcmTaskService {
                 } while (cursor.moveToNext());
                 if (scodesArrayList.size() != 0) {
                     scodes = scodes.substring(0, scodes.length() - 1);
-                    fetchFundInfoFromApi(scodes, scodesArrayList);
+                    String query = "{" + scodes + "]}";
+                    volleySynchronous(FUNDS_BASE_URL, query, null, scodesArrayList);
                 }
             }
             cursor.close();
             if (mIsUpdateSuccessful) {
                 showNotification();
             }
-        } else if (taskParams.getTag().equals(mContext.getString(R.string.tag_fetch_graph_data))) {
+        } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_fetch_graph_data))) {
+            ArrayList<String> scodeArrayList = new ArrayList<>();
             String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
+            scodeArrayList.add(scode);
             Calendar date = Calendar.getInstance();
             SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
             SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
@@ -254,30 +197,22 @@ public class FetchFundsTask extends GcmTaskService {
                     String month = String.format("%02d", monthInt);
 
                     String dateFull = day + "/" + month + "/" + String.valueOf(year);
-                    String value = getGraph(scode, dateFull);
-                    if (value != null) {
-                        ContentValues navForQuarter = new ContentValues();
-                        navForQuarter.put(KEY_QUARTER + quarter, value);
-                        mContext.getContentResolver().update(uri, navForQuarter, null, null);
-                    } else {//if in case values could not be retrieved in the first attempt
-                        value = getGraph(scode, dateFull);
-                        if (value != null) {
-                            ContentValues navForQuarter = new ContentValues();
-                            navForQuarter.put(KEY_QUARTER + quarter, value);
-                            mContext.getContentResolver().update(uri, navForQuarter, null, null);
-                        } else {//if in case values could not be retrieved in the second attempt
+                    String requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + dateFull + "\"" + "}";
+                    String value = volleySynchronous(FUNDS_HISTORICAL_URL,
+                            requestBody, String.valueOf(quarter), scodeArrayList);
+                    if (value == null) {
+                        value = volleySynchronous(FUNDS_HISTORICAL_URL,
+                                requestBody, String.valueOf(quarter), scodeArrayList);
+                        if (value == null) {
                             if (day.equals("31")) {
                                 day = "29";
-                            } else {
+                            } else if (day.equals("30")) {
                                 day = "28";
                             }
                             dateFull = day + "/" + month + "/" + String.valueOf(year);
-                            value = getGraph(scode, dateFull);
-                            if (value != null) {
-                                ContentValues navForQuarter = new ContentValues();
-                                navForQuarter.put(KEY_QUARTER + quarter, value);
-                                mContext.getContentResolver().update(uri, navForQuarter, null, null);
-                            }
+                            requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + dateFull + "\"" + "}";
+                            volleySynchronous(FUNDS_HISTORICAL_URL,
+                                    requestBody, String.valueOf(quarter), scodeArrayList);
                         }
                     }
                     quarter--;
@@ -294,7 +229,7 @@ public class FetchFundsTask extends GcmTaskService {
             intent.setAction(mContext.getString(R.string.gcmtask_intent));
             intent.putExtra(mContext.getString(R.string.key_graph_fetched), true);
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-        } else if (taskParams.getTag().equals(mContext.getString(R.string.tag_insert_scodes))) {
+        } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_insert_scodes))) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(FundsContentProvider.FUND_SCODE,
                     taskParams.getExtras().getString(mContext.getString(R.string.key_scode)));
@@ -311,49 +246,6 @@ public class FetchFundsTask extends GcmTaskService {
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
-    public String getGraph(String scode, String date) {
-        String nav = null;
-        try {
-            String requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + date + "\"" + "}";
-            HttpResponse<JsonNode> response = Unirest.post(FUNDS_HISTORICAL_URL)
-                    .header(KEY_PARAM, KEY_VALUE)
-                    .header(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE)
-                    .header(ACCEPT_PARAM, ACCEPT_VALUE)
-                    .body(requestBody)
-                    .asJson();
-            JsonNode jsonNode = response.getBody();
-            try {
-                JSONObject jsonObject = jsonNode.getObject();
-                nav = jsonObject.getString(KEY_NAV);
-            } catch (JSONException je) {
-                Log.e(TAG, je.toString());
-            }
-        } catch (UnirestException ue) {
-            Log.e(TAG, ue.toString());
-        }
-        return nav;
-    }
-
-    public void fetchFundInfoFromApi(String scodes, ArrayList<String> scodesArrayList) {
-        String query = "{" + scodes + "]}";
-        try {
-            HttpResponse<JsonNode> response = Unirest.post(FUNDS_BASE_URL)
-                    .header(KEY_PARAM, KEY_VALUE)
-                    .header(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE)
-                    .header(ACCEPT_PARAM, ACCEPT_VALUE)
-                    .body(query)
-                    .asJson();
-            JsonNode jsonNode = response.getBody();
-            JSONObject jsonObject = jsonNode.getObject();
-            for (int index = 0; index < scodesArrayList.size(); index++) {
-                extractInfoFromJson(scodesArrayList.get(index), jsonObject);
-            }
-        } catch (UnirestException ue) {
-            Log.e(TAG, ue.toString());
-            mIsUpdateSuccessful = false;
-            retriggerTask();
-        }
-    }
 
     public void retriggerTask() {
         Intent intent = new Intent(mContext, Alarm.class);
@@ -367,18 +259,36 @@ public class FetchFundsTask extends GcmTaskService {
             DatabaseReference myRef = database.getReference(mFirebaseUser.getUid())
                     .child(mContext.getString(R.string.firebase_child_funds)).child(scode);
             JSONObject jsonObject = object.getJSONObject(scode);
+            String fundName = jsonObject.getString(KEY_FUNDNAME);
             String nav = jsonObject.getString(KEY_NAV);
             JSONObject jsonObject1 = jsonObject.getJSONObject(KEY_CHANGE);
             String changePercent = jsonObject1.getString(KEY_CHANGE_PERCENT);
             String changeValue = jsonObject1.getString(KEY_CHANGE_VALUE);
             Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
                     new String[]{FundsContentProvider.FUND_SCODE}, null, null, null);
-            if (nav != null && changePercent != null && changeValue != null) {
+            if (fundName != null && nav != null && changePercent != null && changeValue != null) {
                 if (cursor.moveToFirst()) {
+                    Log.d(TAG, fundName);
+                    myRef.child(mContext.getString(R.string.key_fundname)).setValue(fundName);
+                    myRef.child(mContext.getString(R.string.key_scode)).setValue(scode);
                     myRef.child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
                     myRef.child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
                     myRef.child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
+                    if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
+                        myRef.child(mContext.getString(R.string.key_units_in_hand)).setValue("0");
+                    }
                     mIsUpdateSuccessful = true;
+                    if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
+                        sendToast(mContext.getString(R.string.fund_added_message));
+                    }
+                } else {
+                    if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
+
+                        sendToast(mContext.getString(R.string.message_failed_to_add_fund));
+                        Uri uriDelete = Uri.parse(FundsContentProvider.mUriHistorical.toString() +
+                                "/" + scode);
+                        mContext.getContentResolver().delete(uriDelete, null, null);
+                    }
                 }
             }
         } catch (JSONException je) {
@@ -415,5 +325,216 @@ public class FetchFundsTask extends GcmTaskService {
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(Integer.parseInt(
                 mContext.getString(R.string.notification_id)), builder.build());
+    }
+
+
+    public void volleyRequestJsonArray(String url, String body) {
+
+        try {
+            JSONObject jsonObject = new JSONObject(body);
+            CustomRequest request = new CustomRequest(Request.Method.POST,
+                    url, jsonObject, new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    Log.d(TAG, response.toString());
+                    processSearchResponse(response);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    if (error.toString().equals("com.android.volley.AuthFailureError")) {
+                        sendToast(mContext.getString(R.string.message_something_went_wrong));
+                    } else {
+                        sendToast(mContext.getString(R.string.message_fund_not_found));
+                    }
+                    Log.e(TAG, error.toString());
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put(KEY_PARAM, KEY_VALUE);
+                    header.put(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE);
+                    header.put(ACCEPT_PARAM, ACCEPT_VALUE);
+                    return header;
+                }
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put(KEY_PARAM, KEY_VALUE);
+                    header.put(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE);
+                    header.put(ACCEPT_PARAM, ACCEPT_VALUE);
+                    return header;
+                }
+            };
+
+//            request.setRetryPolicy(new DefaultRetryPolicy(2 * 1000, 1, 0.0f));
+            mRequestQueue.add(request);
+        } catch (JSONException je) {
+            Log.e(TAG, je.toString());
+        }
+    }
+
+    public void volleyRequestJsonObject(String url, String body, final ArrayList<String> scodesArrayList, final String quarter) {
+        try {
+            JSONObject jsonBody = new JSONObject(body);
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                    url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Log.d(TAG, response.toString());
+
+                    if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav)) ||
+                            mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
+                        processFundDetailsJson(scodesArrayList, response);
+                    } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_fetch_graph_data))) {
+                        processGraphData(response, quarter);
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e(TAG, error.toString());
+                    if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))
+                            && scodesArrayList.size() > 0) {
+                        Uri uriDelete = Uri.parse(FundsContentProvider.mUriHistorical.toString() +
+                                "/" + scodesArrayList.get(0));
+                        mContext.getContentResolver().delete(uriDelete, null, null);
+                        sendToast(mContext.getString(R.string.message_failed_to_add_fund));
+                    } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
+                        mIsUpdateSuccessful = false;
+                        retriggerTask();
+                    }
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put(KEY_PARAM, KEY_VALUE);
+                    header.put(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE);
+                    header.put(ACCEPT_PARAM, ACCEPT_VALUE);
+                    return header;
+                }
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put(KEY_PARAM, KEY_VALUE);
+                    header.put(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE);
+                    header.put(ACCEPT_PARAM, ACCEPT_VALUE);
+                    return header;
+                }
+            };
+            mRequestQueue.add(request);
+        } catch (JSONException je) {
+            Log.e(TAG, je.toString());
+        }
+    }
+
+    public void processSearchResponse(JSONArray jsonArray) {
+        ArrayList<BasicFundInfoParcelable> fundsArrayList = new ArrayList<BasicFundInfoParcelable>();
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONArray innerJsonArray = jsonArray.getJSONArray(i);
+                fundsArrayList.add(new BasicFundInfoParcelable(innerJsonArray.getString(0),
+                        innerJsonArray.getString(3)));
+            }
+
+        } catch (JSONException e) {
+            sendToast(mContext.getString(R.string.message_something_went_wrong));
+            Log.e(TAG, e.toString());
+        }
+        if (fundsArrayList.size() > 0) {
+            Bundle dataBundle = new Bundle();
+            dataBundle.putParcelableArrayList(mContext.getString(R.string.basic_search_results_parcelable), fundsArrayList);
+            Intent intent = new Intent();
+            intent.setAction(mContext.getString(R.string.gcmtask_intent));
+            intent.putExtra(mContext.getString(R.string.search_data_bundle), dataBundle);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        } else {
+            sendToast(mContext.getString(R.string.message_fund_not_found));
+        }
+    }
+
+    public void processFundDetailsJson(ArrayList<String> scodesArrayList, JSONObject jsonObject) {
+        for (int index = 0; index < scodesArrayList.size(); index++) {
+            extractInfoFromJson(scodesArrayList.get(index), jsonObject);
+        }
+    }
+
+    public String processGraphData(JSONObject jsonObject, String quarter) {
+        String nav = null;
+        try {
+            String scode = jsonObject.getString(KEY_SCODE);
+            nav = jsonObject.getString(KEY_NAV);
+            Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);
+            if (nav != null && scode != null) {
+                ContentValues navForQuarter = new ContentValues();
+                navForQuarter.put(KEY_QUARTER + quarter, nav);
+                mContext.getContentResolver().update(uri, navForQuarter, null, null);
+            }
+        } catch (JSONException je) {
+            Log.e(TAG, je.toString());
+        }
+        return nav;
+    }
+
+    public String volleySynchronous(String url, String body, String quarter, final ArrayList<String> scodesArrayList) {
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody = new JSONObject(body);
+        } catch (JSONException e) {
+            Log.e(TAG, e.toString());
+        }
+        RequestFuture<JSONObject> future = RequestFuture.newFuture();
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+                url, jsonBody, future, future) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> header = new HashMap<>();
+                header.put(KEY_PARAM, KEY_VALUE);
+                header.put(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE);
+                header.put(ACCEPT_PARAM, ACCEPT_VALUE);
+                return header;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> header = new HashMap<>();
+                header.put(KEY_PARAM, KEY_VALUE);
+                header.put(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE);
+                header.put(ACCEPT_PARAM, ACCEPT_VALUE);
+                return header;
+            }
+        };
+        mRequestQueue.add(request);
+        try {
+            JSONObject response = future.get(5, TimeUnit.SECONDS); // Blocks for at most 2 seconds.
+            Log.d(TAG, response.toString());
+            if (mTaskParamTag.equals(mContext.getString(R.string.tag_fetch_graph_data))) {
+                return processGraphData(response, quarter);
+            } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
+                processFundDetailsJson(scodesArrayList, response);
+            }
+        } catch (InterruptedException e) {
+            // Exception handling
+            if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
+                retriggerTask();
+            }
+            Log.e(TAG, e.toString());
+        } catch (ExecutionException e) {
+            if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
+                retriggerTask();
+            }
+            // Exception handling
+            Log.e(TAG, e.toString());
+        } catch (TimeoutException e) {
+            if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
+                retriggerTask();
+            }
+            Log.e(TAG, e.toString());
+        }
+        return null;
     }
 }

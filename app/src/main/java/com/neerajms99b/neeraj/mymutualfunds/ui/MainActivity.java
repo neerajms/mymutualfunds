@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             //Set the update alarm on first run
-            mAlarmManager.setAlarm(this);
+//            mAlarmManager.setAlarm(this);
             return;
         }
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());

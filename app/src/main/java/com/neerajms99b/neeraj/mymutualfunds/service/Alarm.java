@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
@@ -22,6 +23,7 @@ import java.util.Calendar;
 public class Alarm extends BroadcastReceiver {
     private AlarmManager mAlarmManager;
     private PendingIntent mPendingIntent;
+    private static final String TAG = Alarm.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -55,6 +57,7 @@ public class Alarm extends BroadcastReceiver {
     }
 
     public void setAlarm(Context context) {
+        Log.d(TAG, "Alarm set");
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, Alarm.class);
         intent.putExtra(context.getString(R.string.key_tag), context.getString(R.string.tag_update_nav));

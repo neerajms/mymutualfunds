@@ -45,6 +45,7 @@
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>
     <string name="key_scroll_position" translatable="false">scroll_position</string>
     <string name="graph_fragment_tag" translatable="false">graph_fragment</string>
+    <string name="graph_request_queue_tag" translatable="false">graph_request_tag</string>
 
     <string name="app_name">My Mutual Funds</string>
     <string name="action_add_fund">Add funds</string>
@@ -67,7 +68,7 @@
     <string name="net_worth_graph_description">Net worth for the last few days</string>
     <string name="nav_chart_description">NAV for the last few quarter ends</string>
     <string name="nav_chart_values">Net Asset Value</string>
-    <string name="total_value">Total value:</string>
+    <string name="total_value">Total value</string>
     <string name="menu_clear_history">Clear search history</string>
     <string name="history_cleared_toast">Cleared all search history</string>
     <string name="nothing_to_clear_toast">Nothing to clear in history</string>
@@ -87,6 +88,8 @@
     <string name="add_more_funds_showcase_content">You can add funds from the options menu</string>
     <string name="historical_graph_message">Select a fund to see the historical graph here</string>
     <string name="message_not_connected">You are offline</string>
+    <string name="authentication_failed">Authentication failed</string>
+    <string name="play_services_error">Google play services error</string>
 
     <string name="content_description_search_view">Search fund</string>
     <string name="content_description_sign_in">Sign in</string>

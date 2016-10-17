@@ -26,9 +26,8 @@
                 <TextView
                     android:id="@+id/fund_name"
                     style="@style/FundName"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/margin_8dp"
                     android:textSize="@dimen/fund_name_in_detail_view" />
 
                 <LinearLayout

@@ -25,7 +25,6 @@ import com.neerajms99b.neeraj.mymutualfunds.adapter.FirebaseAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SimpleItemTouchHelper;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
-import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -152,13 +151,8 @@ public class FundsListFragment extends Fragment {
         }
     }
 
-    /* Stores only the scode to Historical table, helps in knowing if the fund is already present
-     in the portfolio */
-    public void addScodeToDatabase(String scode) {
-        Intent intent = new Intent(getContext(), FundsIntentService.class);
-        intent.putExtra(getString(R.string.key_tag), getString(R.string.tag_insert_scodes));
-        intent.putExtra(getString(R.string.key_scode), scode);
-        getContext().startService(intent);
+    /* Restores the recyclerview position */
+    public void restoreRecyclerViewPosition() {
         mRecyclerView.restorePostion();
     }
 }

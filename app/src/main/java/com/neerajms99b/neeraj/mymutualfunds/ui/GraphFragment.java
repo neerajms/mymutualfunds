@@ -185,6 +185,9 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     public void postExecute(Cursor data) {
+        mEntries.clear();
+        mEntriesString.clear();
+        mLabels.clear();
         data.moveToFirst();
         String keyQ = "q";
         Calendar date = Calendar.getInstance();

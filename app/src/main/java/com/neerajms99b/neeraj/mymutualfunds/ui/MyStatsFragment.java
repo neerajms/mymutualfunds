@@ -1,6 +1,7 @@
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -41,6 +42,7 @@ import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.UpdateFragment;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.models.NetWorthGraphModel;
+import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -153,6 +155,9 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                     }
                     calculateNetWorth();
                     storeNetWorthInFirebase();
+                    if (isAdded()) {
+                        addScodeToDatabase(fundInfo.getScode());
+                    }
                 }
             }
 
@@ -361,6 +366,13 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         } catch (ParseException pe) {
             Log.e(TAG, pe.toString());
         }
+    }
+
+    public void addScodeToDatabase(String scode) {
+        Intent intent = new Intent(getContext(), FundsIntentService.class);
+        intent.putExtra(getString(R.string.key_tag), getString(R.string.tag_insert_scodes));
+        intent.putExtra(getString(R.string.key_scode), scode);
+        getContext().startService(intent);
     }
 
     public void processGraphData(DataSnapshot dataSnapshot) {

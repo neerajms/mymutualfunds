@@ -15,6 +15,7 @@
  */
 package com.neerajms99b.neeraj.mymutualfunds.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -39,6 +40,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.neerajms99b.neeraj.mymutualfunds.R;
+import com.neerajms99b.neeraj.mymutualfunds.service.Alarm;
 
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -52,6 +54,8 @@ public class SignInActivity extends AppCompatActivity implements
 
     private ProgressBar mProgressBar;
 
+    private Context mContext;
+
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -60,6 +64,8 @@ public class SignInActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        mContext = this;
 
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar_sign_in);
         mProgressBar.setVisibility(View.INVISIBLE);
@@ -131,9 +137,11 @@ public class SignInActivity extends AppCompatActivity implements
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(SignInActivity.this, "Authentication failed.",
+                            Toast.makeText(SignInActivity.this,
+                                    mContext.getString(R.string.authentication_failed),
                                     Toast.LENGTH_SHORT).show();
                         } else {
+                            new Alarm().setAlarm(mContext);
                             Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                             startActivity(intent);
                             finish();
@@ -147,6 +155,7 @@ public class SignInActivity extends AppCompatActivity implements
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
-        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, mContext.getString(R.string.play_services_error),
+                Toast.LENGTH_SHORT).show();
     }
 }

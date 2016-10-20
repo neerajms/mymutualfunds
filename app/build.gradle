@@ -34,9 +34,6 @@ android {
             signingConfig signingConfigs.myConfig
         }
     }
-    dexOptions {
-        incremental true
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7

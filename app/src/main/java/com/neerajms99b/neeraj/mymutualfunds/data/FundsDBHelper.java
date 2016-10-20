@@ -52,6 +52,12 @@ public class FundsDBHelper extends SQLiteOpenHelper {
             + " (" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             SEARCH_WORD + " TEXT UNIQUE);";
 
+    public static final String DELETE_RECENTS_DATABASE = "DROP TABLE IF EXISTS " +
+            TABLE_NAME_RECENT_SEARCH;
+
+    public static final String DELETE_HISTORICAL_DATABASE = "DROP TABLE IF EXISTS " +
+            TABLE_NAME_HISTORICAL;
+
     public FundsDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -64,6 +70,7 @@ public class FundsDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+        sqLiteDatabase.execSQL(DELETE_RECENTS_DATABASE);
+        sqLiteDatabase.execSQL(DELETE_HISTORICAL_DATABASE);
     }
 }

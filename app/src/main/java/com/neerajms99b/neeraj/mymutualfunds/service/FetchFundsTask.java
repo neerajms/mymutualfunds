@@ -15,6 +15,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -269,7 +270,17 @@ public class FetchFundsTask extends GcmTaskService {
             if (fundName != null && nav != null && changePercent != null && changeValue != null) {
                 if (cursor.moveToFirst()) {
                     Log.d(TAG, fundName);
-                    myRef.child(mContext.getString(R.string.key_fundname)).setValue(fundName);
+                    fundName = fundName.toLowerCase();
+                    String[] words = fundName.split("[ /-]");
+                    String formattedFundName = words[0].toUpperCase();
+                    for (int i = 1; i < words.length; i++) {
+                        if (words[i].length() > 1) {
+                            String firstLetter = words[i].substring(0, 1).toUpperCase();
+                            words[i] = firstLetter + words[i].substring(1, words[i].length());
+                            formattedFundName = formattedFundName + " " + words[i];
+                        }
+                    }
+                    myRef.child(mContext.getString(R.string.key_fundname)).setValue(formattedFundName);
                     myRef.child(mContext.getString(R.string.key_scode)).setValue(scode);
                     myRef.child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
                     myRef.child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
@@ -342,7 +353,8 @@ public class FetchFundsTask extends GcmTaskService {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    if (error.toString().equals("com.android.volley.AuthFailureError")) {
+                    if (error.toString().equals("com.android.volley.AuthFailureError") ||
+                            error.toString().equals("com.android.volley.ServerError")) {
                         sendToast(mContext.getString(R.string.message_something_went_wrong));
                     } else {
                         sendToast(mContext.getString(R.string.message_fund_not_found));
@@ -368,8 +380,7 @@ public class FetchFundsTask extends GcmTaskService {
                     return header;
                 }
             };
-
-//            request.setRetryPolicy(new DefaultRetryPolicy(2 * 1000, 1, 0.0f));
+            request.setRetryPolicy(new DefaultRetryPolicy(5 * 1000, 1, 0.0f));
             mRequestQueue.add(request);
         } catch (JSONException je) {
             Log.e(TAG, je.toString());
@@ -520,17 +531,20 @@ public class FetchFundsTask extends GcmTaskService {
         } catch (InterruptedException e) {
             // Exception handling
             if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
+                mIsUpdateSuccessful = false;
                 retriggerTask();
             }
             Log.e(TAG, e.toString());
         } catch (ExecutionException e) {
             if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
+                mIsUpdateSuccessful = false;
                 retriggerTask();
             }
             // Exception handling
             Log.e(TAG, e.toString());
         } catch (TimeoutException e) {
             if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
+                mIsUpdateSuccessful = false;
                 retriggerTask();
             }
             Log.e(TAG, e.toString());

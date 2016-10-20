@@ -380,7 +380,7 @@ public class FetchFundsTask extends GcmTaskService {
                     return header;
                 }
             };
-            request.setRetryPolicy(new DefaultRetryPolicy(5 * 1000, 1, 0.0f));
+            request.setRetryPolicy(new DefaultRetryPolicy(10 * 1000, 1, 0.0f));
             mRequestQueue.add(request);
         } catch (JSONException je) {
             Log.e(TAG, je.toString());
@@ -437,6 +437,7 @@ public class FetchFundsTask extends GcmTaskService {
                     return header;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(10 * 1000, 1, 0.0f));
             mRequestQueue.add(request);
         } catch (JSONException je) {
             Log.e(TAG, je.toString());
@@ -519,9 +520,10 @@ public class FetchFundsTask extends GcmTaskService {
                 return header;
             }
         };
+        request.setRetryPolicy(new DefaultRetryPolicy(10 * 1000, 1, 0.0f));
         mRequestQueue.add(request);
         try {
-            JSONObject response = future.get(5, TimeUnit.SECONDS); // Blocks for at most 2 seconds.
+            JSONObject response = future.get(10, TimeUnit.SECONDS); // Blocks for at most 10 seconds.
             Log.d(TAG, response.toString());
             if (mTaskParamTag.equals(mContext.getString(R.string.tag_fetch_graph_data))) {
                 return processGraphData(response, quarter);

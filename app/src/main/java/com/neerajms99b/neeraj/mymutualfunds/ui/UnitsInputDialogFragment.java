@@ -32,7 +32,9 @@ public class UnitsInputDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.alert_dialog_ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         String units = editText.getText().toString();
-                        callBack.unitsInput(units, scode);
+                        if (!units.equals("")) {
+                            callBack.unitsInput(units, scode);
+                        }
                     }
                 })
                 .setNegativeButton(R.string.alert_dialog_cancel, new DialogInterface.OnClickListener() {

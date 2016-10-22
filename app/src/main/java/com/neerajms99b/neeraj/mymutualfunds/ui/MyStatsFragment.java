@@ -149,14 +149,15 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
-                if (fundInfo.getScode() != null) {
+                if (fundInfo != null) {
+                    Log.e(TAG, "fund added !!!!!!!!!!!!!!!");
                     if (!alreadyPresent(fundInfo)) {
                         mFundsArrayList.add(fundInfo);
                     }
                     calculateNetWorth();
                     storeNetWorthInFirebase();
                     if (isAdded()) {
-                        addScodeToDatabase(fundInfo.getScode());
+                        addInfoToDatabase(fundInfo.getScode(), fundInfo.getLastUpdated());
                     }
                 }
             }
@@ -368,10 +369,11 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         }
     }
 
-    public void addScodeToDatabase(String scode) {
+    public void addInfoToDatabase(String scode, String lastUpdated) {
         Intent intent = new Intent(getContext(), FundsIntentService.class);
         intent.putExtra(getString(R.string.key_tag), getString(R.string.tag_insert_scodes));
         intent.putExtra(getString(R.string.key_scode), scode);
+        intent.putExtra(getString(R.string.key_last_updated_nav), lastUpdated);
         getContext().startService(intent);
     }
 

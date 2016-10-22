@@ -37,7 +37,8 @@ public class FundsContentProvider extends ContentProvider {
     public static final String NAV_Q10 = "q10";
     public static final String NAV_Q11 = "q11";
     public static final String NAV_Q12 = "q12";
-    public static final String LAST_UPDATED = "lastupdated";
+    public static final String LAST_UPDATED_GRAPH = "lastupdatedgraph";
+    public static final String LAST_UPDATED_NAV = "lastupdatednav";
 
     public static final String SEARCH_WORD = "keyword";
     private SQLiteDatabase database;

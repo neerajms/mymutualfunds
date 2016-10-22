@@ -3,7 +3,6 @@ package com.neerajms99b.neeraj.mymutualfunds.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.gms.gcm.TaskParams;
 import com.neerajms99b.neeraj.mymutualfunds.R;
@@ -56,6 +55,8 @@ public class FundsIntentService extends IntentService {
             Bundle bundle = new Bundle();
             bundle.putString(getString(R.string.key_scode),
                     intent.getStringExtra(getString(R.string.key_scode)));
+            bundle.putString(getString(R.string.key_last_updated_nav),
+                    intent.getStringExtra(getString(R.string.key_last_updated_nav)));
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(
                     intent.getStringExtra(getString(R.string.key_tag)), bundle));

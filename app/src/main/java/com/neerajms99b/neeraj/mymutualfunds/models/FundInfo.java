@@ -13,20 +13,25 @@ public class FundInfo {
     public String mUnits;
     public String mChangeValue;
     public String mChangePercent;
-    public FundInfo(){}
+    public String mLastUpdated;
+
+    public FundInfo() {
+    }
 
     public FundInfo(String scode,
                     String fundName,
                     String nav,
                     String units,
                     String changeValue,
-                    String changePercent){
+                    String changePercent,
+                    String lastUpdated) {
         mScode = scode;
         mFundName = fundName;
         mNav = nav;
         mUnits = units;
         mChangeValue = changeValue;
         mChangePercent = changePercent;
+        mLastUpdated = lastUpdated;
     }
 
     public Map<String, Object> toMap() {
@@ -35,27 +40,37 @@ public class FundInfo {
         result.put("mFundName", mFundName);
         result.put("mNav", mNav);
         result.put("mUnits", mUnits);
-        result.put("mChangeValue",mChangeValue);
-        result.put("mChangePercent",mChangePercent);
+        result.put("mChangeValue", mChangeValue);
+        result.put("mChangePercent", mChangePercent);
+        result.put("mLastUpdated", mLastUpdated);
         return result;
     }
 
-    public String getScode(){
+    public String getScode() {
         return mScode;
     }
-    public String getFundName(){
+
+    public String getFundName() {
         return mFundName;
     }
-    public String getNav(){
+
+    public String getNav() {
         return mNav;
     }
-    public String getUnits(){
+
+    public String getUnits() {
         return mUnits;
     }
-    public String getChangeValue(){
+
+    public String getChangeValue() {
         return mChangeValue;
     }
-    public String getChangePercent(){
+
+    public String getChangePercent() {
         return mChangePercent;
+    }
+
+    public String getLastUpdated() {
+        return mLastUpdated;
     }
 }

@@ -104,8 +104,8 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoadFinished(Loader loader, Cursor data) {
         //If the NAV values are not available in the DB then fetch data
         if (data.moveToFirst() &&
-                data.getString(data.getColumnIndex(FundsContentProvider.LAST_UPDATED)) != null) {
-            String lastUpdated = data.getString(data.getColumnIndex(FundsContentProvider.LAST_UPDATED));
+                data.getString(data.getColumnIndex(FundsContentProvider.LAST_UPDATED_GRAPH)) != null) {
+            String lastUpdated = data.getString(data.getColumnIndex(FundsContentProvider.LAST_UPDATED_GRAPH));
             String[] words = lastUpdated.split("-");
             int lastUpdatedQuarter = Integer.parseInt(words[0]);
             int lastUpdatedYear = Integer.parseInt(words[1]);

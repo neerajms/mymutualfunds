@@ -25,7 +25,8 @@ public class FundsDBHelper extends SQLiteOpenHelper {
     private static final String NAV_Q10 = "q10";
     private static final String NAV_Q11 = "q11";
     private static final String NAV_Q12 = "q12";
-    private static final String LAST_UPDATED = "lastupdated";
+    private static final String LAST_UPDATED_GRAPH = "lastupdatedgraph";
+    private static final String LAST_UPDATED_NAV = "lastupdatednav";
 
     private static final String TABLE_NAME_RECENT_SEARCH = "recent";
     private static final String SEARCH_WORD = "keyword";
@@ -46,7 +47,8 @@ public class FundsDBHelper extends SQLiteOpenHelper {
             NAV_Q10 + " TEXT, " +
             NAV_Q11 + " TEXT, " +
             NAV_Q12 + " TEXT, " +
-            LAST_UPDATED + " TEXT);";
+            LAST_UPDATED_GRAPH + " TEXT, " +
+            LAST_UPDATED_NAV + " TEXT);";
 
     public static final String CREATE_RECENTS_DATABASE = "CREATE TABLE " + TABLE_NAME_RECENT_SEARCH
             + " (" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +

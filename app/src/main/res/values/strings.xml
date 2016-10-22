@@ -46,6 +46,8 @@
     <string name="key_scroll_position" translatable="false">scroll_position</string>
     <string name="graph_fragment_tag" translatable="false">graph_fragment</string>
     <string name="graph_request_queue_tag" translatable="false">graph_request_tag</string>
+    <string name="key_last_updated_nav" translatable="false">last_updated_nav</string>
+    <string name="last_updated_string" translatable="false">mLastUpdated</string>
 
     <string name="app_name">My Mutual Funds</string>
     <string name="action_add_fund">Add funds</string>

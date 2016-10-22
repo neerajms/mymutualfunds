@@ -108,6 +108,13 @@
         <item name="android:gravity">center_vertical</item>
     </style>
 
+    <style name="NetWorthChangePeriodic">
+        <item name="android:textSize">@dimen/net_worth_change_over_period_text</item>
+        <item name="android:layout_marginBottom">@dimen/margin_8dp</item>
+        <item name="android:layout_marginTop">@dimen/margin_8dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
     <style name="HistoricalGraphStyle">
         <item name="android:layout_marginBottom">@dimen/margin_16dp</item>
         <item name="android:layout_marginEnd">@dimen/margin_8dp</item>

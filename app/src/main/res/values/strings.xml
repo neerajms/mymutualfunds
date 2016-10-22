@@ -92,6 +92,8 @@
     <string name="message_not_connected">You are offline</string>
     <string name="authentication_failed">Authentication failed</string>
     <string name="play_services_error">Google play services error</string>
+    <string name="last_seven_days_title">Net Worth Change - Last 7 days</string>
+    <string name="last_thirty_days_title">Net Worth Change - Last 30 days</string>
 
     <string name="content_description_search_view">Search fund</string>
     <string name="content_description_sign_in">Sign in</string>

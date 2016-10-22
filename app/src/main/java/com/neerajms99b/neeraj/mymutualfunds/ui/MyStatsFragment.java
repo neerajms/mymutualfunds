@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -78,6 +79,14 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     private boolean mIsNetChangeNegative;
     private ImageView mChangeArrow;
 
+    private CardView mLastThirtyDaysCard;
+    private TextView mNetWorthChangeLastThirtyDaysTextView;
+    private ImageView mNetWorthChangeArrowLastThirtyDays;
+
+    private CardView mLastSevenDaysCard;
+    private TextView mNetWorthChangeLastSevenDaysTextView;
+    private ImageView mNetWorthChangeArrowLastSevenDays;
+
     private ProgressBar mProgressBarNetWorth;
     private ProgressBar mProgressBarNetWorthGraph;
     private SharedPreferences mSharedPreferences;
@@ -112,8 +121,23 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mNetWorthAmountTextView = (TextView) rootView.findViewById(R.id.net_worth_amount);
         mNetWorthChangeTextView = (TextView) rootView.findViewById(R.id.net_worth_change);
         mChangeArrow = (ImageView) rootView.findViewById(R.id.net_worth_arrow);
+
         mChart = (LineChart) rootView.findViewById(R.id.chart_networth);
         mChart.setVisibility(View.INVISIBLE);
+
+        mLastSevenDaysCard = (CardView) rootView.findViewById(R.id.card_view_last_seven_days);
+        mLastSevenDaysCard.setVisibility(View.INVISIBLE);
+        mNetWorthChangeLastSevenDaysTextView =
+                (TextView) rootView.findViewById(R.id.net_worth_change_last_seven_days);
+        mNetWorthChangeArrowLastSevenDays =
+                (ImageView) rootView.findViewById(R.id.net_worth_arrow_last_seven_days);
+
+        mLastThirtyDaysCard = (CardView) rootView.findViewById(R.id.card_view_last_thirty_days);
+        mLastThirtyDaysCard.setVisibility(View.INVISIBLE);
+        mNetWorthChangeLastThirtyDaysTextView =
+                (TextView) rootView.findViewById(R.id.net_worth_change_last_thirty_days);
+        mNetWorthChangeArrowLastThirtyDays =
+                (ImageView) rootView.findViewById(R.id.net_worth_arrow_last_thirty_days);
 
         //Read net-worth list from firebase
         readFirebaseNetworthList();
@@ -138,6 +162,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     public void updateNetWorth() {//Called on switching from My Funds tab to My Stats tab
         setNetWorth();
         populateChart();
+        setNetworthChangeLastSevenDays();
+        setNetworthChangeLastThirtyDays();
     }
 
     public void readFirebaseFundsList() {
@@ -150,7 +176,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
                 if (fundInfo != null) {
-                    Log.e(TAG, "fund added !!!!!!!!!!!!!!!");
                     if (!alreadyPresent(fundInfo)) {
                         mFundsArrayList.add(fundInfo);
                     }
@@ -203,6 +228,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                 if (isAdded()) {
                     setNetWorth();
                     populateChart();
+                    setNetworthChangeLastSevenDays();
+                    setNetworthChangeLastThirtyDays();
                 }
             }
 
@@ -215,6 +242,8 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
                     mProgressBarNetWorthGraph.setVisibility(View.VISIBLE);
                     setNetWorth();
                     populateChart();
+                    setNetworthChangeLastSevenDays();
+                    setNetworthChangeLastThirtyDays();
                 }
             }
 
@@ -496,5 +525,81 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         mChart.animateY(0);
         mProgressBarNetWorthGraph.setVisibility(View.INVISIBLE);
         mChart.setVisibility(View.VISIBLE);
+    }
+
+    public void setNetworthChangeLastSevenDays() {
+        int size = mGraphList.size();
+        int days = 7;
+        if (size >= days) {
+            float latestNetworth = Float.parseFloat(mGraphList.get(size - 1).getNetworth());
+            float networthSevenDaysBack = Float.parseFloat(mGraphList.get(size - days).getNetworth());
+            float change = latestNetworth - networthSevenDaysBack;
+            float changeAbsolute = Math.abs(change);
+            float changePercentage = changeAbsolute * 100 / networthSevenDaysBack;
+            String changeString = String.format("%.2f", changeAbsolute) + "(" +
+                    String.format("%.2f", changePercentage) + "%" + ")";
+            mNetWorthChangeLastSevenDaysTextView.setText(changeString);
+            if (change < 0) {
+                mLastSevenDaysCard.setVisibility(View.INVISIBLE);
+                if (Build.VERSION.SDK_INT >= 23) {
+                    mNetWorthChangeLastSevenDaysTextView.setTextColor(
+                            ContextCompat.getColor(getContext(), R.color.colorRed));
+                } else {
+                    mNetWorthChangeLastSevenDaysTextView.setTextColor(
+                            getResources().getColor(R.color.colorRed));
+                }
+                mNetWorthChangeArrowLastSevenDays.setImageResource(R.drawable.ic_arrow_down);
+            } else {
+                if (Build.VERSION.SDK_INT >= 23) {
+                    mNetWorthChangeLastSevenDaysTextView.setTextColor(
+                            ContextCompat.getColor(getContext(), R.color.colorGreen));
+                } else {
+                    mNetWorthChangeLastSevenDaysTextView.setTextColor(
+                            getResources().getColor(R.color.colorGreen));
+                }
+                mNetWorthChangeArrowLastSevenDays.setImageResource(R.drawable.ic_arrow_up);
+            }
+            mLastSevenDaysCard.setVisibility(View.VISIBLE);
+        } else {
+            mLastSevenDaysCard.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public void setNetworthChangeLastThirtyDays() {
+        int size = mGraphList.size();
+        int days = 30;
+        if (size >= days) {
+            float latestNetworth = Float.parseFloat(mGraphList.get(size - 1).getNetworth());
+            float networthSevenDaysBack = Float.parseFloat(mGraphList.get(size - days).getNetworth());
+            float change = latestNetworth - networthSevenDaysBack;
+            float changeAbsolute = Math.abs(change);
+            float changePercentage = changeAbsolute * 100 / networthSevenDaysBack;
+            String changeString = String.format("%.2f", changeAbsolute) + "(" +
+                    String.format("%.2f", changePercentage) + "%" + ")";
+            mNetWorthChangeLastThirtyDaysTextView.setText(changeString);
+            if (change < 0) {
+                mLastThirtyDaysCard.setVisibility(View.INVISIBLE);
+                if (Build.VERSION.SDK_INT >= 23) {
+                    mNetWorthChangeLastThirtyDaysTextView.setTextColor(
+                            ContextCompat.getColor(getContext(), R.color.colorRed));
+                } else {
+                    mNetWorthChangeLastThirtyDaysTextView.setTextColor(
+                            getResources().getColor(R.color.colorRed));
+                }
+                mNetWorthChangeArrowLastThirtyDays.setImageResource(R.drawable.ic_arrow_down);
+            } else {
+                if (Build.VERSION.SDK_INT >= 23) {
+                    mNetWorthChangeLastThirtyDaysTextView.setTextColor(
+                            ContextCompat.getColor(getContext(), R.color.colorGreen));
+                } else {
+                    mNetWorthChangeLastThirtyDaysTextView.setTextColor(
+                            getResources().getColor(R.color.colorGreen));
+                }
+                mNetWorthChangeArrowLastThirtyDays.setImageResource(R.drawable.ic_arrow_up);
+            }
+            mLastThirtyDaysCard.setVisibility(View.VISIBLE);
+        } else {
+            mLastThirtyDaysCard.setVisibility(View.INVISIBLE);
+        }
     }
 }

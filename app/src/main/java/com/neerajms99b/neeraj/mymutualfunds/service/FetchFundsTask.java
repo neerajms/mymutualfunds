@@ -82,7 +82,7 @@ public class FetchFundsTask extends GcmTaskService {
     private FirebaseUser mFirebaseUser;
     private FirebaseDatabase mDatabase;
     private ArrayList<String> mFundsScodesArrayList;
-    private boolean mIsUpdateSuccessful;
+    private boolean mIsToBeUpdated;
     private RequestQueue mRequestQueue;
     private String mTaskParamTag;
 
@@ -125,7 +125,8 @@ public class FetchFundsTask extends GcmTaskService {
             String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
             ContentValues initial = new ContentValues();
             initial.put(FundsContentProvider.FUND_SCODE, scode);
-            Uri resultUri = mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, initial);
+            Uri resultUri = mContext.getContentResolver()
+                    .insert(FundsContentProvider.mUriHistorical, initial);
 
             if (resultUri == null) {
                 sendToast(mContext.getString(R.string.unique_constraint_failed_message));
@@ -133,11 +134,11 @@ public class FetchFundsTask extends GcmTaskService {
                 scodesArrayList.add(scode);
                 String scodes = "\"scodes\":[" + "\"" + scode + "\"";
                 String query = "{" + scodes + "]}";
-                volleyRequestJsonObject(FUNDS_BASE_URL, query, scodesArrayList, null);
+                volleyRequestJsonObject(FUNDS_BASE_URL, query, scodesArrayList);
             }
         } else if (mTaskParamTag.equals(mContext.getResources().getString(R.string.tag_update_nav))) {
             Log.d(TAG, "Auto update triggered");
-            mIsUpdateSuccessful = false;
+            mIsToBeUpdated = false;
             String dateStrApi = null;
             String formattedDate = null;
             Cursor cursor = mContext.getContentResolver().query(
@@ -153,13 +154,9 @@ public class FetchFundsTask extends GcmTaskService {
                 do {
                     response = volleySynchronous(FUNDS_BASE_URL, query);
                     if (response != null) {
-                        Log.e(TAG, "response not null");
                         try {
                             JSONObject jsonObject = response.getJSONObject(scode);
                             dateStrApi = jsonObject.getString(KEY_DATE);
-                            if (dateStrApi != null) {
-                                Log.e(TAG, "datestrapi not null");
-                            }
                         } catch (JSONException je) {
                             Log.e(TAG, je.toString());
                         }
@@ -178,6 +175,8 @@ public class FetchFundsTask extends GcmTaskService {
                 cursor.moveToFirst();
                 do {
                     if (!formattedDate.equals(cursor.getString(COL_NAV_LAST_UPDATED))) {
+                        Log.e(TAG, formattedDate + " " + cursor.getString(COL_NAV_LAST_UPDATED));
+                        mIsToBeUpdated = true;
                         scode = cursor.getString(COL_SCODE);
                         scodes = scodes + "\"" + scode + "\"" + ",";
                         scodesArrayList.add(scode);
@@ -206,7 +205,7 @@ public class FetchFundsTask extends GcmTaskService {
                         processFundDetailsJson(scodesArrayList, response);
                     }
                 }
-                if (allFundsUpdated(formattedDate)) {
+                if (mIsToBeUpdated && allFundsUpdated(formattedDate)) {
                     showNotification();
                     updateAppWidget();
                 } else {
@@ -312,9 +311,7 @@ public class FetchFundsTask extends GcmTaskService {
             intent.setAction(mContext.getString(R.string.gcmtask_intent));
             intent.putExtra(mContext.getString(R.string.key_graph_fetched), true);
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-        } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_insert_scodes)))
-
-        {
+        } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_insert_scodes))) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(FundsContentProvider.FUND_SCODE,
                     taskParams.getExtras().getString(mContext.getString(R.string.key_scode)));
@@ -362,37 +359,39 @@ public class FetchFundsTask extends GcmTaskService {
                 Log.e(TAG, pe.toString());
             }
             lastUpdatedDate = dateFormat.format(date);
-            Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
-                    HISTORICAL_COLUMNS, null, null, null);
             if (fundName != null && nav != null && changePercent != null && changeValue != null &&
                     lastUpdatedDate != null) {
-                if (cursor.moveToFirst()) {
-                    Log.d(TAG, fundName);
-                    fundName = fundName.toLowerCase();
-                    String[] words = fundName.split("[ /-]");
-                    String formattedFundName = words[0].toUpperCase();
-                    for (int i = 1; i < words.length; i++) {
-                        if (words[i].length() > 1) {
-                            String firstLetter = words[i].substring(0, 1).toUpperCase();
-                            words[i] = firstLetter + words[i].substring(1, words[i].length());
-                            formattedFundName = formattedFundName + " " + words[i];
-                        }
+                Log.d(TAG, fundName);
+                fundName = fundName.toLowerCase();
+                String[] words = fundName.split("[ /-]");
+                String formattedFundName = words[0].toUpperCase();
+                for (int i = 1; i < words.length; i++) {
+                    if (words[i].length() > 1) {
+                        String firstLetter = words[i].substring(0, 1).toUpperCase();
+                        words[i] = firstLetter + words[i].substring(1, words[i].length());
+                        formattedFundName = formattedFundName + " " + words[i];
                     }
-                    if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
-                        myRef.child(scode).setValue(new FundInfo(
-                                scode, formattedFundName, nav, "0", changeValue,
-                                changePercent, lastUpdatedDate).toMap());
-                        sendToast(mContext.getString(R.string.fund_added_message));
-                    } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
-                        myRef.child(scode).child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
-                        myRef.child(scode).child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
-                        myRef.child(scode).child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
-                    }
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(FundsContentProvider.LAST_UPDATED_NAV, lastUpdatedDate);
-                    Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);
-                    mContext.getContentResolver().update(uri, contentValues, null, null);
                 }
+                if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
+                    myRef.child(scode).setValue(new FundInfo(
+                            scode, formattedFundName, nav, "0", changeValue,
+                            changePercent, lastUpdatedDate).toMap());
+                    sendToast(mContext.getString(R.string.fund_added_message));
+                } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
+                    Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
+                            HISTORICAL_COLUMNS, null, null, null);
+                    if (cursor.moveToFirst()) {
+                        myRef.child(scode).child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
+                        myRef.child(scode).child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
+                        myRef.child(scode).child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
+                        myRef.child(scode).child(mContext.getString(R.string.last_updated_string)).setValue(lastUpdatedDate);
+                    }
+                }
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(FundsContentProvider.LAST_UPDATED_NAV, lastUpdatedDate);
+                Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);
+                mContext.getContentResolver().update(uri, contentValues, null, null);
+
             } else {
                 if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
                     sendToast(mContext.getString(R.string.message_failed_to_add_fund));
@@ -485,7 +484,7 @@ public class FetchFundsTask extends GcmTaskService {
         }
     }
 
-    public void volleyRequestJsonObject(String url, String body, final ArrayList<String> scodesArrayList, final String quarter) {
+    public void volleyRequestJsonObject(String url, String body, final ArrayList<String> scodesArrayList) {
         try {
             JSONObject jsonBody = new JSONObject(body);
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
@@ -497,8 +496,6 @@ public class FetchFundsTask extends GcmTaskService {
                     if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav)) ||
                             mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
                         processFundDetailsJson(scodesArrayList, response);
-                    } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_fetch_graph_data))) {
-                        processGraphData(response, quarter);
                     }
                 }
             }, new Response.ErrorListener() {
@@ -529,7 +526,7 @@ public class FetchFundsTask extends GcmTaskService {
                     return header;
                 }
             };
-            request.setRetryPolicy(new DefaultRetryPolicy(10 * 1000, 3, 0.0f));
+            request.setRetryPolicy(new DefaultRetryPolicy(10 * 1000, 1, 0.0f));
             mRequestQueue.add(request);
         } catch (JSONException je) {
             Log.e(TAG, je.toString());

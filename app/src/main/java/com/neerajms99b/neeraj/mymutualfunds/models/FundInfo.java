@@ -34,12 +34,31 @@ public class FundInfo {
         mLastUpdated = lastUpdated;
     }
 
+    public FundInfo(String nav,
+                    String changeValue,
+                    String changePercent,
+                    String lastUpdated) {
+        mNav = nav;
+        mChangeValue = changeValue;
+        mChangePercent = changePercent;
+        mLastUpdated = lastUpdated;
+    }
+
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("mScode", mScode);
         result.put("mFundName", mFundName);
         result.put("mNav", mNav);
         result.put("mUnits", mUnits);
+        result.put("mChangeValue", mChangeValue);
+        result.put("mChangePercent", mChangePercent);
+        result.put("mLastUpdated", mLastUpdated);
+        return result;
+    }
+
+    public Map<String, Object> toMapUpdate() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("mNav", mNav);
         result.put("mChangeValue", mChangeValue);
         result.put("mChangePercent", mChangePercent);
         result.put("mLastUpdated", mLastUpdated);

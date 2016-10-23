@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setSupportActionBar(toolbar);
         //to dismiss notification once the app is opened
         dismissNotification();
+
         mSharedPreferences = getSharedPreferences(
                 getString(R.string.key_shared_prefs_funds_list), MODE_PRIVATE);
         mAlarmManager = new Alarm();

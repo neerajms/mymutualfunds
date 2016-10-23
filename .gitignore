@@ -7,5 +7,5 @@
 /build
 /captures
 /gradle.properties
-/submissionKeyStore
+/NrjKeyStore.jks
 /keystore.properties

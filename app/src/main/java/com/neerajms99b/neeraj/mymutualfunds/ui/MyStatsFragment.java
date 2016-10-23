@@ -39,6 +39,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.neerajms99b.neeraj.mymutualfunds.BuildConfig;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.UpdateFragment;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
@@ -90,6 +91,9 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     private ProgressBar mProgressBarNetWorth;
     private ProgressBar mProgressBarNetWorthGraph;
     private SharedPreferences mSharedPreferences;
+
+    private static final String BANNER_AD_UNIT_ID = BuildConfig.BANNER_AD_UNIT_ID;
+    private static final String MOBILE_ADS_APP_ID = BuildConfig.MOBILE_ADS_APP_ID;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -143,11 +147,11 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         readFirebaseNetworthList();
 
         //AdMob
-        AdView mAdView = (AdView) rootView.findViewById(R.id.adView);
-        MobileAds.initialize(getActivity().getApplicationContext(),
-                getString(R.string.mobileads_initialize_string));
+        MobileAds.initialize(getActivity().getApplicationContext(), MOBILE_ADS_APP_ID);
+        AdView adView = (AdView) rootView.findViewById(R.id.adView);
+        adView.setAdUnitId(BANNER_AD_UNIT_ID);
         AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        adView.loadAd(adRequest);
         return rootView;
     }
 

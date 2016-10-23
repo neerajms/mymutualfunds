@@ -56,15 +56,6 @@ public class FundInfo {
         return result;
     }
 
-    public Map<String, Object> toMapUpdate() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("mNav", mNav);
-        result.put("mChangeValue", mChangeValue);
-        result.put("mChangePercent", mChangePercent);
-        result.put("mLastUpdated", mLastUpdated);
-        return result;
-    }
-
     public String getScode() {
         return mScode;
     }

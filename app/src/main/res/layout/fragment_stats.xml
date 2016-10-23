@@ -127,7 +127,7 @@
             <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/card_view_last_seven_days"
-                style="@style/StatsCardView"
+                style="@style/NetWorthChangeCardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 card_view:cardCornerRadius="2dp">
@@ -183,7 +183,7 @@
             <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/card_view_last_thirty_days"
-                style="@style/StatsCardView"
+                style="@style/NetWorthChangeCardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 card_view:cardCornerRadius="2dp">

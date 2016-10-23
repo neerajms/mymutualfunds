@@ -33,5 +33,6 @@
     <dimen name="stats_page_scroll_view_bottom_margin">50dp</dimen>
     <dimen name="historical_graph_message_size">20sp</dimen>
     <dimen name="net_worth_change_over_period_text">16sp</dimen>
+    <dimen name="net_worth_change_card_top_margin">0dp</dimen>
 
 </resources>

@@ -10,6 +10,9 @@ public class BasicFundInfoParcelable implements Parcelable {
     public String mScode;
     public String mFundName;
 
+    public BasicFundInfoParcelable() {
+    }
+
     public BasicFundInfoParcelable(String scode,
                                    String fundName) {
         mScode = scode;
@@ -45,4 +48,12 @@ public class BasicFundInfoParcelable implements Parcelable {
             return new BasicFundInfoParcelable[size];
         }
     };
+
+    public String getScode() {
+        return mScode;
+    }
+
+    public String getFundName() {
+        return mFundName;
+    }
 }

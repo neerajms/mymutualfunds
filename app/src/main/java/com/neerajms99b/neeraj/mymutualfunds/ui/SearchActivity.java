@@ -92,7 +92,6 @@ public class SearchActivity extends AppCompatActivity {
         fundsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
                 Intent intentService = new Intent(mContext, FundsIntentService.class);
                 intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_search_scode));
                 intentService.putExtra(getString(R.string.key_scode), mScodesList.get(i));

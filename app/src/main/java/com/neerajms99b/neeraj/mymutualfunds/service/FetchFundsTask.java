@@ -38,7 +38,7 @@ import com.neerajms99b.neeraj.mymutualfunds.models.BasicFundInfoParcelable;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.request.CustomRequest;
 import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivity;
-import com.neerajms99b.neeraj.mymutualfunds.widget.FundsWidgetProvider;
+import com.neerajms99b.neeraj.mymutualfunds.widget.NetWorthWidgetProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -627,10 +627,10 @@ public class FetchFundsTask extends GcmTaskService {
     }
 
     public void updateAppWidget() {
-        Intent intent = new Intent(mContext, FundsWidgetProvider.class);
+        Intent intent = new Intent(mContext, NetWorthWidgetProvider.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         int[] ids = AppWidgetManager.getInstance(getApplication())
-                .getAppWidgetIds(new ComponentName(getApplication(), FundsWidgetProvider.class));
+                .getAppWidgetIds(new ComponentName(getApplication(), NetWorthWidgetProvider.class));
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
         mContext.sendBroadcast(intent);
     }

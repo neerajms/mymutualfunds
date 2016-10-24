@@ -28,14 +28,14 @@ import java.util.Date;
  * Created by neeraj on 6/10/16.
  */
 
-public class FundsWidgetProvider extends AppWidgetProvider {
+public class NetWorthWidgetProvider extends AppWidgetProvider {
     private Context mContext;
     private FirebaseUser mFirebaseUser;
     private static final String KEY_NET_WORTH = "net_worth";
     private static final String KEY_ACTION_UPDATE_WIDGET_DATA = "actionUpdateWidgetData";
     private static final String KEY_WIDGET_DATA_BUNDLE = "widgetDataBundle";
     private ArrayList<NetWorthGraphModel> mNetWorthList;
-    private String TAG = FundsWidgetProvider.class.getSimpleName();
+    private String TAG = NetWorthWidgetProvider.class.getSimpleName();
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -48,7 +48,7 @@ public class FundsWidgetProvider extends AppWidgetProvider {
             fireBaseReceiver();
         }
         for (int appWidgetId : appWidgetIds) {
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.net_worth_widget);
             appWidgetManager.updateAppWidget(appWidgetId, views);
         }
     }
@@ -57,7 +57,7 @@ public class FundsWidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        ComponentName componentName = new ComponentName(context, FundsWidgetProvider.class);
+        ComponentName componentName = new ComponentName(context, NetWorthWidgetProvider.class);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
         int length = appWidgetIds.length;
         String action = intent.getAction();
@@ -75,7 +75,7 @@ public class FundsWidgetProvider extends AppWidgetProvider {
                              AppWidgetManager appWidgetManager, int appWidgetId) {
         String netWorth = context.getResources().getString(R.string.rupee_symbol) +
                 bundle.getString(context.getResources().getString(R.string.key_net_worth));
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget);
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.net_worth_widget);
         remoteViews.setTextViewText(R.id.net_worth_amount_widget,
                 netWorth);
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -118,7 +118,7 @@ public class FundsWidgetProvider extends AppWidgetProvider {
         String netWorth = mNetWorthList.get(mNetWorthList.size() - 1).getNetworth();
         Bundle bundle = new Bundle();
         bundle.putString(KEY_NET_WORTH, netWorth);
-        Intent intent = new Intent(mContext, FundsWidgetProvider.class);
+        Intent intent = new Intent(mContext, NetWorthWidgetProvider.class);
         intent.setAction(KEY_ACTION_UPDATE_WIDGET_DATA);
         intent.putExtra(KEY_WIDGET_DATA_BUNDLE, bundle);
         mContext.sendBroadcast(intent);

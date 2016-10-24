@@ -92,7 +92,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     private ProgressBar mProgressBarNetWorthGraph;
     private SharedPreferences mSharedPreferences;
 
-    private static final String BANNER_AD_UNIT_ID = BuildConfig.BANNER_AD_UNIT_ID;
     private static final String MOBILE_ADS_APP_ID = BuildConfig.MOBILE_ADS_APP_ID;
 
     @Override
@@ -149,7 +148,6 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         //AdMob
         MobileAds.initialize(getActivity().getApplicationContext(), MOBILE_ADS_APP_ID);
         AdView adView = (AdView) rootView.findViewById(R.id.adView);
-        adView.setAdUnitId(BANNER_AD_UNIT_ID);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
         return rootView;

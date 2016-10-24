@@ -59,7 +59,7 @@ public class FundsListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_funds_list, container, false);
 
         if (rootView.findViewById(R.id.graph_fragment_container) != null) {
             mIsTwoPane = true;

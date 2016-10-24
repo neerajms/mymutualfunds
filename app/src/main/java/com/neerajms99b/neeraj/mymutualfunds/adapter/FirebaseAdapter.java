@@ -114,7 +114,7 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
     }
 
     @Override
-    protected void populateViewHolder(FundHolder viewHolder, final FundInfo model, int position) {
+    protected void populateViewHolder(final FundHolder viewHolder, final FundInfo model, int position) {
         mCallBack.restoreRecyclerViewPosition();
         double changeValue = Double.valueOf(model.getChangeValue());
         double changePercent = Double.valueOf(model.getChangePercent().substring(0, model.getChangePercent().length() - 1));

@@ -40,7 +40,7 @@
         com.neerajms99b.neeraj.mymutualfunds.ui.FundsListFragment</string>
     <string name="key_is_firstrun" translatable="false">isFirstRun</string>
     <string name="intent_action_boot_completed" translatable="false">android.intent.action.BOOT_COMPLETED</string>
-    <!--<string name="banner_ad_unit_id" translatable="false">ca-app-pub-4233744461303871/7462646549</string>-->
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-4233744461303871/7462646549</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>
     <string name="key_scroll_position" translatable="false">scroll_position</string>
     <string name="graph_fragment_tag" translatable="false">graph_fragment</string>

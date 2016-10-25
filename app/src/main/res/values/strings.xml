@@ -47,6 +47,7 @@
     <string name="graph_request_queue_tag" translatable="false">graph_request_tag</string>
     <string name="key_last_updated_nav" translatable="false">last_updated_nav</string>
     <string name="last_updated_string" translatable="false">mLastUpdated</string>
+    <string name="shared_pref_widget" translatable="false">com.neerajms99b.neeraj.mymutualfunds.widget.SharePrefs</string>
 
     <string name="app_name">My Mutual Funds</string>
     <string name="action_add_fund">Add funds</string>

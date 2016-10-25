@@ -3,6 +3,7 @@ package com.neerajms99b.neeraj.mymutualfunds.widget;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -65,6 +66,11 @@ public class FundWidgetConfigure extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_pref_widget),MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(String.valueOf(mAppWidgetId),mFundsList.get(i).getScode());
+                editor.apply();
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
                 RemoteViews views = new RemoteViews(mContext.getPackageName(),
                         R.layout.fund_widget);
@@ -72,21 +78,22 @@ public class FundWidgetConfigure extends AppCompatActivity {
                 views.setTextViewText(R.id.fund_nav_widget,
                         String.format("%.2f", Float.parseFloat(mFundsList.get(i).getNav())) +
                                 "  " + mFundsList.get(i).getChangeValue());
-
                 appWidgetManager.updateAppWidget(mAppWidgetId, views);
-//                Intent intent = new Intent(mContext, FundWidgetProvider.class);
-//                intent.setAction(getString(R.string.action_update_widget_data));
-//                Bundle bundle = new Bundle();
-//                bundle.putString(getString(R.string.key_fundname), mFundsList.get(i).getFundName());
-//                bundle.putString(getString(R.string.key_scode), mFundsList.get(i).getScode());
-//                bundle.putString(getString(R.string.key_fund_nav), mFundsList.get(i).getNav());
-//                bundle.putString(getString(R.string.key_change_value), mFundsList.get(i).getChangeValue());
-//                bundle.putString(getString(R.string.key_change_percent), mFundsList.get(i).getChangePercent());
-//                intent.putExtra(getString(R.string.key_widget_data_bundle), bundle);
-//                startService(intent);
+
                 Intent resultValue = new Intent();
                 resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
                 setResult(RESULT_OK, resultValue);
+
+                Intent intent = new Intent(mContext, FundWidgetProvider.class);
+                intent.setAction(getString(R.string.action_update_widget_data));
+                Bundle bundle = new Bundle();
+                bundle.putString(getString(R.string.key_fundname), mFundsList.get(i).getFundName());
+                bundle.putString(getString(R.string.key_scode), mFundsList.get(i).getScode());
+                bundle.putString(getString(R.string.key_fund_nav), mFundsList.get(i).getNav());
+                bundle.putString(getString(R.string.key_change_value), mFundsList.get(i).getChangeValue());
+                bundle.putString(getString(R.string.key_change_percent), mFundsList.get(i).getChangePercent());
+                intent.putExtra(getString(R.string.key_widget_data_bundle), bundle);
+                mContext.startService(intent);
                 finish();
             }
         });

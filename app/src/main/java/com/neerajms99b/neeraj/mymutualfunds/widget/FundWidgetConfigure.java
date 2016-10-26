@@ -28,6 +28,9 @@ import java.util.ArrayList;
 public class FundWidgetConfigure extends AppCompatActivity {
 
     private static final String TAG = FundWidgetConfigure.class.getSimpleName();
+    private static final String TAG_ACTION = "tag";
+    private static final String KEY_FIRST_TIME = "first_time";
+    private static final String KEY_WIDGET_ID = "appWidgetId";
 
     private FirebaseDatabase mDatabase;
     private FirebaseAuth mFirebaseAuth;
@@ -67,17 +70,17 @@ public class FundWidgetConfigure extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_pref_widget),MODE_PRIVATE);
+                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_pref_widget), MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(String.valueOf(mAppWidgetId),mFundsList.get(i).getScode());
+                editor.putString(String.valueOf(mAppWidgetId), mFundsList.get(i).getScode());
                 editor.apply();
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
                 RemoteViews views = new RemoteViews(mContext.getPackageName(),
                         R.layout.fund_widget);
-                views.setTextViewText(R.id.fund_name_widget, mFundsList.get(i).getFundName());
-                views.setTextViewText(R.id.fund_nav_widget,
-                        String.format("%.2f", Float.parseFloat(mFundsList.get(i).getNav())) +
-                                "  " + mFundsList.get(i).getChangeValue());
+//                views.setTextViewText(R.id.fund_name_widget, mFundsList.get(i).getFundName());
+//                views.setTextViewText(R.id.fund_nav_widget,
+//                        String.format("%.2f", Float.parseFloat(mFundsList.get(i).getNav())) +
+//                                "  " + mFundsList.get(i).getChangeValue());
                 appWidgetManager.updateAppWidget(mAppWidgetId, views);
 
                 Intent resultValue = new Intent();
@@ -85,15 +88,19 @@ public class FundWidgetConfigure extends AppCompatActivity {
                 setResult(RESULT_OK, resultValue);
 
                 Intent intent = new Intent(mContext, FundWidgetProvider.class);
-                intent.setAction(getString(R.string.action_update_widget_data));
+                intent.putExtra(TAG_ACTION, getString(R.string.action_update_widget_data));
+                intent.putExtra(KEY_FIRST_TIME, true);
+                intent.putExtra(KEY_WIDGET_ID, String.valueOf(mAppWidgetId));
                 Bundle bundle = new Bundle();
+                bundle.putInt(KEY_WIDGET_ID, mAppWidgetId);
                 bundle.putString(getString(R.string.key_fundname), mFundsList.get(i).getFundName());
                 bundle.putString(getString(R.string.key_scode), mFundsList.get(i).getScode());
                 bundle.putString(getString(R.string.key_fund_nav), mFundsList.get(i).getNav());
                 bundle.putString(getString(R.string.key_change_value), mFundsList.get(i).getChangeValue());
                 bundle.putString(getString(R.string.key_change_percent), mFundsList.get(i).getChangePercent());
                 intent.putExtra(getString(R.string.key_widget_data_bundle), bundle);
-                mContext.startService(intent);
+                mContext.sendBroadcast(intent);
+
                 finish();
             }
         });

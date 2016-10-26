@@ -28,12 +28,17 @@ public class FundWidgetProvider extends AppWidgetProvider {
     private FirebaseUser mFirebaseUser;
     private Context mContext;
     private static final String KEY_FUNDS = "funds";
-    private static final String KEY_ACTION = "android.appwidget.action.APPWIDGET_UPDATE";
+    private static final String KEY_ACTION = "actionUpdateWidgetData";
+    private static final String TAG_ACTION = "tag";
     private static final String KEY_NAV = "mNav";
     private static final String KEY_CHANGE_VALUE = "mChangeValue";
+    private static final String KEY_SCODE = "mScode";
     private static final String KEY_CHANGE_PERCENT = "mChangePercent";
     private static final String KEY_FUND_NAME = "mFundName";
-    private static final String KEY_BUNDLE = "mBundle";
+    private static final String KEY_BUNDLE = "widgetDataBundle";
+    private static final String KEY_FIRST_TIME = "first_time";
+    private static final String KEY_WIDGET_ID = "appWidgetId";
+    private static final String KEY_ACTION_UPDATE = "updateWidget";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -47,7 +52,7 @@ public class FundWidgetProvider extends AppWidgetProvider {
             if (sharedPreferences.contains(String.valueOf(appWidgetId))) {
                 String scode = sharedPreferences.getString(String.valueOf(appWidgetId), null);
                 Log.e("widget", scode);
-                readFirebaseFundsList(scode);
+                readFirebaseFundsList(appWidgetId, scode);
             }
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.fund_widget);
             appWidgetManager.updateAppWidget(appWidgetId, views);
@@ -57,19 +62,32 @@ public class FundWidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
+        mContext = context;
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = firebaseAuth.getCurrentUser();
         Log.e("widget", "onReceive");
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         ComponentName componentName = new ComponentName(context, FundWidgetProvider.class);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
         int length = appWidgetIds.length;
-        String action = intent.getAction();
+        String action = intent.getStringExtra(TAG_ACTION);
         if (length >= 1) {
             Log.e("widget", "length satisfied" + action);
             if (action != null && action.equals(KEY_ACTION)) {
                 Log.e("widget", "action matched");
                 Bundle bundle = intent.getBundleExtra(
                         context.getResources().getString(R.string.key_widget_data_bundle));
-                updateWidget(context, bundle, appWidgetManager, appWidgetIds[length - 1]);
+                if (intent.getBooleanExtra(KEY_FIRST_TIME, false)) {
+                    Log.e("widget", "first time");
+                    readFirebaseFundsList(bundle.getInt(KEY_WIDGET_ID), bundle.getString(KEY_SCODE));
+                }
+                updateWidget(context, bundle, appWidgetManager, bundle.getInt(KEY_WIDGET_ID));
+            } else if (action != null && action.equals(KEY_ACTION_UPDATE)) {
+                SharedPreferences sharedPreferences = context.getSharedPreferences(
+                        context.getString(R.string.shared_pref_widget), Context.MODE_PRIVATE);
+                for (int widgetId : appWidgetIds) {
+                    readFirebaseFundsList(widgetId, sharedPreferences.getString(String.valueOf(widgetId), null));
+                }
             }
         }
     }
@@ -87,7 +105,8 @@ public class FundWidgetProvider extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
     }
 
-    public void readFirebaseFundsList(final String scode) {
+    public void readFirebaseFundsList(final int appWidgetId, final String scode) {
+        Log.e("widget", "firebase set");
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference fundsListReference =
                 database.getReference(mFirebaseUser.getUid())
@@ -98,15 +117,17 @@ public class FundWidgetProvider extends AppWidgetProvider {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
                 if (fundInfo.getScode().equals(scode)) {
-                    setValuesInWidget(fundInfo);
+                    setValuesInWidget(appWidgetId, fundInfo);
                 }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Log.e("widget", "child changed");
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
                 if (fundInfo.getScode().equals(scode)) {
-                    setValuesInWidget(fundInfo);
+                    Log.e("widget", "child changed");
+                    setValuesInWidget(appWidgetId, fundInfo);
                 }
             }
 
@@ -126,10 +147,11 @@ public class FundWidgetProvider extends AppWidgetProvider {
         fundsListReference.addChildEventListener(childEventListener);
     }
 
-    public void setValuesInWidget(FundInfo fundInfo) {
+    public void setValuesInWidget(int appWidgetId, FundInfo fundInfo) {
         Intent intent = new Intent(mContext, FundWidgetProvider.class);
-        intent.setAction(KEY_ACTION);
+        intent.putExtra(TAG_ACTION, KEY_ACTION);
         Bundle bundle = new Bundle();
+        bundle.putInt(KEY_WIDGET_ID, appWidgetId);
         bundle.putString(KEY_FUND_NAME, fundInfo.getFundName());
         bundle.putString(KEY_NAV, fundInfo.getNav());
         bundle.putString(KEY_CHANGE_VALUE, fundInfo.getChangeValue());

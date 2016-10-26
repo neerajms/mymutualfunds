@@ -38,6 +38,7 @@ import com.neerajms99b.neeraj.mymutualfunds.models.BasicFundInfoParcelable;
 import com.neerajms99b.neeraj.mymutualfunds.models.FundInfo;
 import com.neerajms99b.neeraj.mymutualfunds.request.CustomRequest;
 import com.neerajms99b.neeraj.mymutualfunds.ui.MainActivity;
+import com.neerajms99b.neeraj.mymutualfunds.widget.FundWidgetProvider;
 import com.neerajms99b.neeraj.mymutualfunds.widget.NetWorthWidgetProvider;
 
 import org.json.JSONArray;
@@ -76,6 +77,7 @@ public class FetchFundsTask extends GcmTaskService {
     private final String KEY_QUARTER = "q";
     private final String KEY_SCODE = "scode";
     private final String KEY_DATE = "date";
+    private static final String KEY_ACTION_UPDATE = "updateWidget";
 
     private Context mContext;
     private FirebaseAuth mFirebaseAuth;
@@ -633,6 +635,11 @@ public class FetchFundsTask extends GcmTaskService {
                 .getAppWidgetIds(new ComponentName(getApplication(), NetWorthWidgetProvider.class));
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
         mContext.sendBroadcast(intent);
+        int[] idsFundWidget = AppWidgetManager.getInstance(getApplication())
+                .getAppWidgetIds(new ComponentName(getApplication(), FundWidgetProvider.class));
+        Intent intentFundWidget = new Intent(mContext, FundWidgetProvider.class);
+        intentFundWidget.putExtra(KEY_ACTION_UPDATE, idsFundWidget);
+        mContext.sendBroadcast(intentFundWidget);
     }
 
     public boolean allFundsUpdated(String lastUpdatedDate) {

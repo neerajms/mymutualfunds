@@ -39,6 +39,7 @@ public class FundWidgetProvider extends AppWidgetProvider {
     private static final String KEY_FIRST_TIME = "first_time";
     private static final String KEY_WIDGET_ID = "appWidgetId";
     private static final String KEY_ACTION_UPDATE = "updateWidget";
+    private static final String TAG = FundWidgetProvider.class.getSimpleName();
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -51,7 +52,6 @@ public class FundWidgetProvider extends AppWidgetProvider {
                     context.getString(R.string.shared_pref_widget), Context.MODE_PRIVATE);
             if (sharedPreferences.contains(String.valueOf(appWidgetId))) {
                 String scode = sharedPreferences.getString(String.valueOf(appWidgetId), null);
-                Log.e("widget", scode);
                 readFirebaseFundsList(appWidgetId, scode);
             }
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.fund_widget);
@@ -65,20 +65,16 @@ public class FundWidgetProvider extends AppWidgetProvider {
         mContext = context;
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = firebaseAuth.getCurrentUser();
-        Log.e("widget", "onReceive");
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         ComponentName componentName = new ComponentName(context, FundWidgetProvider.class);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
         int length = appWidgetIds.length;
         String action = intent.getStringExtra(TAG_ACTION);
         if (length >= 1) {
-            Log.e("widget", "length satisfied" + action);
             if (action != null && action.equals(KEY_ACTION)) {
-                Log.e("widget", "action matched");
                 Bundle bundle = intent.getBundleExtra(
                         context.getResources().getString(R.string.key_widget_data_bundle));
                 if (intent.getBooleanExtra(KEY_FIRST_TIME, false)) {
-                    Log.e("widget", "first time");
                     readFirebaseFundsList(bundle.getInt(KEY_WIDGET_ID), bundle.getString(KEY_SCODE));
                 }
                 updateWidget(context, bundle, appWidgetManager, bundle.getInt(KEY_WIDGET_ID));
@@ -95,7 +91,6 @@ public class FundWidgetProvider extends AppWidgetProvider {
     public void updateWidget(Context context, Bundle bundle,
                              AppWidgetManager appWidgetManager, int appWidgetId) {
         String fundName = bundle.getString(context.getResources().getString(R.string.key_fundname));
-        Log.e("widget", fundName);
         String nav = bundle.getString(context.getResources().getString(R.string.key_fund_nav));
         String navFormatted = String.format("%.2f", Float.parseFloat(nav));
         String changeValue = bundle.getString(context.getResources().getString(R.string.key_change_value));
@@ -107,7 +102,6 @@ public class FundWidgetProvider extends AppWidgetProvider {
     }
 
     public void readFirebaseFundsList(final int appWidgetId, final String scode) {
-        Log.e("widget", "firebase set");
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference fundsListReference =
                 database.getReference(mFirebaseUser.getUid())
@@ -124,10 +118,8 @@ public class FundWidgetProvider extends AppWidgetProvider {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.e("widget", "child changed");
                 FundInfo fundInfo = dataSnapshot.getValue(FundInfo.class);
                 if (fundInfo.getScode().equals(scode)) {
-                    Log.e("widget", "child changed");
                     setValuesInWidget(appWidgetId, fundInfo);
                 }
             }
@@ -142,7 +134,7 @@ public class FundWidgetProvider extends AppWidgetProvider {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("widget", databaseError.toString());
+                Log.e(TAG, databaseError.toString());
             }
         };
         fundsListReference.addChildEventListener(childEventListener);

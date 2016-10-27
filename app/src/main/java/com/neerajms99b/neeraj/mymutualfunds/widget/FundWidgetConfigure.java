@@ -77,10 +77,6 @@ public class FundWidgetConfigure extends AppCompatActivity {
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
                 RemoteViews views = new RemoteViews(mContext.getPackageName(),
                         R.layout.fund_widget);
-//                views.setTextViewText(R.id.fund_name_widget, mFundsList.get(i).getFundName());
-//                views.setTextViewText(R.id.fund_nav_widget,
-//                        String.format("%.2f", Float.parseFloat(mFundsList.get(i).getNav())) +
-//                                "  " + mFundsList.get(i).getChangeValue());
                 appWidgetManager.updateAppWidget(mAppWidgetId, views);
 
                 Intent resultValue = new Intent();

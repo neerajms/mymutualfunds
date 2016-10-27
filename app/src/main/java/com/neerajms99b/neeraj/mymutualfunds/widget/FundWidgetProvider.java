@@ -97,11 +97,12 @@ public class FundWidgetProvider extends AppWidgetProvider {
         String fundName = bundle.getString(context.getResources().getString(R.string.key_fundname));
         Log.e("widget", fundName);
         String nav = bundle.getString(context.getResources().getString(R.string.key_fund_nav));
+        String navFormatted = String.format("%.2f", Float.parseFloat(nav));
         String changeValue = bundle.getString(context.getResources().getString(R.string.key_change_value));
+        String changeValueFormatted = String.format("%.2f", Float.parseFloat(changeValue));
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.fund_widget);
-        remoteViews.setTextViewText(R.id.fund_name_widget,
-                fundName);
-        remoteViews.setTextViewText(R.id.fund_nav_widget, nav + "  " + changeValue);
+        remoteViews.setTextViewText(R.id.fund_name_widget, fundName);
+        remoteViews.setTextViewText(R.id.fund_nav_widget, navFormatted + "  " + changeValueFormatted);
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
     }
 

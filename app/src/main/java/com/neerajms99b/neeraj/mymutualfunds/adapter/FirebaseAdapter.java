@@ -132,12 +132,14 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
                 mCallBack.editClicked(model.getScode());
             }
         });
+        /*Removed functionality of viewing historical graph(Got removed from API)
         viewHolder.getFundCardView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mCallBack.showGraph(model.getScode(), model.getFundName(), model.getNav(), model.getUnits());
             }
         });
+        */
     }
 
     @Override

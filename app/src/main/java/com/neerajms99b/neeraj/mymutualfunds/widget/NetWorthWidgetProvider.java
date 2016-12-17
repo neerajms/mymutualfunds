@@ -32,7 +32,7 @@ public class NetWorthWidgetProvider extends AppWidgetProvider {
     private Context mContext;
     private FirebaseUser mFirebaseUser;
     private static final String KEY_NET_WORTH = "net_worth";
-    private static final String KEY_ACTION_UPDATE_WIDGET_DATA = "actionUpdateWidgetData";
+    private static final String KEY_ACTION_UPDATE_WIDGET_DATA = "com.neerajms99b.neeraj.mymutualfunds.NETWORTH_WIDGET_INITIAL";
     private static final String KEY_WIDGET_DATA_BUNDLE = "widgetDataBundle";
     private ArrayList<NetWorthGraphModel> mNetWorthList;
     private String TAG = NetWorthWidgetProvider.class.getSimpleName();
@@ -62,8 +62,7 @@ public class NetWorthWidgetProvider extends AppWidgetProvider {
         int length = appWidgetIds.length;
         String action = intent.getAction();
         if (length >= 1) {
-            if (action != null && action.equals(context.getResources()
-                    .getString(R.string.action_update_widget_data))) {
+            if (action != null && action.equals(KEY_ACTION_UPDATE_WIDGET_DATA)) {
                 Bundle bundle = intent.getBundleExtra(
                         context.getResources().getString(R.string.key_widget_data_bundle));
                 updateWidget(context, bundle, appWidgetManager, appWidgetIds[length - 1]);
@@ -74,7 +73,7 @@ public class NetWorthWidgetProvider extends AppWidgetProvider {
     public void updateWidget(Context context, Bundle bundle,
                              AppWidgetManager appWidgetManager, int appWidgetId) {
         String netWorth = context.getResources().getString(R.string.rupee_symbol) +
-                bundle.getString(context.getResources().getString(R.string.key_net_worth));
+                bundle.getString(KEY_NET_WORTH);
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.net_worth_widget);
         remoteViews.setTextViewText(R.id.net_worth_amount_widget,
                 netWorth);

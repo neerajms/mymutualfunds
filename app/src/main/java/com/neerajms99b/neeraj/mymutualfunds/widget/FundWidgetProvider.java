@@ -28,7 +28,7 @@ public class FundWidgetProvider extends AppWidgetProvider {
     private FirebaseUser mFirebaseUser;
     private Context mContext;
     private static final String KEY_FUNDS = "funds";
-    private static final String KEY_ACTION = "actionUpdateWidgetData";
+    private static final String KEY_ACTION = "com.neerajms99b.neeraj.mymutualfunds.FUNDS_WIDGET_INITIAL";
     private static final String TAG_ACTION = "tag";
     private static final String KEY_NAV = "mNav";
     private static final String KEY_CHANGE_VALUE = "mChangeValue";
@@ -38,7 +38,7 @@ public class FundWidgetProvider extends AppWidgetProvider {
     private static final String KEY_BUNDLE = "widgetDataBundle";
     private static final String KEY_FIRST_TIME = "first_time";
     private static final String KEY_WIDGET_ID = "appWidgetId";
-    private static final String KEY_ACTION_UPDATE = "updateWidget";
+    private static final String KEY_ACTION_UPDATE = "com.neerajms99b.neeraj.mymutualfunds.FUNDS_WIDGET_UPDATE";
     private static final String TAG = FundWidgetProvider.class.getSimpleName();
 
     @Override
@@ -69,7 +69,7 @@ public class FundWidgetProvider extends AppWidgetProvider {
         ComponentName componentName = new ComponentName(context, FundWidgetProvider.class);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
         int length = appWidgetIds.length;
-        String action = intent.getStringExtra(TAG_ACTION);
+        String action = intent.getAction();
         if (length >= 1) {
             if (action != null && action.equals(KEY_ACTION)) {
                 Bundle bundle = intent.getBundleExtra(
@@ -142,7 +142,7 @@ public class FundWidgetProvider extends AppWidgetProvider {
 
     public void setValuesInWidget(int appWidgetId, FundInfo fundInfo) {
         Intent intent = new Intent(mContext, FundWidgetProvider.class);
-        intent.putExtra(TAG_ACTION, KEY_ACTION);
+        intent.setAction(KEY_ACTION);
         Bundle bundle = new Bundle();
         bundle.putInt(KEY_WIDGET_ID, appWidgetId);
         bundle.putString(KEY_FUND_NAME, fundInfo.getFundName());

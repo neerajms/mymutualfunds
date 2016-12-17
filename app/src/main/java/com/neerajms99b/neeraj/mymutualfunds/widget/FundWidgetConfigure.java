@@ -31,6 +31,7 @@ public class FundWidgetConfigure extends AppCompatActivity {
     private static final String TAG_ACTION = "tag";
     private static final String KEY_FIRST_TIME = "first_time";
     private static final String KEY_WIDGET_ID = "appWidgetId";
+    private static final String KEY_ACTION_WIDGET_INITIAL = "com.neerajms99b.neeraj.mymutualfunds.FUNDS_WIDGET_INITIAL";
 
     private FirebaseDatabase mDatabase;
     private FirebaseAuth mFirebaseAuth;
@@ -84,7 +85,7 @@ public class FundWidgetConfigure extends AppCompatActivity {
                 setResult(RESULT_OK, resultValue);
 
                 Intent intent = new Intent(mContext, FundWidgetProvider.class);
-                intent.putExtra(TAG_ACTION, getString(R.string.action_update_widget_data));
+                intent.setAction(KEY_ACTION_WIDGET_INITIAL);
                 intent.putExtra(KEY_FIRST_TIME, true);
                 intent.putExtra(KEY_WIDGET_ID, String.valueOf(mAppWidgetId));
                 Bundle bundle = new Bundle();

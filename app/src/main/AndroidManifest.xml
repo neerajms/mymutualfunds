@@ -77,6 +77,7 @@
         <receiver android:name=".widget.NetWorthWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.neerajms99b.neeraj.mymutualfunds.NETWORTH_WIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
@@ -87,6 +88,7 @@
         <receiver android:name=".widget.FundWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.neerajms99b.neeraj.mymutualfunds.FUNDS_WIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data

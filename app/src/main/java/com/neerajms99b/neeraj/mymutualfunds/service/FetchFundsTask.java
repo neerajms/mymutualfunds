@@ -77,6 +77,8 @@ public class FetchFundsTask extends GcmTaskService {
     private final String KEY_QUARTER = "q";
     private final String KEY_SCODE = "scode";
     private final String KEY_DATE = "date";
+    private final String KEY_SCHEME_ID = "scheme_id";
+    private final String KEY_NAME = "name";
     private static final String KEY_ACTION_UPDATE = "updateWidget";
 
     private Context mContext;
@@ -100,7 +102,6 @@ public class FetchFundsTask extends GcmTaskService {
 
     public FetchFundsTask(Context context) {
         mContext = context;
-        mRequestQueue = Volley.newRequestQueue(mContext);
     }
 
     @Override
@@ -112,9 +113,7 @@ public class FetchFundsTask extends GcmTaskService {
         if (mContext == null) {
             mContext = this;
         }
-        if (mRequestQueue == null) {
-            mRequestQueue = Volley.newRequestQueue(mContext);
-        }
+        mRequestQueue = Volley.newRequestQueue(mContext);
 
         if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_fund))) {
             ArrayList<BasicFundInfoParcelable> fundsArrayList = new ArrayList<BasicFundInfoParcelable>();
@@ -207,11 +206,14 @@ public class FetchFundsTask extends GcmTaskService {
                         processFundDetailsJson(scodesArrayList, response);
                     }
                 }
-                if (mIsToBeUpdated && allFundsUpdated(formattedDate)) {
-                    showNotification();
-                    updateAppWidget();
-                } else {
-                    retriggerTask();
+
+                if (mIsToBeUpdated) {
+                    if (allFundsUpdated(formattedDate)) {
+                        showNotification();
+                        updateAppWidget();
+                    } else {
+                        retriggerTask();
+                    }
                 }
             }
         } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_fetch_graph_data))) {
@@ -539,9 +541,9 @@ public class FetchFundsTask extends GcmTaskService {
         ArrayList<BasicFundInfoParcelable> fundsArrayList = new ArrayList<BasicFundInfoParcelable>();
         try {
             for (int i = 0; i < jsonArray.length(); i++) {
-                JSONArray innerJsonArray = jsonArray.getJSONArray(i);
-                fundsArrayList.add(new BasicFundInfoParcelable(innerJsonArray.getString(0),
-                        innerJsonArray.getString(3)));
+                JSONObject object = jsonArray.getJSONObject(i);
+                fundsArrayList.add(new BasicFundInfoParcelable(object.getString(KEY_SCHEME_ID),
+                        object.getString(KEY_NAME)));
             }
         } catch (JSONException e) {
             sendToast(mContext.getString(R.string.message_something_went_wrong));
@@ -638,6 +640,7 @@ public class FetchFundsTask extends GcmTaskService {
         int[] idsFundWidget = AppWidgetManager.getInstance(getApplication())
                 .getAppWidgetIds(new ComponentName(getApplication(), FundWidgetProvider.class));
         Intent intentFundWidget = new Intent(mContext, FundWidgetProvider.class);
+        intentFundWidget.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         intentFundWidget.putExtra(KEY_ACTION_UPDATE, idsFundWidget);
         mContext.sendBroadcast(intentFundWidget);
     }

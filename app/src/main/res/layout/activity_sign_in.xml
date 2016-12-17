@@ -23,8 +23,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="visible"
-        android:contentDescription="@string/content_description_sign_in"/>
+        android:contentDescription="@string/content_description_sign_in"
+        android:visibility="visible" />
 
     <ProgressBar
         android:id="@+id/progress_bar_sign_in"
@@ -33,5 +33,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:indeterminate="true" />
+
+    <TextView
+        android:id="@+id/sign_in_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="@dimen/margin_8dp"
+        android:text="@string/sign_in_message" />
 
 </FrameLayout>

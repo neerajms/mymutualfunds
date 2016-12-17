@@ -37,7 +37,7 @@ public class Alarm extends BroadcastReceiver {
             OneoffTask task = new OneoffTask.Builder()
                     .setService(FetchFundsTask.class)
                     .setTag(context.getString(R.string.tag_update_nav))
-                    .setExecutionWindow(0L, 12 * DateUtils.HOUR_IN_MILLIS)
+                    .setExecutionWindow(0L, 1 * DateUtils.HOUR_IN_MILLIS)
                     .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                     .build();
             gcmNetworkManager.schedule(task);
@@ -48,7 +48,7 @@ public class Alarm extends BroadcastReceiver {
             OneoffTask task = new OneoffTask.Builder()
                     .setService(FetchFundsTask.class)
                     .setTag(context.getString(R.string.tag_update_nav))
-                    .setExecutionWindow(0L, 60 * DateUtils.MINUTE_IN_MILLIS)
+                    .setExecutionWindow(0L, 1 * DateUtils.HOUR_IN_MILLIS)
                     .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                     .build();
             gcmNetworkManager.schedule(task);

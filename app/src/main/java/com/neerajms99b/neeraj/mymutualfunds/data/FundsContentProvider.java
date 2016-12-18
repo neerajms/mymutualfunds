@@ -48,7 +48,7 @@ public class FundsContentProvider extends ContentProvider {
     static {
         mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         mUriMatcher.addURI(AUTHORITY, TABLE_NAME_RECENT_SEARCH + "/*", 1);
-        mUriMatcher.addURI(AUTHORITY, TABLE_NAME_HISTORICAL + "/#", 2);
+        mUriMatcher.addURI(AUTHORITY, TABLE_NAME_HISTORICAL + "/*", 2);
         mUriMatcher.addURI(AUTHORITY, TABLE_NAME_RECENT_SEARCH, 3);
         mUriMatcher.addURI(AUTHORITY, TABLE_NAME_HISTORICAL, 4);
     }

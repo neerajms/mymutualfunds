@@ -22,7 +22,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.gcm.GcmTaskService;
@@ -45,13 +44,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -89,6 +85,7 @@ public class FetchFundsTask extends GcmTaskService {
     private boolean mIsToBeUpdated;
     private RequestQueue mRequestQueue;
     private String mTaskParamTag;
+    private String mFundName;
 
     private String[] HISTORICAL_COLUMNS = {
             FundsContentProvider.FUND_SCODE,
@@ -120,10 +117,11 @@ public class FetchFundsTask extends GcmTaskService {
             String fundName = taskParams.getExtras().getString(
                     mContext.getString(R.string.key_fund_search_word));
             String query = "{\"search\":\"" + fundName + "\"}";
-            volleyRequestJsonArray(FUNDS_BASE_URL, query);
+            volleyRequestJsonArray(FUNDS_BASE_URL, query, null);
         } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
             ArrayList<String> scodesArrayList = new ArrayList<>();
             String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
+            mFundName = taskParams.getExtras().getString(mContext.getString(R.string.key_fundname));
             ContentValues initial = new ContentValues();
             initial.put(FundsContentProvider.FUND_SCODE, scode);
             Uri resultUri = mContext.getContentResolver()
@@ -135,7 +133,7 @@ public class FetchFundsTask extends GcmTaskService {
                 scodesArrayList.add(scode);
                 String scodes = "\"scodes\":[" + "\"" + scode + "\"";
                 String query = "{" + scodes + "]}";
-                volleyRequestJsonObject(FUNDS_BASE_URL, query, scodesArrayList);
+                volleyRequestJsonArray(FUNDS_BASE_URL, query, scodesArrayList);
             }
         } else if (mTaskParamTag.equals(mContext.getResources().getString(R.string.tag_update_nav))) {
             Log.d(TAG, "Auto update triggered");
@@ -150,27 +148,32 @@ public class FetchFundsTask extends GcmTaskService {
                 String scode = cursor.getString(COL_SCODE);
                 scodes = scodes + "\"" + scode + "\"";
                 String query = "{" + scodes + "]}";
-                JSONObject response = null;
+                JSONArray response = null;
 
                 do {
                     response = volleySynchronous(FUNDS_BASE_URL, query);
                     if (response != null) {
                         try {
-                            JSONObject jsonObject = response.getJSONObject(scode);
+                            JSONObject jsonObject = response.getJSONObject(0);
                             dateStrApi = jsonObject.getString(KEY_DATE);
                         } catch (JSONException je) {
                             Log.e(TAG, je.toString());
                         }
                     }
                 } while (dateStrApi == null);
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                Date date = null;
-                try {
-                    date = dateFormat.parse(dateStrApi);
-                } catch (ParseException pe) {
-                    Log.e(TAG, pe.toString());
-                }
-                formattedDate = dateFormat.format(date);
+//                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//                Date date = null;
+//                try {
+//                    date = dateFormat.parse(dateStrApi);
+//                } catch (ParseException pe) {
+//                    Log.e(TAG, pe.toString());
+//                }
+//                formattedDate = dateFormat.format(date);
+                StringTokenizer tokenizer = new StringTokenizer(dateStrApi, "-");
+                String year = tokenizer.nextToken();
+                String month = tokenizer.nextToken();
+                String day = tokenizer.nextToken();
+                formattedDate = day + "/" + month + "/" + year;
                 ArrayList<String> scodesArrayList = new ArrayList<>();
                 scodes = "\"scodes\":[";
                 cursor.moveToFirst();
@@ -185,6 +188,7 @@ public class FetchFundsTask extends GcmTaskService {
                             scodes = scodes + "\"" + cursor.getString(COL_SCODE) + "\"";
                             query = "{" + scodes + "]}";
                             response = volleySynchronous(FUNDS_BASE_URL, query);
+//                            volleyRequestJsonArray(FUNDS_BASE_URL, query, scodesArrayList);
                             if (response != null) {
                                 processFundDetailsJson(scodesArrayList, response);
                             }
@@ -201,6 +205,7 @@ public class FetchFundsTask extends GcmTaskService {
                 if (scodesArrayList.size() != 0) {
                     scodes = scodes.substring(0, scodes.length() - 1);
                     query = "{" + scodes + "]}";
+//                    volleyRequestJsonArray(FUNDS_BASE_URL, query, scodesArrayList);
                     response = volleySynchronous(FUNDS_BASE_URL, query);
                     if (response != null) {
                         processFundDetailsJson(scodesArrayList, response);
@@ -217,104 +222,104 @@ public class FetchFundsTask extends GcmTaskService {
                 }
             }
         } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_fetch_graph_data))) {
-            ArrayList<String> scodeArrayList = new ArrayList<>();
-            String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
-            scodeArrayList.add(scode);
-            Calendar date = Calendar.getInstance();
-            SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
-            SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
-            String yearString = dateFormatYear.format(date.getTime());
-            String monthString = dateFormatMonth.format(date.getTime());
-            int currentQuarter = Integer.valueOf(monthString) / 4;
-            int monthInt = 0;
-            int yearInt = Integer.valueOf(yearString);
-            switch (currentQuarter) {
-                case 0:
-                    monthInt = 12;
-                    yearInt = yearInt - 1;
-                    break;
-                case 1:
-                    monthInt = 3;
-                    break;
-                case 2:
-                    monthInt = 6;
-                    break;
-                default:
-                    monthInt = 9;
-            }
-            Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);
-            int year = yearInt;
-            int quarter = 12;
-            while (year >= yearInt - 2) {
-                while (monthInt >= 3) {
-                    String day = "01";
-                    if (monthInt == 12 || monthInt == 3) {
-                        day = "31";
-                    } else if (monthInt == 6 || monthInt == 9) {
-                        day = "30";
-                    }
-                    String month = String.format("%02d", monthInt);
-
-                    String dateFull = day + "/" + month + "/" + String.valueOf(year);
-                    String requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + dateFull + "\"" + "}";
-                    JSONObject object = volleySynchronous(FUNDS_HISTORICAL_URL, requestBody);
-                    String value = null;
-                    if (object != null) {
-
-                        try {
-                            value = object.getString(KEY_NAV);
-                        } catch (JSONException je) {
-                            Log.e(TAG, je.toString());
-                        }
-                        if (value != null) {
-                            processGraphData(object, String.valueOf(quarter));
-                        }
-                    } else {
-                        object = volleySynchronous(FUNDS_HISTORICAL_URL, requestBody);
-                        if (object != null) {
-                            try {
-                                value = object.getString(KEY_NAV);
-                            } catch (JSONException je) {
-                                Log.e(TAG, je.toString());
-                            }
-                            if (value != null) {
-                                processGraphData(object, String.valueOf(quarter));
-                            }
-                        } else {
-                            if (day.equals("31")) {
-                                day = "29";
-                            } else if (day.equals("30")) {
-                                day = "28";
-                            }
-                            dateFull = day + "/" + month + "/" + String.valueOf(year);
-                            requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + dateFull + "\"" + "}";
-                            object = volleySynchronous(FUNDS_HISTORICAL_URL, requestBody);
-                            if (object != null) {
-                                try {
-                                    value = object.getString(KEY_NAV);
-                                } catch (JSONException je) {
-                                    Log.e(TAG, je.toString());
-                                }
-                                if (value != null) {
-                                    processGraphData(object, String.valueOf(quarter));
-                                }
-                            }
-                        }
-                    }
-                    quarter--;
-                    monthInt = monthInt - 3;
-                }
-                year--;
-                monthInt = 12;
-            }
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(FundsContentProvider.LAST_UPDATED_GRAPH,
-                    String.valueOf(currentQuarter) + "-" + yearString);
-            mContext.getContentResolver().update(uri, contentValues, null, null);
-            Intent intent = new Intent();
-            intent.setAction(mContext.getString(R.string.gcmtask_intent));
-            intent.putExtra(mContext.getString(R.string.key_graph_fetched), true);
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+//            ArrayList<String> scodeArrayList = new ArrayList<>();
+//            String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
+//            scodeArrayList.add(scode);
+//            Calendar date = Calendar.getInstance();
+//            SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
+//            SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
+//            String yearString = dateFormatYear.format(date.getTime());
+//            String monthString = dateFormatMonth.format(date.getTime());
+//            int currentQuarter = Integer.valueOf(monthString) / 4;
+//            int monthInt = 0;
+//            int yearInt = Integer.valueOf(yearString);
+//            switch (currentQuarter) {
+//                case 0:
+//                    monthInt = 12;
+//                    yearInt = yearInt - 1;
+//                    break;
+//                case 1:
+//                    monthInt = 3;
+//                    break;
+//                case 2:
+//                    monthInt = 6;
+//                    break;
+//                default:
+//                    monthInt = 9;
+//            }
+//            Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);
+//            int year = yearInt;
+//            int quarter = 12;
+//            while (year >= yearInt - 2) {
+//                while (monthInt >= 3) {
+//                    String day = "01";
+//                    if (monthInt == 12 || monthInt == 3) {
+//                        day = "31";
+//                    } else if (monthInt == 6 || monthInt == 9) {
+//                        day = "30";
+//                    }
+//                    String month = String.format("%02d", monthInt);
+//
+//                    String dateFull = day + "/" + month + "/" + String.valueOf(year);
+//                    String requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + dateFull + "\"" + "}";
+//                    JSONObject object = volleySynchronous(FUNDS_HISTORICAL_URL, requestBody);
+//                    String value = null;
+//                    if (object != null) {
+//
+//                        try {
+//                            value = object.getString(KEY_NAV);
+//                        } catch (JSONException je) {
+//                            Log.e(TAG, je.toString());
+//                        }
+//                        if (value != null) {
+//                            processGraphData(object, String.valueOf(quarter));
+//                        }
+//                    } else {
+//                        object = volleySynchronous(FUNDS_HISTORICAL_URL, requestBody);
+//                        if (object != null) {
+//                            try {
+//                                value = object.getString(KEY_NAV);
+//                            } catch (JSONException je) {
+//                                Log.e(TAG, je.toString());
+//                            }
+//                            if (value != null) {
+//                                processGraphData(object, String.valueOf(quarter));
+//                            }
+//                        } else {
+//                            if (day.equals("31")) {
+//                                day = "29";
+//                            } else if (day.equals("30")) {
+//                                day = "28";
+//                            }
+//                            dateFull = day + "/" + month + "/" + String.valueOf(year);
+//                            requestBody = "{\"scode\":" + scode + ",\"date\":" + "\"" + dateFull + "\"" + "}";
+//                            object = volleySynchronous(FUNDS_HISTORICAL_URL, requestBody);
+//                            if (object != null) {
+//                                try {
+//                                    value = object.getString(KEY_NAV);
+//                                } catch (JSONException je) {
+//                                    Log.e(TAG, je.toString());
+//                                }
+//                                if (value != null) {
+//                                    processGraphData(object, String.valueOf(quarter));
+//                                }
+//                            }
+//                        }
+//                    }
+//                    quarter--;
+//                    monthInt = monthInt - 3;
+//                }
+//                year--;
+//                monthInt = 12;
+//            }
+//            ContentValues contentValues = new ContentValues();
+//            contentValues.put(FundsContentProvider.LAST_UPDATED_GRAPH,
+//                    String.valueOf(currentQuarter) + "-" + yearString);
+//            mContext.getContentResolver().update(uri, contentValues, null, null);
+//            Intent intent = new Intent();
+//            intent.setAction(mContext.getString(R.string.gcmtask_intent));
+//            intent.putExtra(mContext.getString(R.string.key_graph_fetched), true);
+//            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
         } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_insert_scodes))) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(FundsContentProvider.FUND_SCODE,
@@ -341,53 +346,61 @@ public class FetchFundsTask extends GcmTaskService {
         mContext.sendBroadcast(intent);
     }
 
-    public void extractInfoFromJson(String scode, JSONObject object) {
+    public void extractInfoFromJson(int index, JSONArray jsonArray) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference(mFirebaseUser.getUid())
                     .child(mContext.getString(R.string.firebase_child_funds));
-            JSONObject jsonObject = object.getJSONObject(scode);
-            String fundName = jsonObject.getString(KEY_FUNDNAME);
+            JSONObject jsonObject = jsonArray.getJSONObject(index);
+            String scode = jsonObject.getString(KEY_SCODE);
+            String fundName = mFundName;
             String nav = jsonObject.getString(KEY_NAV);
             String lastUpdatedDate = jsonObject.getString(KEY_DATE);
-            JSONObject jsonObject1 = jsonObject.getJSONObject(KEY_CHANGE);
-            String changePercent = jsonObject1.getString(KEY_CHANGE_PERCENT);
-            String changeValue = jsonObject1.getString(KEY_CHANGE_VALUE);
+            StringTokenizer tokenizer = new StringTokenizer(lastUpdatedDate, "-");
+            String year = tokenizer.nextToken();
+            String month = tokenizer.nextToken();
+            String day = tokenizer.nextToken();
+//            JSONObject jsonObject1 = jsonObject.getJSONObject(KEY_CHANGE);
+//            String changePercent = jsonObject1.getString(KEY_CHANGE_PERCENT);
+//            String changeValue = jsonObject1.getString(KEY_CHANGE_VALUE);
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-            Date date = null;
-            try {
-                date = dateFormat.parse(lastUpdatedDate);
-            } catch (ParseException pe) {
-                Log.e(TAG, pe.toString());
-            }
-            lastUpdatedDate = dateFormat.format(date);
-            if (fundName != null && nav != null && changePercent != null && changeValue != null &&
-                    lastUpdatedDate != null) {
-                Log.d(TAG, fundName);
-                fundName = fundName.toLowerCase();
-                String[] words = fundName.split("[ /-]");
-                String formattedFundName = words[0].toUpperCase();
-                for (int i = 1; i < words.length; i++) {
-                    if (words[i].length() > 1) {
-                        String firstLetter = words[i].substring(0, 1).toUpperCase();
-                        words[i] = firstLetter + words[i].substring(1, words[i].length());
-                        formattedFundName = formattedFundName + " " + words[i];
+//            Date date = null;
+//            try {
+//                date = dateFormat.parse(lastUpdatedDate);
+//            } catch (ParseException pe) {
+//                Log.e(TAG, pe.toString());
+//            }
+//            lastUpdatedDate = dateFormat.format(date);
+            lastUpdatedDate = day + "/" + month + "/" + year;
+            if (nav != null && lastUpdatedDate != null) {
+                if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode)) && fundName != null) {
+                    Log.d(TAG, fundName);
+                    fundName = fundName.toLowerCase();
+                    String[] words = fundName.split("[ /-]");
+                    String formattedFundName = words[0].toUpperCase();
+                    for (int i = 1; i < words.length; i++) {
+                        if (words[i].length() > 1) {
+                            String firstLetter = words[i].substring(0, 1).toUpperCase();
+                            words[i] = firstLetter + words[i].substring(1, words[i].length());
+                            formattedFundName = formattedFundName + " " + words[i];
+                        }
                     }
-                }
-                if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
+
                     myRef.child(scode).setValue(new FundInfo(
-                            scode, formattedFundName, nav, "0", changeValue,
-                            changePercent, lastUpdatedDate).toMap());
+                            scode, formattedFundName, nav, "0", "0"/*changeValue*/,
+                            "0%"/*changePercent*/, lastUpdatedDate).toMap());
                     sendToast(mContext.getString(R.string.fund_added_message));
                 } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav))) {
-                    Cursor cursor = mContext.getContentResolver().query(FundsContentProvider.mUriHistorical,
+                    String url = FundsContentProvider.mUriHistorical.toString() + "/" + scode;
+                    Uri uri = Uri.parse(url);
+                    Cursor cursor = mContext.getContentResolver().query(uri,
                             HISTORICAL_COLUMNS, null, null, null);
                     if (cursor.moveToFirst()) {
                         myRef.child(scode).child(mContext.getString(R.string.key_fund_nav)).setValue(nav);
-                        myRef.child(scode).child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
-                        myRef.child(scode).child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
+//                        myRef.child(scode).child(mContext.getString(R.string.key_change_value)).setValue(changeValue);
+//                        myRef.child(scode).child(mContext.getString(R.string.key_change_percent)).setValue(changePercent);
                         myRef.child(scode).child(mContext.getString(R.string.last_updated_string)).setValue(lastUpdatedDate);
                     }
                 }
@@ -441,7 +454,7 @@ public class FetchFundsTask extends GcmTaskService {
     }
 
 
-    public void volleyRequestJsonArray(String url, String body) {
+    public void volleyRequestJsonArray(String url, String body, final ArrayList<String> scodesArrayList) {
         try {
             JSONObject jsonObject = new JSONObject(body);
             CustomRequest request = new CustomRequest(Request.Method.POST,
@@ -449,7 +462,12 @@ public class FetchFundsTask extends GcmTaskService {
                 @Override
                 public void onResponse(JSONArray response) {
                     Log.d(TAG, response.toString());
-                    processSearchResponse(response);
+                    if (mTaskParamTag.equals(mContext.getString(R.string.tag_search_fund))) {
+                        processSearchResponse(response);
+                    } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav)) ||
+                            mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
+                        processFundDetailsJson(scodesArrayList, response);
+                    }
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -488,54 +506,54 @@ public class FetchFundsTask extends GcmTaskService {
         }
     }
 
-    public void volleyRequestJsonObject(String url, String body, final ArrayList<String> scodesArrayList) {
-        try {
-            JSONObject jsonBody = new JSONObject(body);
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
-                    url, jsonBody, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    Log.d(TAG, response.toString());
-
-                    if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav)) ||
-                            mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
-                        processFundDetailsJson(scodesArrayList, response);
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e(TAG, error.toString());
-                    Uri uriDelete = Uri.parse(FundsContentProvider.mUriHistorical.toString() +
-                            "/" + scodesArrayList.get(0));
-                    mContext.getContentResolver().delete(uriDelete, null, null);
-                    sendToast(mContext.getString(R.string.message_failed_to_add_fund));
-                }
-            }) {
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> header = new HashMap<>();
-                    header.put(KEY_PARAM, KEY_VALUE);
-                    header.put(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE);
-                    header.put(ACCEPT_PARAM, ACCEPT_VALUE);
-                    return header;
-                }
-
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> header = new HashMap<>();
-                    header.put(KEY_PARAM, KEY_VALUE);
-                    header.put(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE);
-                    header.put(ACCEPT_PARAM, ACCEPT_VALUE);
-                    return header;
-                }
-            };
-            request.setRetryPolicy(new DefaultRetryPolicy(10 * 1000, 1, 0.0f));
-            mRequestQueue.add(request);
-        } catch (JSONException je) {
-            Log.e(TAG, je.toString());
-        }
-    }
+//    public void volleyRequestJsonObject(String url, String body, final ArrayList<String> scodesArrayList) {
+//        try {
+//            JSONObject jsonBody = new JSONObject(body);
+//            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+//                    url, jsonBody, new Response.Listener<JSONObject>() {
+//                @Override
+//                public void onResponse(JSONObject response) {
+//                    Log.d(TAG, response.toString());
+//
+//                    if (mTaskParamTag.equals(mContext.getString(R.string.tag_update_nav)) ||
+//                            mTaskParamTag.equals(mContext.getString(R.string.tag_search_scode))) {
+//                        processFundDetailsJson(scodesArrayList, response);
+//                    }
+//                }
+//            }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    Log.e(TAG, error.toString());
+//                    Uri uriDelete = Uri.parse(FundsContentProvider.mUriHistorical.toString() +
+//                            "/" + scodesArrayList.get(0));
+//                    mContext.getContentResolver().delete(uriDelete, null, null);
+//                    sendToast(mContext.getString(R.string.message_failed_to_add_fund));
+//                }
+//            }) {
+//                @Override
+//                protected Map<String, String> getParams() throws AuthFailureError {
+//                    Map<String, String> header = new HashMap<>();
+//                    header.put(KEY_PARAM, KEY_VALUE);
+//                    header.put(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE);
+//                    header.put(ACCEPT_PARAM, ACCEPT_VALUE);
+//                    return header;
+//                }
+//
+//                @Override
+//                public Map<String, String> getHeaders() throws AuthFailureError {
+//                    Map<String, String> header = new HashMap<>();
+//                    header.put(KEY_PARAM, KEY_VALUE);
+//                    header.put(CONTENT_TYPE_PARAM, CONTENT_TYPE_VALUE);
+//                    header.put(ACCEPT_PARAM, ACCEPT_VALUE);
+//                    return header;
+//                }
+//            };
+//            request.setRetryPolicy(new DefaultRetryPolicy(10 * 1000, 1, 0.0f));
+//            mRequestQueue.add(request);
+//        } catch (JSONException je) {
+//            Log.e(TAG, je.toString());
+//        }
+//    }
 
     public void processSearchResponse(JSONArray jsonArray) {
         ArrayList<BasicFundInfoParcelable> fundsArrayList = new ArrayList<BasicFundInfoParcelable>();
@@ -561,9 +579,9 @@ public class FetchFundsTask extends GcmTaskService {
         }
     }
 
-    public void processFundDetailsJson(ArrayList<String> scodesArrayList, JSONObject jsonObject) {
+    public void processFundDetailsJson(ArrayList<String> scodesArrayList, JSONArray jsonArray) {
         for (int index = 0; index < scodesArrayList.size(); index++) {
-            extractInfoFromJson(scodesArrayList.get(index), jsonObject);
+            extractInfoFromJson(index, jsonArray);
         }
     }
 
@@ -584,15 +602,15 @@ public class FetchFundsTask extends GcmTaskService {
         return nav;
     }
 
-    public JSONObject volleySynchronous(String url, String body) {
+    public JSONArray volleySynchronous(String url, String body) {
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody = new JSONObject(body);
         } catch (JSONException e) {
             Log.e(TAG, e.toString());
         }
-        RequestFuture<JSONObject> future = RequestFuture.newFuture();
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,
+        RequestFuture<JSONArray> future = RequestFuture.newFuture();
+        CustomRequest request = new CustomRequest(Request.Method.POST,
                 url, jsonBody, future, future) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
@@ -615,7 +633,7 @@ public class FetchFundsTask extends GcmTaskService {
         request.setRetryPolicy(new DefaultRetryPolicy(10 * 1000, 1, 0.0f));
         mRequestQueue.add(request);
         try {
-            JSONObject response = future.get(10, TimeUnit.SECONDS); // Blocks for at most 10 seconds.
+            JSONArray response = future.get(10, TimeUnit.SECONDS); // Blocks for at most 10 seconds.
             Log.d(TAG, response.toString());
             return response;
         } catch (InterruptedException e) {

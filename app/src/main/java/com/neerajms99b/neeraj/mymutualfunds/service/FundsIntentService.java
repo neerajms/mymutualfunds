@@ -34,6 +34,8 @@ public class FundsIntentService extends IntentService {
             Bundle bundle = new Bundle();
             bundle.putString(getString(R.string.key_scode),
                     intent.getStringExtra(getString(R.string.key_scode)));
+            bundle.putString(getString(R.string.key_fundname),
+                    intent.getStringExtra(getString(R.string.key_fundname)));
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(
                     intent.getStringExtra(getString(R.string.key_tag)), bundle));

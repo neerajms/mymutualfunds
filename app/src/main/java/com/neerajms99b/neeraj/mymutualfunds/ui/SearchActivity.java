@@ -95,6 +95,7 @@ public class SearchActivity extends AppCompatActivity {
                 Intent intentService = new Intent(mContext, FundsIntentService.class);
                 intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_search_scode));
                 intentService.putExtra(getString(R.string.key_scode), mScodesList.get(i));
+                intentService.putExtra(getString(R.string.key_fundname),mArrayList.get(i));
                 startService(intentService);
             }
         });

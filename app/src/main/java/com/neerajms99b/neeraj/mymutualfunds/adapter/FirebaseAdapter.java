@@ -47,36 +47,36 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         public ImageButton mEditButton;
 
         public FundHolder(CardView cardView, TextView fundNameTextView,
-                          TextView fundNAVTextView, TextView units, TextView change,
-                          ImageButton editButton, ImageView arrow) {
+                          TextView fundNAVTextView, TextView units,/* TextView change,*/
+                          ImageButton editButton/*, ImageView arrow*/) {
             super(cardView);
             mFundCardView = cardView;
             mFundName = fundNameTextView;
             mFundNAV = fundNAVTextView;
             mUnits = units;
             mEditButton = editButton;
-            mChange = change;
-            mArrow = arrow;
+//            mChange = change;
+//            mArrow = arrow;
         }
 
         public void setFundName(String fundName) {
             mFundName.setText(fundName);
         }
 
-        public void setFundNAV(String fundNav, boolean isNegative) {
-            if (isNegative) {
-                if (Build.VERSION.SDK_INT >= 23) {
-                    mFundNAV.setTextColor(ContextCompat.getColor(mCallBack.getContext(), R.color.colorRed));
-                } else {
-                    mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorRed));
-                }
-            } else {
-                if (Build.VERSION.SDK_INT >= 23) {
-                    mFundNAV.setTextColor(ContextCompat.getColor(mCallBack.getContext(), R.color.colorGreen));
-                } else {
-                    mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
-                }
-            }
+        public void setFundNAV(String fundNav/*, boolean isNegative*/) {
+//            if (isNegative) {
+//                if (Build.VERSION.SDK_INT >= 23) {
+//                    mFundNAV.setTextColor(ContextCompat.getColor(mCallBack.getContext(), R.color.colorRed));
+//                } else {
+//                    mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorRed));
+//                }
+//            } else {
+//                if (Build.VERSION.SDK_INT >= 23) {
+//                    mFundNAV.setTextColor(ContextCompat.getColor(mCallBack.getContext(), R.color.colorGreen));
+//                } else {
+//                    mFundNAV.setTextColor(mCallBack.getResources().getColor(R.color.colorGreen));
+//                }
+//            }
             String nav = String.format("%.2f", Float.parseFloat(fundNav));
             mFundNAV.setText(nav);
         }
@@ -116,16 +116,16 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
     @Override
     protected void populateViewHolder(final FundHolder viewHolder, final FundInfo model, int position) {
         mCallBack.restoreRecyclerViewPosition();
-        double changeValue = Double.valueOf(model.getChangeValue());
-        double changePercent = Double.valueOf(model.getChangePercent().substring(0, model.getChangePercent().length() - 1));
-        boolean isNegative = false;
-        if (changeValue < 0.0) {
-            isNegative = true;
-        }
+//        double changeValue = Double.valueOf(model.getChangeValue());
+//        double changePercent = Double.valueOf(model.getChangePercent().substring(0, model.getChangePercent().length() - 1));
+//        boolean isNegative = false;
+//        if (changeValue < 0.0) {
+//            isNegative = true;
+//        }
         viewHolder.setFundName(model.getFundName());
-        viewHolder.setFundNAV(model.getNav(), isNegative);
+        viewHolder.setFundNAV(model.getNav()/*, isNegative*/);
         viewHolder.setUnits(model.getUnits());
-        viewHolder.setChange(changeValue, changePercent, isNegative);
+//        viewHolder.setChange(changeValue, changePercent, isNegative);
         viewHolder.getEditButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -166,12 +166,12 @@ public class FirebaseAdapter extends FirebaseRecyclerAdapter<FundInfo, FirebaseA
         TextView fundNameTextView = (TextView) cardView.findViewById(R.id.fund_name);
         TextView fundNAVTextView = (TextView) cardView.findViewById(R.id.fund_nav);
         TextView units = (TextView) cardView.findViewById(R.id.units);
-        TextView change = (TextView) cardView.findViewById(R.id.nav_change);
-        ImageView arrow = (ImageView) cardView.findViewById(R.id.arrow);
-        arrow.setVisibility(View.INVISIBLE);
+//        TextView change = (TextView) cardView.findViewById(R.id.nav_change);
+//        ImageView arrow = (ImageView) cardView.findViewById(R.id.arrow);
+//        arrow.setVisibility(View.INVISIBLE);
         ImageButton editButton = (ImageButton) cardView.findViewById(R.id.edit_units);
         FundHolder viewHolder = new FundHolder(cardView, fundNameTextView, fundNAVTextView,
-                units, change, editButton, arrow);
+                units/*, change*/, editButton/*, arrow*/);
         return viewHolder;
     }
 

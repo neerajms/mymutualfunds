@@ -7,4 +7,5 @@
     <color name="textColorBlack">#000000</color>
     <color name="colorRed">#d50000</color>
     <color name="colorGreen">#00c853</color>
+    <color name="fundNavTextColor">#00e5ff</color>
 </resources>

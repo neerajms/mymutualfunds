@@ -52,6 +52,8 @@
     <string name="intent_filter_funds_widget_update" translatable="false">com.neerajms99b.neeraj.mymutualfunds.FUNDS_WIDGET_UPDATE</string>
     <string name="intent_filter_net_worth_widget_initial" translatable="false">com.neerajms99b.neeraj.mymutualfunds.NETWORTH_WIDGET_INITIAL</string>
     <string name="intent_filter_funds_widget_initial" translatable="false">com.neerajms99b.neeraj.mymutualfunds.FUNDS_WIDGET_INITIAL</string>
+    <string name="key_shared_prefs_main_activity" translatable="false">com.neerajms99b.neeraj.mymutualfunds.ui.MainActivity</string>
+    <string name="tag_download_data" translatable="false">downloadDataWithProgress</string>
 
     <string name="app_name">My Mutual Funds</string>
     <string name="action_add_fund">Add funds</string>

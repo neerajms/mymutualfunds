@@ -44,6 +44,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,6 +83,8 @@ public class FetchFundsTask extends GcmTaskService {
     private final String KEY_SCHEME_ID = "scheme_id";
     private final String KEY_NAME = "name";
     private static final String KEY_ACTION_UPDATE = "updateWidget";
+    private static final String TEXT_FILE_URL = "http://portal.amfiindia.com/spages/NAV0.txt";
+    private static final String FILE_NAME = "values.txt";
 
     private Context mContext;
     private FirebaseAuth mFirebaseAuth;
@@ -136,91 +145,91 @@ public class FetchFundsTask extends GcmTaskService {
                 volleyRequestJsonArray(FUNDS_BASE_URL, query, scodesArrayList);
             }
         } else if (mTaskParamTag.equals(mContext.getResources().getString(R.string.tag_update_nav))) {
-            Log.d(TAG, "Auto update triggered");
-            mIsToBeUpdated = false;
-            String dateStrApi = null;
-            String formattedDate = null;
-            Cursor cursor = mContext.getContentResolver().query(
-                    FundsContentProvider.mUriHistorical, HISTORICAL_COLUMNS, null, null, null);
-            if (cursor.moveToFirst()) {
-                int index = 0;
-                String scodes = "\"scodes\":[";
-                String scode = cursor.getString(COL_SCODE);
-                scodes = scodes + "\"" + scode + "\"";
-                String query = "{" + scodes + "]}";
-                JSONArray response = null;
-
-                do {
-                    response = volleySynchronous(FUNDS_BASE_URL, query);
-                    if (response != null) {
-                        try {
-                            JSONObject jsonObject = response.getJSONObject(0);
-                            dateStrApi = jsonObject.getString(KEY_DATE);
-                        } catch (JSONException je) {
-                            Log.e(TAG, je.toString());
-                        }
-                    }
-                } while (dateStrApi == null);
-//                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-//                Date date = null;
-//                try {
-//                    date = dateFormat.parse(dateStrApi);
-//                } catch (ParseException pe) {
-//                    Log.e(TAG, pe.toString());
+//            Log.d(TAG, "Auto update triggered");
+//            mIsToBeUpdated = false;
+//            String dateStrApi = null;
+//            String formattedDate = null;
+//            Cursor cursor = mContext.getContentResolver().query(
+//                    FundsContentProvider.mUriHistorical, HISTORICAL_COLUMNS, null, null, null);
+//            if (cursor.moveToFirst()) {
+//                int index = 0;
+//                String scodes = "\"scodes\":[";
+//                String scode = cursor.getString(COL_SCODE);
+//                scodes = scodes + "\"" + scode + "\"";
+//                String query = "{" + scodes + "]}";
+//                JSONArray response = null;
+//
+//                do {
+//                    response = volleySynchronous(FUNDS_BASE_URL, query);
+//                    if (response != null) {
+//                        try {
+//                            JSONObject jsonObject = response.getJSONObject(0);
+//                            dateStrApi = jsonObject.getString(KEY_DATE);
+//                        } catch (JSONException je) {
+//                            Log.e(TAG, je.toString());
+//                        }
+//                    }
+//                } while (dateStrApi == null);
+////                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+////                Date date = null;
+////                try {
+////                    date = dateFormat.parse(dateStrApi);
+////                } catch (ParseException pe) {
+////                    Log.e(TAG, pe.toString());
+////                }
+////                formattedDate = dateFormat.format(date);
+//                StringTokenizer tokenizer = new StringTokenizer(dateStrApi, "-");
+//                String year = tokenizer.nextToken();
+//                String month = tokenizer.nextToken();
+//                String day = tokenizer.nextToken();
+//                formattedDate = day + "/" + month + "/" + year;
+//                ArrayList<String> scodesArrayList = new ArrayList<>();
+//                scodes = "\"scodes\":[";
+//                cursor.moveToFirst();
+//                do {
+//                    if (!formattedDate.equals(cursor.getString(COL_NAV_LAST_UPDATED))) {
+//                        Log.e(TAG, formattedDate + " " + cursor.getString(COL_NAV_LAST_UPDATED));
+//                        mIsToBeUpdated = true;
+//                        scode = cursor.getString(COL_SCODE);
+//                        scodes = scodes + "\"" + scode + "\"" + ",";
+//                        scodesArrayList.add(scode);
+//                        if (index == 4) {
+//                            scodes = scodes + "\"" + cursor.getString(COL_SCODE) + "\"";
+//                            query = "{" + scodes + "]}";
+//                            response = volleySynchronous(FUNDS_BASE_URL, query);
+////                            volleyRequestJsonArray(FUNDS_BASE_URL, query, scodesArrayList);
+//                            if (response != null) {
+//                                processFundDetailsJson(scodesArrayList, response);
+//                            }
+//                            scodes = "\"scodes\":[";
+//                            scodesArrayList.clear();
+//                        }
+//                        index++;
+//                        if (index == 5) {
+//                            index = 0;
+//                        }
+//                    }
+//                } while (cursor.moveToNext());
+//                cursor.close();
+//                if (scodesArrayList.size() != 0) {
+//                    scodes = scodes.substring(0, scodes.length() - 1);
+//                    query = "{" + scodes + "]}";
+////                    volleyRequestJsonArray(FUNDS_BASE_URL, query, scodesArrayList);
+//                    response = volleySynchronous(FUNDS_BASE_URL, query);
+//                    if (response != null) {
+//                        processFundDetailsJson(scodesArrayList, response);
+//                    }
 //                }
-//                formattedDate = dateFormat.format(date);
-                StringTokenizer tokenizer = new StringTokenizer(dateStrApi, "-");
-                String year = tokenizer.nextToken();
-                String month = tokenizer.nextToken();
-                String day = tokenizer.nextToken();
-                formattedDate = day + "/" + month + "/" + year;
-                ArrayList<String> scodesArrayList = new ArrayList<>();
-                scodes = "\"scodes\":[";
-                cursor.moveToFirst();
-                do {
-                    if (!formattedDate.equals(cursor.getString(COL_NAV_LAST_UPDATED))) {
-                        Log.e(TAG, formattedDate + " " + cursor.getString(COL_NAV_LAST_UPDATED));
-                        mIsToBeUpdated = true;
-                        scode = cursor.getString(COL_SCODE);
-                        scodes = scodes + "\"" + scode + "\"" + ",";
-                        scodesArrayList.add(scode);
-                        if (index == 4) {
-                            scodes = scodes + "\"" + cursor.getString(COL_SCODE) + "\"";
-                            query = "{" + scodes + "]}";
-                            response = volleySynchronous(FUNDS_BASE_URL, query);
-//                            volleyRequestJsonArray(FUNDS_BASE_URL, query, scodesArrayList);
-                            if (response != null) {
-                                processFundDetailsJson(scodesArrayList, response);
-                            }
-                            scodes = "\"scodes\":[";
-                            scodesArrayList.clear();
-                        }
-                        index++;
-                        if (index == 5) {
-                            index = 0;
-                        }
-                    }
-                } while (cursor.moveToNext());
-                cursor.close();
-                if (scodesArrayList.size() != 0) {
-                    scodes = scodes.substring(0, scodes.length() - 1);
-                    query = "{" + scodes + "]}";
-//                    volleyRequestJsonArray(FUNDS_BASE_URL, query, scodesArrayList);
-                    response = volleySynchronous(FUNDS_BASE_URL, query);
-                    if (response != null) {
-                        processFundDetailsJson(scodesArrayList, response);
-                    }
-                }
-
-                if (mIsToBeUpdated) {
-                    if (allFundsUpdated(formattedDate)) {
-                        showNotification();
-                        updateAppWidget();
-                    } else {
-                        retriggerTask();
-                    }
-                }
-            }
+//
+//                if (mIsToBeUpdated) {
+//                    if (allFundsUpdated(formattedDate)) {
+//                        showNotification();
+//                        updateAppWidget();
+//                    } else {
+//                        retriggerTask();
+//                    }
+//                }
+//            }
         } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_fetch_graph_data))) {
 //            ArrayList<String> scodeArrayList = new ArrayList<>();
 //            String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
@@ -327,9 +336,71 @@ public class FetchFundsTask extends GcmTaskService {
             contentValues.put(FundsContentProvider.LAST_UPDATED_NAV,
                     taskParams.getExtras().getString(mContext.getString(R.string.key_last_updated_nav)));
             mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, contentValues);
+        } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_download_data))) {
+            try {
+                URL url = new URL(TEXT_FILE_URL);
+                URLConnection connection = url.openConnection();
+                connection.connect();
+                int fileLength = connection.getContentLength();
+                Log.d(TAG, "Length =" + fileLength);
+                InputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+//                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                String[] tokens = new String[8];
+                int i;
+                bufferedReader.readLine();
+                while ((line = bufferedReader.readLine()) != null) {
+//                    stringBuilder.append(line);
+                    StringTokenizer tokenizer = splitOnSemiColon(line);
+                    if (tokenizer.countTokens() == 8) {
+                        i = 0;
+                        while (i < 8) {
+                            tokens[i] = tokenizer.nextToken();
+                            i++;
+                        }
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put(FundsContentProvider.FUND_SCODE, tokens[0]);
+                        contentValues.put(FundsContentProvider.FUND_NAME, tokens[3]);
+                        contentValues.put(FundsContentProvider.NAV, tokens[4]);
+                        contentValues.put(FundsContentProvider.LAST_UPDATED_NAV, tokens[7]);
+                        Uri uri = mContext.getContentResolver().insert(FundsContentProvider.mUriFullFundsList, contentValues);
+//                        Log.d(TAG, uri.toString());
+                    } else {
+                        Log.d(TAG, line);
+                    }
+                }
+//                FileOutputStream outputStream = mContext.openFileOutput(FILE_NAME, MODE_PRIVATE);
+//                byte[] data = new byte[1024];
+//                int count = 0;
+//                byte[] dataPrint = new byte[1024];
+//                while ((count = inputStream.read(data)) != -1) {
+//                    outputStream.write(data, 0, count);
+//                }
+//                outputStream.flush();
+//                outputStream.close();
+                inputStream.close();
+//                FileInputStream fileInputStream = mContext.openFileInput(FILE_NAME);
+//                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+//                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+//                StringBuilder stringBuilder = new StringBuilder();
+//                String line;
+//                while ((line = bufferedReader.readLine()) != null) {
+//                    stringBuilder.append(line);
+//                    Log.d(TAG, line);
+//                }
+//                fileInputStream.close();
+            } catch (IOException e) {
+                Log.e(TAG, e.toString());
+            }
         }
 
         return 0;
+    }
+
+    public StringTokenizer splitOnSemiColon(String splitStr) {
+        return new StringTokenizer(splitStr, ";");
     }
 
     public void sendToast(String message) {

@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.neerajms99b.neeraj.mymutualfunds.R;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.PagerAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.service.Alarm;
+import com.neerajms99b.neeraj.mymutualfunds.service.FundsIntentService;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
     private FirebaseAuth mFirebaseAuth;
@@ -75,6 +76,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             }
         });
         mContext = this;
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.key_shared_prefs_main_activity), MODE_PRIVATE);
+        if (sharedPreferences.getBoolean(getString(R.string.key_is_firstrun), true)) {
+            Intent intent = new Intent(mContext, FundsIntentService.class);
+            intent.putExtra(getString(R.string.key_tag), getString(R.string.tag_download_data));
+            startService(intent);
+            sharedPreferences.edit().putBoolean(getString(R.string.key_is_firstrun), false);
+        }
     }
 
     @Override

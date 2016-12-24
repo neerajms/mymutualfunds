@@ -18,10 +18,13 @@ public class FundsContentProvider extends ContentProvider {
     private static final String AUTHORITY = "com.neerajms99b.neeraj.mymutualfunds.data";
     private static final String TABLE_NAME_HISTORICAL = "historical";
     private static final String TABLE_NAME_RECENT_SEARCH = "recent";
+    private static final String TABLE_NAME_FULL_FUNDS_LIST = "fullfundslist";
     private static final String URL_HISTORICAL = "content://" + AUTHORITY + "/" + TABLE_NAME_HISTORICAL;
     private static final String URL_RECENT_SEARCH = "content://" + AUTHORITY + "/" + TABLE_NAME_RECENT_SEARCH;
+    private static final String URL_FULL_FUNDS_LIST = "content://" + AUTHORITY + "/" + TABLE_NAME_FULL_FUNDS_LIST;
     public static Uri mUriHistorical = Uri.parse(URL_HISTORICAL);
     public static Uri mUriRecentSearch = Uri.parse(URL_RECENT_SEARCH);
+    public static Uri mUriFullFundsList = Uri.parse(URL_FULL_FUNDS_LIST);
 
     public static final String KEY_ID = "_id";
     public static final String FUND_SCODE = "scode";
@@ -43,6 +46,9 @@ public class FundsContentProvider extends ContentProvider {
     public static final String SEARCH_WORD = "keyword";
     private SQLiteDatabase database;
 
+    public static final String FUND_NAME = "fundname";
+    public static final String NAV = "nav";
+
     private static final UriMatcher mUriMatcher;
 
     static {
@@ -51,6 +57,9 @@ public class FundsContentProvider extends ContentProvider {
         mUriMatcher.addURI(AUTHORITY, TABLE_NAME_HISTORICAL + "/*", 2);
         mUriMatcher.addURI(AUTHORITY, TABLE_NAME_RECENT_SEARCH, 3);
         mUriMatcher.addURI(AUTHORITY, TABLE_NAME_HISTORICAL, 4);
+        mUriMatcher.addURI(AUTHORITY, TABLE_NAME_FULL_FUNDS_LIST, 7);
+        mUriMatcher.addURI(AUTHORITY, TABLE_NAME_FULL_FUNDS_LIST + "/#", 5);
+        mUriMatcher.addURI(AUTHORITY, TABLE_NAME_FULL_FUNDS_LIST + "/*", 6);
     }
 
     @Override
@@ -78,7 +87,14 @@ public class FundsContentProvider extends ContentProvider {
             case 4:
                 qb.setTables(TABLE_NAME_HISTORICAL);
                 break;
-
+            case 5:
+                qb.setTables(TABLE_NAME_FULL_FUNDS_LIST);
+                selection = FUND_NAME + " LIKE \'%" + uri.getLastPathSegment() + "%\'";
+                break;
+            case 6:
+                qb.setTables(TABLE_NAME_FULL_FUNDS_LIST);
+                selection = FUND_SCODE + "=" + uri.getLastPathSegment();
+                break;
             default:
                 return null;
         }
@@ -107,10 +123,13 @@ public class FundsContentProvider extends ContentProvider {
                 case 4:
                     rowID = database.insert(TABLE_NAME_HISTORICAL, null, contentValues);
                     break;
+                case 7:
+                    rowID = database.insert(TABLE_NAME_FULL_FUNDS_LIST, null, contentValues);
+                    break;
             }
 
             if (rowID > 0) {
-                String _uri = String.valueOf(uri) + "/" + String.valueOf(cv.get(KEY_ID));
+                String _uri = String.valueOf(uri) + "/" + String.valueOf(rowID);
                 Uri tempUri = Uri.parse(_uri);
                 getContext().getContentResolver().notifyChange(tempUri, null);
                 return tempUri;

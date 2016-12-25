@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -102,6 +103,8 @@ public class FetchFundsTask extends GcmTaskService {
     };
     private int COL_SCODE = 0;
     private int COL_NAV_LAST_UPDATED = 1;
+
+    public static final int DOWNLOAD_PROGRESS = 4283;
 
     public FetchFundsTask() {
     }
@@ -337,12 +340,15 @@ public class FetchFundsTask extends GcmTaskService {
                     taskParams.getExtras().getString(mContext.getString(R.string.key_last_updated_nav)));
             mContext.getContentResolver().insert(FundsContentProvider.mUriHistorical, contentValues);
         } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_download_data))) {
+            ResultReceiver receiver = (ResultReceiver) taskParams.getExtras().getParcelable(
+                    mContext.getString(R.string.key_download_progress_receiver));
             try {
                 URL url = new URL(TEXT_FILE_URL);
                 URLConnection connection = url.openConnection();
                 connection.connect();
-                int fileLength = connection.getContentLength();
-                Log.d(TAG, "Length =" + fileLength);
+                String fileLengthStr = connection.getHeaderField("content-length");
+                int fileLength = 20000;
+                Log.d(TAG, "Length =" + fileLengthStr);
                 InputStream inputStream = new BufferedInputStream(connection.getInputStream());
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -351,8 +357,12 @@ public class FetchFundsTask extends GcmTaskService {
                 String[] tokens = new String[8];
                 int i;
                 bufferedReader.readLine();
+                int lineCount = 0;
+                long totalBytes = 0;
+                Bundle resultData = new Bundle();
                 while ((line = bufferedReader.readLine()) != null) {
 //                    stringBuilder.append(line);
+                    lineCount++;
                     StringTokenizer tokenizer = splitOnSemiColon(line);
                     if (tokenizer.countTokens() == 8) {
                         i = 0;
@@ -365,12 +375,18 @@ public class FetchFundsTask extends GcmTaskService {
                         contentValues.put(FundsContentProvider.FUND_NAME, tokens[3]);
                         contentValues.put(FundsContentProvider.NAV, tokens[4]);
                         contentValues.put(FundsContentProvider.LAST_UPDATED_NAV, tokens[7]);
-                        Uri uri = mContext.getContentResolver().insert(FundsContentProvider.mUriFullFundsList, contentValues);
-//                        Log.d(TAG, uri.toString());
-                    } else {
-                        Log.d(TAG, line);
+                        mContext.getContentResolver().insert(FundsContentProvider.mUriFullFundsList, contentValues);
+
+                        int progress = (int) (lineCount * 100 / fileLength);
+                        if (!(progress > 99)) {
+                            resultData.putInt(mContext.getString(R.string.key_download_progress), progress);
+                            receiver.send(DOWNLOAD_PROGRESS, resultData);
+                        }
                     }
                 }
+                resultData.putInt(mContext.getString(R.string.key_download_progress),
+                        100);
+                receiver.send(DOWNLOAD_PROGRESS, resultData);
 //                FileOutputStream outputStream = mContext.openFileOutput(FILE_NAME, MODE_PRIVATE);
 //                byte[] data = new byte[1024];
 //                int count = 0;

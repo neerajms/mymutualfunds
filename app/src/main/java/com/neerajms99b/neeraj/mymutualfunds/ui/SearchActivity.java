@@ -9,26 +9,24 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.neerajms99b.neeraj.mymutualfunds.R;
+import com.neerajms99b.neeraj.mymutualfunds.adapter.SearchResultsListAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.adapter.SearchSuggestionsAdapter;
 import com.neerajms99b.neeraj.mymutualfunds.data.FundsContentProvider;
 import com.neerajms99b.neeraj.mymutualfunds.models.BasicFundInfoParcelable;
@@ -56,6 +54,8 @@ public class SearchActivity extends AppCompatActivity {
     private SearchView mSearchView;
     private TextView mDisconnectedIndicator;
 
+    private SearchResultsListAdapter mSearchResultsListAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,43 +74,48 @@ public class SearchActivity extends AppCompatActivity {
         mSearchView = (SearchView) findViewById(R.id.search);
         initializeSearchView();
 
-        mDisconnectedIndicator = (TextView) findViewById(R.id.disconnected_indicator);
-        mDisconnectedIndicator.setVisibility(View.INVISIBLE);
+        mSearchResultsListAdapter = new SearchResultsListAdapter(this, null);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_search_swipe_refresh_layout);
-        mSwipeRefreshLayout.setOnRefreshListener(null);
-        mSwipeRefreshLayout.setEnabled(false);
-        if (Build.VERSION.SDK_INT >= 23) {
-            mSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(mContext, R.color.colorAccent));
-        } else {
-            mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
-        }
+        RecyclerView searchResultsRecyclerView = (RecyclerView) findViewById(R.id.search_results_recycler_view);
+        searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        searchResultsRecyclerView.setAdapter(mSearchResultsListAdapter);
+//        mDisconnectedIndicator = (TextView) findViewById(R.id.disconnected_indicator);
+//        mDisconnectedIndicator.setVisibility(View.INVISIBLE);
+//
+//        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_search_swipe_refresh_layout);
+//        mSwipeRefreshLayout.setOnRefreshListener(null);
+//        mSwipeRefreshLayout.setEnabled(false);
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            mSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(mContext, R.color.colorAccent));
+//        } else {
+//            mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+//        }
 
-        mFundsListAdapter = new ArrayAdapter<>(this, R.layout.search_results_list_item,
-                R.id.list_item, mArrayList);
-        ListView fundsListView = (ListView) findViewById(R.id.funds_listview);
-        fundsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intentService = new Intent(mContext, FundsIntentService.class);
-                intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_search_scode));
-                intentService.putExtra(getString(R.string.key_scode), mScodesList.get(i));
-                intentService.putExtra(getString(R.string.key_fundname),mArrayList.get(i));
-                startService(intentService);
-            }
-        });
-        fundsListView.setAdapter(mFundsListAdapter);
+//        mFundsListAdapter = new ArrayAdapter<>(this, R.layout.search_results_list_item,
+//                R.id.list_item, mArrayList);
+//        ListView fundsListView = (ListView) findViewById(R.id.funds_listview);
+//        fundsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                Intent intentService = new Intent(mContext, FundsIntentService.class);
+//                intentService.putExtra(getString(R.string.key_tag), getString(R.string.tag_search_scode));
+//                intentService.putExtra(getString(R.string.key_scode), mScodesList.get(i));
+//                intentService.putExtra(getString(R.string.key_fundname), mArrayList.get(i));
+//                startService(intentService);
+//            }
+//        });
+//        fundsListView.setAdapter(mFundsListAdapter);
 
         if (savedInstanceState != null
                 && savedInstanceState.containsKey(KEY_ARRAYLIST)
                 && savedInstanceState.containsKey(KEY_SCODESLIST)) {
-            mFundsListAdapter.clear();
-            mArrayList = savedInstanceState.getStringArrayList(KEY_ARRAYLIST);
-            mFundsListAdapter.addAll(mArrayList);
-            mScodesList = savedInstanceState.getStringArrayList(KEY_SCODESLIST);
+//            mFundsListAdapter.clear();
+//            mArrayList = savedInstanceState.getStringArrayList(KEY_ARRAYLIST);
+//            mFundsListAdapter.addAll(mArrayList);
+//            mScodesList = savedInstanceState.getStringArrayList(KEY_SCODESLIST);
         } else {
-            mArrayList = new ArrayList<>();
-            mFundsListAdapter.addAll(mArrayList);
+//            mArrayList = new ArrayList<>();
+//            mFundsListAdapter.addAll(mArrayList);
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
@@ -143,15 +148,15 @@ public class SearchActivity extends AppCompatActivity {
         mNetworkReceiver = new NetworkReceiver();
         mContext.registerReceiver(mNetworkReceiver,
                 new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mMessageReceiver, new IntentFilter(getResources().getString(R.string.gcmtask_intent)));
+//        LocalBroadcastManager.getInstance(this).registerReceiver(
+//                mMessageReceiver, new IntentFilter(getResources().getString(R.string.gcmtask_intent)));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mContext.unregisterReceiver(mNetworkReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+//        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
@@ -161,26 +166,26 @@ public class SearchActivity extends AppCompatActivity {
         outState.putStringArrayList(KEY_SCODESLIST, mScodesList);
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getExtras().containsKey(getString(R.string.search_data_bundle))) {
-                ArrayList<BasicFundInfoParcelable> arrayList = new ArrayList<BasicFundInfoParcelable>();
-                arrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
-                        .getParcelableArrayList(getString(R.string.basic_search_results_parcelable));
-                populateArrayList(arrayList);
-                showList();
-                mSwipeRefreshLayout.setRefreshing(false);
-            } else if (intent.getExtras().containsKey(getString(R.string.key_toast_message))) {
-                if (mSwipeRefreshLayout.isRefreshing()) {
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
-                Toast.makeText(context,
-                        intent.getExtras().getString(getString(R.string.key_toast_message)),
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
+//    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            if (intent.getExtras().containsKey(getString(R.string.search_data_bundle))) {
+//                ArrayList<BasicFundInfoParcelable> arrayList = new ArrayList<BasicFundInfoParcelable>();
+//                arrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
+//                        .getParcelableArrayList(getString(R.string.basic_search_results_parcelable));
+//                populateArrayList(arrayList);
+//                showList();
+////                mSwipeRefreshLayout.setRefreshing(false);
+//            } else if (intent.getExtras().containsKey(getString(R.string.key_toast_message))) {
+//                if (mSwipeRefreshLayout.isRefreshing()) {
+//                    mSwipeRefreshLayout.setRefreshing(false);
+//                }
+//                Toast.makeText(context,
+//                        intent.getExtras().getString(getString(R.string.key_toast_message)),
+//                        Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    };
 
     public void populateArrayList(ArrayList<BasicFundInfoParcelable> arrayList) {
         mArrayList.clear();
@@ -206,21 +211,28 @@ public class SearchActivity extends AppCompatActivity {
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                onSubmission(query);
+//                onSubmission(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.length() >= 1) {
-                    Uri uri = Uri.parse(mRecentString + newText);
-                    mCursor = getContentResolver().query(uri, null, null, null, null);
-                    if (mCursor != null && mCursor.moveToFirst()) {
-                        mAdapter.changeCursor(mCursor);
-                        mAdapter.notifyDataSetChanged();
-                    } else {
-                        mAdapter.changeCursor(null);
-                    }
+                if (newText.length() > 1) {
+                    Uri uri = Uri.parse(FundsContentProvider.mUriFullFundsList.toString() + "/" + newText);
+                    new QueryAsyncTask().execute(uri);
+//
+////                    mCursor = getContentResolver().query(uri, null, null, null, null);
+//                    if (mCursor != null && mCursor.moveToFirst()) {
+////                        mAdapter.changeCursor(mCursor);
+////                        mAdapter.notifyDataSetChanged();
+//                        mSearchResultsListAdapter.swapCursor(mCursor);
+////                        mSearchResultsListAdapter.notifyDataSetChanged();
+//                    } else {
+////                        mAdapter.changeCursor(null);
+//                        mSearchResultsListAdapter.swapCursor(null);
+//                    }
+                } else {
+                    mSearchResultsListAdapter.swapCursor(null);
                 }
                 return false;
             }
@@ -256,11 +268,11 @@ public class SearchActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (isInternetOn(context)) {
-                mSearchView.setVisibility(View.VISIBLE);
-                mDisconnectedIndicator.setVisibility(View.INVISIBLE);
+//                mSearchView.setVisibility(View.VISIBLE);
+//                mDisconnectedIndicator.setVisibility(View.INVISIBLE);
             } else {
-                mSearchView.setVisibility(View.INVISIBLE);
-                mDisconnectedIndicator.setVisibility(View.VISIBLE);
+//                mSearchView.setVisibility(View.INVISIBLE);
+//                mDisconnectedIndicator.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -270,5 +282,23 @@ public class SearchActivity extends AppCompatActivity {
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    public class QueryAsyncTask extends AsyncTask<Uri, Void, Cursor> {
+
+        @Override
+        protected Cursor doInBackground(Uri... uris) {
+            return getContentResolver().query(uris[0], null, null, null, null);
+        }
+
+        @Override
+        protected void onPostExecute(Cursor cursor) {
+            super.onPostExecute(cursor);
+            if (cursor != null && cursor.moveToFirst()) {
+                mSearchResultsListAdapter.swapCursor(cursor);
+            } else {
+                mSearchResultsListAdapter.swapCursor(null);
+            }
+        }
     }
 }

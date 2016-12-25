@@ -30,7 +30,7 @@ public class SearchSuggestionsAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.search_suggestions_list_item,parent,false);
+                .inflate(R.layout.search_suggestions_list_item, parent, false);
         SearchView.LayoutParams layoutParams = new SearchView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         linearLayout.setLayoutParams(layoutParams);
@@ -41,6 +41,6 @@ public class SearchSuggestionsAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        mTextView.setText(cursor.getString(cursor.getColumnIndex(FundsContentProvider.SEARCH_WORD)));
+        mTextView.setText(cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_NAME)));
     }
 }

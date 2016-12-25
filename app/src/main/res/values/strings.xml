@@ -54,10 +54,12 @@
     <string name="intent_filter_funds_widget_initial" translatable="false">com.neerajms99b.neeraj.mymutualfunds.FUNDS_WIDGET_INITIAL</string>
     <string name="key_shared_prefs_main_activity" translatable="false">com.neerajms99b.neeraj.mymutualfunds.ui.MainActivity</string>
     <string name="tag_download_data" translatable="false">downloadDataWithProgress</string>
+    <string name="key_download_progress" translatable="false">downloadProgress</string>
+    <string name="key_download_progress_receiver" translatable="false">downloadProgressReceiver</string>
 
     <string name="app_name">My Mutual Funds</string>
     <string name="action_add_fund">Add funds</string>
-    <string name="search_hint">Enter fund name or scheme code</string>
+    <string name="search_hint">Enter fund name</string>
     <string name="unique_constraint_failed_message">Fund already in portfolio</string>
     <string name="fund_added_message">Fund added to portfolio</string>
     <string name="units_title">Enter number of units</string>
@@ -101,6 +103,7 @@
     <string name="play_services_error">Google play services error</string>
     <string name="last_seven_days_title">Net Worth Change - Last 7 days</string>
     <string name="last_thirty_days_title">Net Worth Change - Last 30 days</string>
+    <string name="message_downloading">Downloading required data</string>
 
     <string name="content_description_search_view">Search fund</string>
     <string name="content_description_sign_in">Sign in</string>

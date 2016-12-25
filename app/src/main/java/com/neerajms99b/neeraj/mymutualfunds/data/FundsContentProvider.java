@@ -89,12 +89,14 @@ public class FundsContentProvider extends ContentProvider {
                 break;
             case 5:
                 qb.setTables(TABLE_NAME_FULL_FUNDS_LIST);
-                selection = FUND_NAME + " LIKE \'%" + uri.getLastPathSegment() + "%\'";
+                selection = FUND_SCODE + "=" + uri.getLastPathSegment();
                 break;
             case 6:
                 qb.setTables(TABLE_NAME_FULL_FUNDS_LIST);
-                selection = FUND_SCODE + "=" + uri.getLastPathSegment();
+                selection = FUND_NAME + " LIKE \'" + uri.getLastPathSegment() + "%\'";
+                projection = new String[]{KEY_ID,FUND_NAME};
                 break;
+
             default:
                 return null;
         }

@@ -3,6 +3,7 @@ package com.neerajms99b.neeraj.mymutualfunds.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.os.ResultReceiver;
 
 import com.google.android.gms.gcm.TaskParams;
 import com.neerajms99b.neeraj.mymutualfunds.R;
@@ -54,8 +55,11 @@ public class FundsIntentService extends IntentService {
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(tag, bundle));
         } else if (tag.equals(getString(R.string.tag_download_data))) {
+            ResultReceiver receiver = intent.getParcelableExtra(getString(R.string.key_download_progress_receiver));
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(getString(R.string.key_download_progress_receiver), receiver);
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
-            fetchFundsTask.onRunTask(new TaskParams(tag));
+            fetchFundsTask.onRunTask(new TaskParams(tag, bundle));
         }
     }
 }

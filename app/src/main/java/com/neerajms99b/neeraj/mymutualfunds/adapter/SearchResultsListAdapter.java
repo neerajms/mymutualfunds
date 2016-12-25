@@ -18,6 +18,7 @@ import com.neerajms99b.neeraj.mymutualfunds.ui.SearchActivity;
 
 public class SearchResultsListAdapter extends CursorRecyclerViewAdapter<SearchResultsListAdapter.ViewHolder> {
     private SearchActivity mCallBack;
+
     public SearchResultsListAdapter(SearchActivity searchActivity, Cursor cursor) {
         super(searchActivity, cursor);
         mCallBack = searchActivity;
@@ -35,13 +36,14 @@ public class SearchResultsListAdapter extends CursorRecyclerViewAdapter<SearchRe
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor, int position) {
+    public void onBindViewHolder(ViewHolder viewHolder, final Cursor cursor, final int position) {
         viewHolder.mFundNameTextView.setText(
                 cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_NAME)));
         viewHolder.mFundNameTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                cursor.moveToPosition(position);
+                mCallBack.onSelectFund(cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_SCODE)));
             }
         });
     }

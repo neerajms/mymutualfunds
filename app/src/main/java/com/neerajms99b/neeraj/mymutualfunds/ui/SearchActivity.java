@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -148,15 +149,15 @@ public class SearchActivity extends AppCompatActivity {
         mNetworkReceiver = new NetworkReceiver();
         mContext.registerReceiver(mNetworkReceiver,
                 new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-//        LocalBroadcastManager.getInstance(this).registerReceiver(
-//                mMessageReceiver, new IntentFilter(getResources().getString(R.string.gcmtask_intent)));
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mMessageReceiver, new IntentFilter(getResources().getString(R.string.gcmtask_intent)));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mContext.unregisterReceiver(mNetworkReceiver);
-//        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
@@ -166,26 +167,26 @@ public class SearchActivity extends AppCompatActivity {
         outState.putStringArrayList(KEY_SCODESLIST, mScodesList);
     }
 
-//    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            if (intent.getExtras().containsKey(getString(R.string.search_data_bundle))) {
-//                ArrayList<BasicFundInfoParcelable> arrayList = new ArrayList<BasicFundInfoParcelable>();
-//                arrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
-//                        .getParcelableArrayList(getString(R.string.basic_search_results_parcelable));
-//                populateArrayList(arrayList);
-//                showList();
-////                mSwipeRefreshLayout.setRefreshing(false);
-//            } else if (intent.getExtras().containsKey(getString(R.string.key_toast_message))) {
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getExtras().containsKey(getString(R.string.search_data_bundle))) {
+                ArrayList<BasicFundInfoParcelable> arrayList = new ArrayList<BasicFundInfoParcelable>();
+                arrayList = intent.getExtras().getBundle(getString(R.string.search_data_bundle))
+                        .getParcelableArrayList(getString(R.string.basic_search_results_parcelable));
+                populateArrayList(arrayList);
+                showList();
+//                mSwipeRefreshLayout.setRefreshing(false);
+            } else if (intent.getExtras().containsKey(getString(R.string.key_toast_message))) {
 //                if (mSwipeRefreshLayout.isRefreshing()) {
 //                    mSwipeRefreshLayout.setRefreshing(false);
 //                }
-//                Toast.makeText(context,
-//                        intent.getExtras().getString(getString(R.string.key_toast_message)),
-//                        Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    };
+                Toast.makeText(context,
+                        intent.getExtras().getString(getString(R.string.key_toast_message)),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     public void populateArrayList(ArrayList<BasicFundInfoParcelable> arrayList) {
         mArrayList.clear();
@@ -300,5 +301,12 @@ public class SearchActivity extends AppCompatActivity {
                 mSearchResultsListAdapter.swapCursor(null);
             }
         }
+    }
+
+    public void onSelectFund(String scode) {
+        Intent intent = new Intent(mContext, FundsIntentService.class);
+        intent.putExtra(getString(R.string.key_tag), getString(R.string.tag_add_fund));
+        intent.putExtra(getString(R.string.key_scode), scode);
+        startService(intent);
     }
 }

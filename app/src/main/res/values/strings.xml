@@ -56,6 +56,7 @@
     <string name="tag_download_data" translatable="false">downloadDataWithProgress</string>
     <string name="key_download_progress" translatable="false">downloadProgress</string>
     <string name="key_download_progress_receiver" translatable="false">downloadProgressReceiver</string>
+    <string name="tag_add_fund" translatable="false">addFundToFirebase</string>
 
     <string name="app_name">My Mutual Funds</string>
     <string name="action_add_fund">Add funds</string>

@@ -94,7 +94,7 @@ public class FundsContentProvider extends ContentProvider {
             case 6:
                 qb.setTables(TABLE_NAME_FULL_FUNDS_LIST);
                 selection = FUND_NAME + " LIKE \'" + uri.getLastPathSegment() + "%\'";
-                projection = new String[]{KEY_ID,FUND_NAME};
+                projection = new String[]{KEY_ID, FUND_SCODE, FUND_NAME};
                 break;
 
             default:

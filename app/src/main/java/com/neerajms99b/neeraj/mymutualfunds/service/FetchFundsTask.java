@@ -410,6 +410,13 @@ public class FetchFundsTask extends GcmTaskService {
             } catch (IOException e) {
                 Log.e(TAG, e.toString());
             }
+        } else if (mTaskParamTag.equals(mContext.getString(R.string.tag_add_fund))) {
+            String scode = taskParams.getExtras().getString(mContext.getString(R.string.key_scode));
+            Uri uri = Uri.parse(FundsContentProvider.mUriFullFundsList.toString() + "/" + scode);
+            Cursor cursor = mContext.getContentResolver().query(uri, null, null, null, null);
+            if (cursor.moveToFirst()) {
+                storeDataInFirebase(cursor);
+            }
         }
 
         return 0;
@@ -431,6 +438,39 @@ public class FetchFundsTask extends GcmTaskService {
         Intent intent = new Intent(mContext, Alarm.class);
         intent.putExtra(mContext.getString(R.string.key_tag), mContext.getString(R.string.retrigger_update_nav));
         mContext.sendBroadcast(intent);
+    }
+
+    public void storeDataInFirebase(Cursor cursor) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference(mFirebaseUser.getUid())
+                .child(mContext.getString(R.string.firebase_child_funds));
+        String scode = cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_SCODE));
+        String fundName = cursor.getString(cursor.getColumnIndex(FundsContentProvider.FUND_NAME));
+        String nav = cursor.getString(cursor.getColumnIndex(FundsContentProvider.NAV));
+        String lastUpdatedDate = cursor.getString(cursor.getColumnIndex(FundsContentProvider.LAST_UPDATED_NAV));
+        StringTokenizer tokenizer = new StringTokenizer(lastUpdatedDate, "-");
+        String year = tokenizer.nextToken();
+        String month = tokenizer.nextToken();
+        String day = tokenizer.nextToken();
+        lastUpdatedDate = day + "/" + month + "/" + year;
+        if (mTaskParamTag.equals(mContext.getString(R.string.tag_add_fund))) {
+            fundName = fundName.toLowerCase();
+            String[] words = fundName.split("[ /-]");
+            String formattedFundName = words[0].toUpperCase();
+            for (int i = 1; i < words.length; i++) {
+                if (words[i].length() > 1) {
+                    String firstLetter = words[i].substring(0, 1).toUpperCase();
+                    words[i] = firstLetter + words[i].substring(1, words[i].length());
+                    formattedFundName = formattedFundName + " " + words[i];
+                }
+            }
+
+            myRef.child(scode).setValue(new FundInfo(
+                    scode, formattedFundName, nav, "0", "0"/*changeValue*/,
+                    "0%"/*changePercent*/, lastUpdatedDate).toMap());
+            sendToast(mContext.getString(R.string.fund_added_message));
+        }
+
     }
 
     public void extractInfoFromJson(int index, JSONArray jsonArray) {

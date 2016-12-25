@@ -60,6 +60,12 @@ public class FundsIntentService extends IntentService {
             bundle.putParcelable(getString(R.string.key_download_progress_receiver), receiver);
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(tag, bundle));
+        } else if (tag.equals(getString(R.string.tag_add_fund))){
+            Bundle bundle = new Bundle();
+            bundle.putString(getString(R.string.key_scode),
+                    intent.getStringExtra(getString(R.string.key_scode)));
+            FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
+            fetchFundsTask.onRunTask(new TaskParams(tag,bundle));
         }
     }
 }

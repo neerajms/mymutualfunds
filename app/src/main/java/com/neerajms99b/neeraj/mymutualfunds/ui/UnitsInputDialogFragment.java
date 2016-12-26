@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -23,6 +24,7 @@ public class UnitsInputDialogFragment extends DialogFragment {
         LayoutInflater layoutInflater = getActivity().getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.units_input_alert_dialog, null);
         final EditText editText = (EditText) view.findViewById(R.id.units_edittext);
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         final FundsListFragment callBack = (FundsListFragment) getTargetFragment();
         Bundle bundle = getArguments();
         final String scode = bundle.getString(getString(R.string.key_scode));

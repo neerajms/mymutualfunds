@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,7 +14,6 @@ import android.support.v4.os.ResultReceiver;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Display;
 
 import com.github.amlcurran.showcaseview.ShowcaseView;
@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         mSharedPreferences = getSharedPreferences(
                 getString(R.string.key_shared_prefs_funds_list), MODE_PRIVATE);
+        mContext = this;
         mAlarmManager = new Alarm();
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             startActivity(new Intent(this, SignInActivity.class));
             finish();
             //Set the update alarm on first run
-//            mAlarmManager.setAlarm(this);
+            mAlarmManager.setAlarm(this);
             return;
         }
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
@@ -81,17 +82,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             public void onPageScrollStateChanged(int state) {
             }
         });
-        mContext = this;
-        SharedPreferences sharedPreferences =
-                getSharedPreferences(getString(R.string.key_shared_prefs_main_activity), MODE_PRIVATE);
-        if (sharedPreferences.getBoolean(getString(R.string.key_is_firstrun), true)) {
+
+        if (mSharedPreferences.getBoolean(getString(R.string.is_firstrun_download), true)) {
+            mSharedPreferences.edit().putBoolean(getString(R.string.is_firstrun_download), false).apply();
             startProgressDialog();
             Intent intent = new Intent(mContext, FundsIntentService.class);
             intent.putExtra(getString(R.string.key_tag), getString(R.string.tag_download_data));
             intent.putExtra(getString(R.string.key_download_progress_receiver),
                     new DownloadProgressReceiver(new Handler()));
             startService(intent);
-            sharedPreferences.edit().putBoolean(getString(R.string.key_is_firstrun), false).commit();
         }
     }
 
@@ -105,16 +104,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             super.onReceiveResult(resultCode, resultData);
             if (resultCode == FetchFundsTask.DOWNLOAD_PROGRESS) {
                 int progress = resultData.getInt(getString(R.string.key_download_progress));
-                Log.d(TAG, "Progress = " + progress);
                 mProgressDialog.setProgress(progress);
                 if (progress == 100) {
                     mProgressDialog.dismiss();
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
                 }
             }
         }
     }
 
     public void startProgressDialog() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         mProgressDialog = new ProgressDialog(mContext);
         mProgressDialog.setMessage(getString(R.string.message_downloading));
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -123,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
     }
-
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
@@ -154,15 +153,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-    }
-
-    public void launchGraphActivity(String scode, String fundName, String fundNav, String units) {
-        Intent intent = new Intent(this, GraphActivity.class);
-        intent.putExtra(getString(R.string.key_scode), scode);
-        intent.putExtra(getString(R.string.key_fundname), fundName);
-        intent.putExtra(getString(R.string.key_fund_nav), fundNav);
-        intent.putExtra(getString(R.string.key_units_in_hand), units);
-        startActivity(intent);
     }
 
     public void dismissNotification() {

@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,7 +38,6 @@ public class FundsListFragment extends Fragment {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mMyRef;
     private FirebaseAdapter mFirebaseAdapter;
-    private boolean mIsTwoPane;
     private final String TAG = FundsListFragment.class.getSimpleName();
 
     public FundsListFragment() {
@@ -60,10 +58,6 @@ public class FundsListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_funds_list, container, false);
-
-        if (rootView.findViewById(R.id.graph_fragment_container) != null) {
-            mIsTwoPane = true;
-        }
 
         mCallBack = (MainActivity) getActivity();
         mRecyclerView = (StateSaveRecyclerView) rootView.findViewById(R.id.funds_recycler_view);
@@ -125,30 +119,8 @@ public class FundsListFragment extends Fragment {
         mMyRef = mDatabase.getReference(mFirebaseUser.getUid()).child(getString(R.string.firebase_child_funds));
         String scode = mFirebaseAdapter.getItem(position).getScode();
         mMyRef.child(scode).removeValue();
-        Uri uri = Uri.parse(FundsContentProvider.mUriHistorical.toString() + "/" + scode);
+        Uri uri = Uri.parse(FundsContentProvider.mUriPortfolio.toString() + "/" + scode);
         getActivity().getContentResolver().delete(uri, null, null);
-    }
-
-    //Show the nav graph for each fund
-    public void showGraph(String scode, String fundName, String fundNav, String units) {
-        Log.d(TAG, scode);
-        if (mIsTwoPane) {
-            GraphFragment fragment = new GraphFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString(getString(R.string.key_scode), scode);
-            bundle.putString(getString(R.string.key_fundname), fundName);
-            bundle.putString(getString(R.string.key_fund_nav), fundNav);
-            bundle.putString(getString(R.string.key_units_in_hand), units);
-            fragment.setArguments(bundle);
-            mCallBack.getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.graph_fragment_container,
-                            fragment,
-                            getString(R.string.graph_fragment_tag))
-                    .commit();
-
-        } else {
-            mCallBack.launchGraphActivity(scode, fundName, fundNav, units);
-        }
     }
 
     /* Restores the recyclerview position */

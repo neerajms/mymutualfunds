@@ -23,27 +23,7 @@ public class FundsIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         String tag = intent.getStringExtra(getString(R.string.key_tag));
-        if (tag.equals(getString(R.string.tag_search_fund))) {
-            Bundle bundle = new Bundle();
-            bundle.putString(getString(R.string.key_fund_search_word),
-                    intent.getStringExtra(getString(R.string.key_fund_search_word)));
-            FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
-            fetchFundsTask.onRunTask(new TaskParams(tag, bundle));
-        } else if (tag.equals(getString(R.string.tag_search_scode))) {
-            Bundle bundle = new Bundle();
-            bundle.putString(getString(R.string.key_scode),
-                    intent.getStringExtra(getString(R.string.key_scode)));
-            bundle.putString(getString(R.string.key_fundname),
-                    intent.getStringExtra(getString(R.string.key_fundname)));
-            FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
-            fetchFundsTask.onRunTask(new TaskParams(tag, bundle));
-        } else if (tag.equals(getString(R.string.tag_fetch_graph_data))) {
-            Bundle bundle = new Bundle();
-            bundle.putString(getString(R.string.key_scode),
-                    intent.getStringExtra(getString(R.string.key_scode)));
-            FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
-            fetchFundsTask.onRunTask(new TaskParams(tag, bundle));
-        } else if (tag.equals(getString(R.string.tag_update_nav))) {
+        if (tag.equals(getString(R.string.tag_update_nav))) {
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(tag));
         } else if (tag.equals(getString(R.string.tag_insert_scodes))) {
@@ -60,12 +40,12 @@ public class FundsIntentService extends IntentService {
             bundle.putParcelable(getString(R.string.key_download_progress_receiver), receiver);
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
             fetchFundsTask.onRunTask(new TaskParams(tag, bundle));
-        } else if (tag.equals(getString(R.string.tag_add_fund))){
+        } else if (tag.equals(getString(R.string.tag_add_fund))) {
             Bundle bundle = new Bundle();
             bundle.putString(getString(R.string.key_scode),
                     intent.getStringExtra(getString(R.string.key_scode)));
             FetchFundsTask fetchFundsTask = new FetchFundsTask(this);
-            fetchFundsTask.onRunTask(new TaskParams(tag,bundle));
+            fetchFundsTask.onRunTask(new TaskParams(tag, bundle));
         }
     }
 }

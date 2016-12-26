@@ -41,6 +41,7 @@
     <string name="key_is_firstrun" translatable="false">isFirstRun</string>
     <string name="intent_action_boot_completed" translatable="false">android.intent.action.BOOT_COMPLETED</string>
     <string name="banner_ad_unit_id" translatable="false">ca-app-pub-4233744461303871/7462646549</string>
+    <string name="banner_ad_unit_id_debug" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
     <string name="tag_update_nav" translatable="false">updateNavPeriodic</string>
     <string name="key_scroll_position" translatable="false">scroll_position</string>
     <string name="graph_fragment_tag" translatable="false">graph_fragment</string>
@@ -57,6 +58,7 @@
     <string name="key_download_progress" translatable="false">downloadProgress</string>
     <string name="key_download_progress_receiver" translatable="false">downloadProgressReceiver</string>
     <string name="tag_add_fund" translatable="false">addFundToFirebase</string>
+    <string name="is_firstrun_download" translatable="false">isFirstRunDownload</string>
 
     <string name="app_name">My Mutual Funds</string>
     <string name="action_add_fund">Add funds</string>
@@ -104,7 +106,7 @@
     <string name="play_services_error">Google play services error</string>
     <string name="last_seven_days_title">Net Worth Change - Last 7 days</string>
     <string name="last_thirty_days_title">Net Worth Change - Last 30 days</string>
-    <string name="message_downloading">Downloading required data</string>
+    <string name="message_downloading">Downloading and processing required data</string>
 
     <string name="content_description_search_view">Search fund</string>
     <string name="content_description_sign_in">Sign in</string>

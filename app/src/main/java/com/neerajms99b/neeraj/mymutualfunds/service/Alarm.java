@@ -37,18 +37,7 @@ public class Alarm extends BroadcastReceiver {
             OneoffTask task = new OneoffTask.Builder()
                     .setService(FetchFundsTask.class)
                     .setTag(context.getString(R.string.tag_update_nav))
-                    .setExecutionWindow(0L, 1 * DateUtils.HOUR_IN_MILLIS)
-                    .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                    .build();
-            gcmNetworkManager.schedule(task);
-            wakeLock.release();
-        } else if (tag.equals(context.getString(R.string.retrigger_update_nav))) {
-            wakeLock.acquire();
-            GcmNetworkManager gcmNetworkManager = GcmNetworkManager.getInstance(context);
-            OneoffTask task = new OneoffTask.Builder()
-                    .setService(FetchFundsTask.class)
-                    .setTag(context.getString(R.string.tag_update_nav))
-                    .setExecutionWindow(0L, 1 * DateUtils.HOUR_IN_MILLIS)
+                    .setExecutionWindow(0L, 4 * DateUtils.HOUR_IN_MILLIS)
                     .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                     .build();
             gcmNetworkManager.schedule(task);
@@ -63,7 +52,7 @@ public class Alarm extends BroadcastReceiver {
         intent.putExtra(context.getString(R.string.key_tag), context.getString(R.string.tag_update_nav));
         mPendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DATE, 1);
         calendar.set(Calendar.HOUR_OF_DAY, 6);
         mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, mPendingIntent);

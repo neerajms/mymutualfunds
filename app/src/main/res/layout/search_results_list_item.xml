@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:selectableItemBackground"
     android:contentDescription="@string/content_description_search_results_list_item"
     android:gravity="center_vertical"
     android:minHeight="?attr/listPreferredItemHeightLarge"
@@ -11,7 +10,8 @@
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/list_item"
         style="@style/SearchResultsListItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackground" />
 
 </LinearLayout>

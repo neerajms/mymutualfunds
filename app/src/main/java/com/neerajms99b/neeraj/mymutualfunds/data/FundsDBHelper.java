@@ -8,54 +8,24 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by neeraj on 12/8/16.
  */
 public class FundsDBHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "fundsdb";
     private static final String TABLE_NAME_HISTORICAL = "historical";
+    private static final String TABLE_NAME_PORTFOLIO = "portfolio";
     private static final String KEY_ID = "_id";
     private static final String FUND_SCODE = "scode";
-    private static final String NAV_Q1 = "q1";
-    private static final String NAV_Q2 = "q2";
-    private static final String NAV_Q3 = "q3";
-    private static final String NAV_Q4 = "q4";
-    private static final String NAV_Q5 = "q5";
-    private static final String NAV_Q6 = "q6";
-    private static final String NAV_Q7 = "q7";
-    private static final String NAV_Q8 = "q8";
-    private static final String NAV_Q9 = "q9";
-    private static final String NAV_Q10 = "q10";
-    private static final String NAV_Q11 = "q11";
-    private static final String NAV_Q12 = "q12";
-    private static final String LAST_UPDATED_GRAPH = "lastupdatedgraph";
     private static final String LAST_UPDATED_NAV = "lastupdatednav";
 
     private static final String TABLE_NAME_RECENT_SEARCH = "recent";
-    private static final String SEARCH_WORD = "keyword";
 
     private static final String TABLE_NAME_FULL_FUNDS_LIST = "fullfundslist";
     private static final String FUND_NAME = "fundname";
     private static final String NAV = "nav";
 
-    public static final String CREATE_FUNDS_DATABASE = "CREATE TABLE " + TABLE_NAME_HISTORICAL + " (" +
+    public static final String CREATE_FUNDS_DATABASE = "CREATE TABLE " + TABLE_NAME_PORTFOLIO + " (" +
             KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             FUND_SCODE + " TEXT UNIQUE, " +
-            NAV_Q1 + " TEXT, " +
-            NAV_Q2 + " TEXT, " +
-            NAV_Q3 + " TEXT, " +
-            NAV_Q4 + " TEXT, " +
-            NAV_Q5 + " TEXT, " +
-            NAV_Q6 + " TEXT, " +
-            NAV_Q7 + " TEXT, " +
-            NAV_Q8 + " TEXT, " +
-            NAV_Q9 + " TEXT, " +
-            NAV_Q10 + " TEXT, " +
-            NAV_Q11 + " TEXT, " +
-            NAV_Q12 + " TEXT, " +
-            LAST_UPDATED_GRAPH + " TEXT, " +
             LAST_UPDATED_NAV + " TEXT);";
-
-    public static final String CREATE_RECENTS_DATABASE = "CREATE TABLE " + TABLE_NAME_RECENT_SEARCH
-            + " (" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            SEARCH_WORD + " TEXT UNIQUE);";
 
     public static final String CREATE_FULL_FUNDS_TABLE = "CREATE TABLE " + TABLE_NAME_FULL_FUNDS_LIST
             + " (" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -80,17 +50,16 @@ public class FundsDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_FUNDS_DATABASE);
-        sqLiteDatabase.execSQL(CREATE_RECENTS_DATABASE);
         sqLiteDatabase.execSQL(CREATE_FULL_FUNDS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-//        sqLiteDatabase.execSQL(DELETE_RECENTS_DATABASE);
-//        sqLiteDatabase.execSQL(DELETE_HISTORICAL_DATABASE);
         if (newVersion > oldVersion) {
-            sqLiteDatabase.execSQL(DELETE_FULL_FUNDS_LIST);
+            sqLiteDatabase.execSQL(DELETE_HISTORICAL_DATABASE);
+            sqLiteDatabase.execSQL(DELETE_RECENTS_DATABASE);
             sqLiteDatabase.execSQL(CREATE_FULL_FUNDS_TABLE);
+            sqLiteDatabase.execSQL(CREATE_FUNDS_DATABASE);
         }
     }
 }

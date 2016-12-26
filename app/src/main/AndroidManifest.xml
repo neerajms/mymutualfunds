@@ -23,10 +23,8 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- &lt;!&ndash; enable the search dialog to send searches to SearchableActivity &ndash;&gt; -->
-            <!-- <meta-data android:name="android.app.default_searchable" -->
-            <!-- android:value="ui.SearchActivity" /> -->
         </activity>
+
         <activity
             android:name=".ui.SearchActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -41,14 +39,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.MainActivity" />
         </activity>
+
         <activity android:name=".ui.SignInActivity" />
-        <activity
-            android:name=".ui.GraphActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity" />
-        </activity>
 
         <service
             android:name=".service.FetchFundsTask"
@@ -58,6 +50,7 @@
                 <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
             </intent-filter>
         </service>
+
         <service android:name=".service.FundsIntentService" />
 
         <provider
@@ -73,34 +66,6 @@
         </receiver>
 
         <receiver android:name=".service.Alarm" />
-
-        <receiver android:name=".widget.NetWorthWidgetProvider">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.neerajms99b.neeraj.mymutualfunds.NETWORTH_WIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/net_worth_widget_info" />
-        </receiver>
-
-        <receiver android:name=".widget.FundWidgetProvider">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.neerajms99b.neeraj.mymutualfunds.FUNDS_WIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/fund_widget_info" />
-        </receiver>
-
-        <activity android:name=".widget.FundWidgetConfigure">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
-        </activity>
 
     </application>
 

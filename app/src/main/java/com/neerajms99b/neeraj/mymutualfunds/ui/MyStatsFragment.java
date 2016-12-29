@@ -3,6 +3,7 @@ package com.neerajms99b.neeraj.mymutualfunds.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -29,9 +30,6 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.AxisValueFormatter;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -146,10 +144,10 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         readFirebaseNetworthList();
 
         //AdMob
-        MobileAds.initialize(getActivity().getApplicationContext(), MOBILE_ADS_APP_ID);
-        AdView adView = (AdView) rootView.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+//        MobileAds.initialize(getActivity().getApplicationContext(), MOBILE_ADS_APP_ID);
+//        AdView adView = (AdView) rootView.findViewById(R.id.adView);
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        adView.loadAd(adRequest);
         return rootView;
     }
 
@@ -421,12 +419,24 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         }
         mEntries.clear();
         mLabels.clear();
-        if (mGraphList.size() > 30) {
+        int graphListSize = mGraphList.size();
+        if (graphListSize > 30) {
             removeOldNetWorth();
         }
-        for (int i = 0; i < mGraphList.size(); i++) {
-            mEntries.add(i, new Entry(i, Float.valueOf(mGraphList.get(i).getNetworth())));
-            mLabels.add(i, mGraphList.get(i).getDate().toString().substring(4, 10));
+        if (graphListSize == 1) {
+            mEntries.add(0, new Entry(0, 0.0f));
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(mGraphList.get(0).getDate());
+            calendar.add(Calendar.DATE, -1);
+            Date date = calendar.getTime();
+            mLabels.add(0, date.toString().substring(4, 10));
+            mEntries.add(1, new Entry(1, Float.valueOf(mGraphList.get(0).getNetworth())));
+            mLabels.add(1, mGraphList.get(0).getDate().toString().substring(4, 10));
+        } else if (graphListSize > 1) {
+            for (int i = 0; i < graphListSize; i++) {
+                mEntries.add(i, new Entry(i, Float.valueOf(mGraphList.get(i).getNetworth())));
+                mLabels.add(i, mGraphList.get(i).getDate().toString().substring(4, 10));
+            }
         }
     }
 
@@ -472,26 +482,36 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
     public void populateChart() {
         LineDataSet lineDataSet = new LineDataSet(mEntries,
                 NET_WORTH_GRAPH_VALUES);
-        lineDataSet.setDrawCircles(true);
-        lineDataSet.setDrawCircleHole(true);
-        if (Build.VERSION.SDK_INT >= 23) {
-            lineDataSet.setCircleColorHole(ContextCompat.getColor(getContext(), R.color.colorAccent));
-            lineDataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent), 220);
-        } else {
-            lineDataSet.setCircleColorHole(getResources().getColor(R.color.colorAccent));
-            lineDataSet.setColor(getResources().getColor(R.color.colorAccent), 220);
-        }
-        lineDataSet.setCircleRadius(4.5f);
+        lineDataSet.setDrawCircles(false);
+        lineDataSet.setDrawCircleHole(false);
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            lineDataSet.setCircleColorHole(ContextCompat.getColor(getContext(), R.color.colorAccent));
+//            lineDataSet.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent), 220);
+//        } else {
+//            lineDataSet.setCircleColorHole(getResources().getColor(R.color.colorAccent));
+//            lineDataSet.setColor(getResources().getColor(R.color.colorAccent), 220);
+//        }
+//        lineDataSet.setCircleRadius(4.5f);
+        lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         lineDataSet.setDrawValues(false);
-        lineDataSet.setLineWidth(3.5f);
+        lineDataSet.setLineWidth(1f);
+        lineDataSet.setDrawFilled(true);
+        if (Build.VERSION.SDK_INT >= 18) {
+            Drawable drawable = ContextCompat.getDrawable(getContext(), R.drawable.gradient);
+            lineDataSet.setFillDrawable(drawable);
+        } else {
+            lineDataSet.setFillColor(getResources().getColor(R.color.colorAccent));
+        }
 
         YAxis yAxisLeft = mChart.getAxisLeft();
-        if (Build.VERSION.SDK_INT >= 23) {
-            yAxisLeft.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
-        } else {
-            yAxisLeft.setTextColor(getResources().getColor(android.R.color.black));
-        }
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            yAxisLeft.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+//        } else {
+//            yAxisLeft.setTextColor(getResources().getColor(android.R.color.black));
+//        }
         yAxisLeft.setDrawGridLines(false);
+        yAxisLeft.setDrawLabels(false);
+        yAxisLeft.setDrawAxisLine(false);
 
         YAxis yAxisRight = mChart.getAxisRight();
         yAxisRight.setDrawLabels(false);
@@ -512,7 +532,9 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
 
         XAxis xAxis = mChart.getXAxis();
         xAxis.setDrawGridLines(false);
-        xAxis.setAvoidFirstLastClipping(true);
+        xAxis.setDrawLabels(false);
+        xAxis.setDrawAxisLine(false);
+//        xAxis.setAvoidFirstLastClipping(true);
         if (Build.VERSION.SDK_INT >= 23) {
             xAxis.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
         } else {
@@ -522,9 +544,12 @@ public class MyStatsFragment extends Fragment implements UpdateFragment {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
         LineData data = new LineData(lineDataSet);
-        mChart.setDescription(GRAPH_DESCRIPTION);
+        mChart.setDescription("");
         mChart.setData(data);
         mChart.animateY(0);
+        mChart.getLegend().setEnabled(false);
+        mChart.setTouchEnabled(false);
+        mChart.setViewPortOffsets(0f, 20f, 0f, 40f);
         mProgressBarNetWorthGraph.setVisibility(View.INVISIBLE);
         mChart.setVisibility(View.VISIBLE);
     }

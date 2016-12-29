@@ -17,7 +17,7 @@
     <dimen name="units_in_hand_text">14sp</dimen>
     <dimen name="fund_nav_minWidth">72dp</dimen>
     <dimen name="historical_graph_height">310dp</dimen>
-    <dimen name="net_worth_graph_min_height">310dp</dimen>
+    <dimen name="net_worth_graph_min_height">200dp</dimen>
     <dimen name="total_value_text_size">16sp</dimen>
     <dimen name="fund_name_in_detail_view">16sp</dimen>
     <dimen name="suggestions_list_item_min_height">56dp</dimen>
